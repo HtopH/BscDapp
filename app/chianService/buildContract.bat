@@ -5,7 +5,7 @@ echo *********************begin publish cont*********************
 echo 工作目录:%cd%
 
 set srcfolder=%cd%
-set abigen=G:\GoCode\src\github.com\ethereum\go-ethereum\cmd\abigen\abigen.exe
+set abigen=D:\Code_world\Golang_code\src\github.com\ethereum\go-ethereum\cmd\abigen\abigen.exe
 
 
 
@@ -18,10 +18,10 @@ rem 4. out 指定输出go文件名称
 
 rem abi myContract.abi	指定abi文件来源
 rem pkg chianService	指定输出文件的包名
-rem type myContract	指定合约结构体名称
-rem out myContract.go	指定合约交互文件名称
+rem type bscGame	指定合约结构体名称
+rem out bscGame.go	指定合约交互文件名称
 
 
-%abigen% --abi %srcfolder%\myContract.abi --pkg chianService --type myContract --out myContract.go
+%abigen% --abi %srcfolder%\myContract.abi --pkg chianService --type bscGame --out bscGame.go
 
 pause

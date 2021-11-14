@@ -1,0 +1,34 @@
+server:
+  Url: "http://127.0.0.1"
+  Address: ":8599"
+  ServerRoot: "public"
+  ServerAgent: "BscDApp"
+  LogPath: "log/"
+  ClientMaxBodySize: "20m"
+
+logger:
+  Path: "log/"
+  Level: "all"
+  Stdout: true
+
+database:
+  link: "mysql:root:AJCxFf2mJZJEhrjS@tcp(127.0.0.1:3306)/bsadapp"
+  maxIdle: "10"
+  maxOpen: "100"
+  maxLifetime: "30s"
+  debug: true
+  logger:
+    Path: "log/"
+    Level: "all"
+    Stdout: true
+
+redis:
+  default: "127.0.0.1:6379,0"
+
+gfcli:
+  gen:
+    dao:
+      link: "mysql:root:AJCxFf2mJZJEhrjS@tcp(127.0.0.1:3306)/bsadapp"
+
+
+
