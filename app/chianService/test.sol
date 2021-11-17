@@ -6,25 +6,40 @@ contract Purchase {
    uint128 public spendTickets =0;
    uint128 public baseNum =100000000000000000000000;
    uint64  private WEI = 1000000000000000000;
-   uint128 private percentWei = 1000000;
+   uint32 private percentWei = 1000000;
 
-   uint128 public n;
-   uint128 public base;
-   uint128 public num;
+    function getPercent() public view returns (uint32 percent) {
+        uint32 n=getNo();
+        uint32 base=getBase(n);
+        if (n==1){
+            percent=percentWei;
+        }else if(n<1&&n<11){
+            percent=uint32(percentWei-percentWei*(n-1)/base);
+        }else{
+            if ((n-10)%9>0){
+                percent=uint32(percentWei*10/base-percentWei*((n-10)%9)/base);
+            }else{
+              percent=uint32(percentWei*10/base-percentWei*9/base);
+            }
+        }
+        return percent;
+    }
 
-    function one (uint128 _value) public {
+    function getBase(uint32 n) public pure returns(uint32 base){
+        base=10;
+        if (n>10){
+            base=10**((n-11)/9+2);
+        }
+        return base;
+    }
+
+    function getNo() public view returns(uint32 n){
         if (spendTickets>0){
-            n=(spendTickets.sub(1)).div(baseNum).add(1);
+            n=uint32((spendTickets.sub(1)).div(baseNum).add(1));
         }else{
             n=1;
         }
-        if (n>1){
-            base=10**((n-1)/10+1);
-        }else{
-            base=0;
-        }
-        num=percentWei-(n-1)*percentWei/base;
-
+        return n;
     }
 
     function set (uint128 _value) public{

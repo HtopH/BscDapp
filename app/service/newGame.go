@@ -21,7 +21,7 @@ type newGame struct {
 	Client       *ethclient.Client
 	WsClient     *ethclient.Client
 	TransactOpts *bind.TransactOpts
-	Ctx          context.Context
+	Ctx context.Context
 }
 
 var (

@@ -20,125 +20,133 @@ interface IBEP20 {
 contract NewGame {
     using SafeMath for uint128;
 
-    IBEP20 private SYS_TOKEN;
-    IBEP20 private TUSD_TOKEN;
-
+    IBEP20 private Ticket_TOKEN;
+    IBEP20 private USD_TOKEN;
 
     address constant private ADMIN_ADDR = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     address private op_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
-    address private owner = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
 
-    address public SYS_ADDR = 0x843c95480D6BC6E23C33adb0ec5D2246CBA8E1E9;
-    address public TUSD_ADDR=0xD47636fb8bdBAF9AF3c90bc913800e3bf72E7cB4;
-
-    event join(uint64 id, address indexed addr);
-
-    event paylog(uint64 id,uint128 _value,uint8 _type);
+    uint128 public seedPool;
+    uint128 public jackPor;
+    uint128 public spendTickets;
+    uint128 private baseNum =100000000000000000000000;
+    uint64  private WEI = 1000000000000000000;
+    uint32  private percentWei = 1000000;
+    uint16  public round =1;
 
     struct Player {
-        address ADDR;
-        uint128 SYS;
-        uint128 TUSD;
+        uint128 getTickets;
+        uint128 useTickets;
+        uint128 balanceU;
+        uint128 useU;
+        uint64  refId;
     }
 
     Player[] private players;
     mapping (address => uint64) public addrToId;
     mapping (uint64 => address) public idToAddr;
+    mapping (uint16=>mapping(address=>uint128)) roundInfo;
+
+    event registerLog(uint64 id,address indexed addr,uint64 refId);
+    event buyTicketLog(address indexed addr,uint128 _value,uint128 getTicket,uint32 percent);
+    event joinLog(address indexed addr,uint128 _value,uint128 ticketUse);
 
      modifier onlyAdmin() {
-        require(msg.sender == ADMIN_ADDR);
+        require(msg.sender == ADMIN_ADDR,"You are not Admin");
         _;
     }
 
     modifier onlyOperator() {
-        require(msg.sender == op_addr);
+        require(msg.sender == op_addr,"You are not operator");
         _;
     }
 
     constructor() public {
-        SYS_TOKEN = IBEP20(SYS_ADDR);
-        TUSD_TOKEN = IBEP20(TUSD_ADDR);
+        Ticket_TOKEN = IBEP20(0x843c95480D6BC6E23C33adb0ec5D2246CBA8E1E9);
+        USD_TOKEN = IBEP20(0xD47636fb8bdBAF9AF3c90bc913800e3bf72E7cB4);
 
         Player memory _player = Player({
-            ADDR:owner,
-            SYS : 0,
-            TUSD : 0
+            getTickets:0,
+            useTickets:0,
+            balanceU:0,
+            useU:0,
+            refId:0
         });
         players.push(_player);
         players.push(_player);
         uint64 playerId = uint64(players.length - 1);
-        addrToId[owner] = playerId;
-        idToAddr[playerId] =owner;
+        addrToId[0x125a0daEE26BD73B37A3c2a86c84426c68743750] = playerId;
+        idToAddr[playerId] =0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     }
 
+    function register(address ref_addr) external {
+        require(addrToId[msg.sender]==0,"user is exit!");
+        uint64 refId;
 
-    function register() public{
-        require(addrToId[msg.sender]==0,"accout have register");
+        if (addrToId[ref_addr]!=0){
+            refId=addrToId[ref_addr];
+        }else{
+            refId=1;
+        }
+
         Player memory _player = Player({
-            ADDR:msg.sender,
-            SYS : 0,
-            TUSD : 0
+            getTickets:0,
+            useTickets:0,
+            balanceU:0,
+            useU:0,
+            refId:refId
         });
         players.push(_player);
         uint64 playerId = uint64(players.length - 1);
         addrToId[msg.sender] = playerId;
-        idToAddr[playerId] = msg.sender;
-        emit join(playerId,msg.sender);
+        idToAddr[playerId] =msg.sender;
+        emit registerLog(playerId,msg.sender,addrToId[ref_addr]);
     }
 
-    function pay (uint128 _value,uint8 _type) public {
+    function payForTickets(uint128 _value) external {
+        require(addrToId[msg.sender]!=0,"please register first");
         uint64 playerId=addrToId[msg.sender];
-        require(idToAddr[playerId]!=address(0),'There is no user');
         Player storage this_player=players[playerId];
+        USD_TOKEN.transferFrom(msg.sender,address(this),_value);
+        players[playerId].useU=this_player.useU+_value;
 
-        if(_type==1){
+        uint32 percent=getPercent();
+        uint128 ticketNum= _value.mul(percent).div(percent);
+        Ticket_TOKEN.transfer(msg.sender,ticketNum);
+        players[playerId].getTickets=this_player.getTickets+ticketNum;
 
-            require(SYS_TOKEN.balanceOf(msg.sender)>_value,"You have not enough mount");
-            SYS_TOKEN.transferFrom(msg.sender,address(this),uint256(_value));
-            players[playerId].SYS = this_player.SYS.add(_value);
-        }else if(_type==2){
+        spendTickets+=ticketNum;
+        jackPor+=_value.mul(25).div(100);
+        seedPool+=_value.mul(25).div(100);
+        Player storage ref_player=players[this_player.refId];
+        players[this_player.refId].balanceU=ref_player.balanceU.add(_value.mul(20).div(100));
 
-            require(TUSD_TOKEN.balanceOf(msg.sender)>_value,"You have not enough mount");
-            TUSD_TOKEN.transferFrom(msg.sender,address(this),uint256(_value));
-            players[playerId].TUSD = this_player.TUSD.add(_value);
-
-        }
-        emit paylog(playerId,_value,_type);
+        emit buyTicketLog(msg.sender,_value,ticketNum,percent);
     }
 
-    function get (uint8 _type) public {
-        require(_type <3 && _type >0, "type error");
-        uint64 playerId=addrToId[msg.sender];
-        require(idToAddr[playerId]!=address(0),'There is no user');
-        Player storage this_player=players[playerId];
-        if(_type==1){
-            require(this_player.SYS>0,"There is no Amount");
-            players[playerId].SYS = 0;
-           if (!SYS_TOKEN.transfer(msg.sender,uint256(this_player.SYS))){
-               players[playerId].SYS =this_player.SYS;
-           }
-        }else if(_type==2){
-            require(this_player.TUSD>0,"There is no Amount");
-            players[playerId].TUSD = 0;
-            TUSD_TOKEN.transfer(msg.sender,uint256(this_player.TUSD));
-            if (!TUSD_TOKEN.transfer(msg.sender,uint256(this_player.TUSD))){
-               players[playerId].TUSD =this_player.TUSD;
-           }
+    // function joinGame (uint128 _value) external {
 
-        }
+    //     uint64 playerId=addrToId[msg.sender];
 
-    }
+    // }
 
 
-    function withdrawAdmin(uint256 val, uint8 _token_type) public onlyAdmin {
+    function withdrawAdmin(uint256 val, uint8 _token_type) external onlyAdmin {
         require(_token_type <3 && _token_type >0, "Token type error");
         if(_token_type == 1){
-            require(val <= SYS_TOKEN.balanceOf(address(this)), "Not enough balance.");
-            SYS_TOKEN.transfer(address(uint160(ADMIN_ADDR)),val);
+            require(val <= Ticket_TOKEN.balanceOf(address(this)), "Not enough balance.");
+            Ticket_TOKEN.transfer(address(uint160(ADMIN_ADDR)),val);
         }else if(_token_type == 2){
-            require(val <= TUSD_TOKEN.balanceOf(address(this)), "Not enough balance.");
-            TUSD_TOKEN.transfer(address(uint160(ADMIN_ADDR)),val);
+            require(val <= USD_TOKEN.balanceOf(address(this)), "Not enough balance.");
+            USD_TOKEN.transfer(address(uint160(ADMIN_ADDR)),val);
         }
+    }
+
+    function setRound() external onlyOperator {
+        round=round+1;
+        uint128 half= seedPool.mul(50).div(100);
+        jackPor=half;
+        seedPool-=half;
     }
 
     function set_op_addr(address opAddr) external onlyAdmin{
@@ -146,10 +154,44 @@ contract NewGame {
         op_addr = opAddr;
     }
 
-    function get_balance_info() external view returns (uint256 SYS_balance,uint256 TUSD_balance){
-        SYS_balance = SYS_TOKEN.balanceOf(address(this));
-        TUSD_balance = TUSD_TOKEN.balanceOf(address(this));
-        return(SYS_balance,TUSD_balance);
+    function getPercent() public view returns (uint32 percent) {
+        uint32 n=getNo();
+        uint32 base=getBase(n);
+        if (n==1){
+            percent=percentWei;
+        }else if(n<1&&n<11){
+            percent=uint32(percentWei-percentWei*(n-1)/base);
+        }else{
+            if ((n-10)%9>0){
+                percent=uint32(percentWei*10/base-percentWei*((n-10)%9)/base);
+            }else{
+              percent=uint32(percentWei*10/base-percentWei*9/base);
+            }
+        }
+        return percent;
+    }
+
+    function getBase(uint32 n) public pure returns(uint32 base){
+        base=10;
+        if (n>10){
+            base=10**((n-11)/9+2);
+        }
+        return base;
+    }
+
+    function getNo() internal view returns(uint32 n){
+        if (spendTickets>0){
+            n=uint32((spendTickets.sub(1)).div(baseNum).add(1));
+        }else{
+            n=1;
+        }
+        return n;
+    }
+
+    function get_balance_info() external view returns (uint256 ticketBalance,uint256 usdBalance){
+        ticketBalance = Ticket_TOKEN.balanceOf(address(this));
+        usdBalance = USD_TOKEN.balanceOf(address(this));
+        return(ticketBalance,usdBalance);
     }
 
     function get_player_count() external view

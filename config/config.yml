@@ -12,7 +12,7 @@ logger:
   Stdout: true
 
 database:
-  link: "mysql:root:AJCxFf2mJZJEhrjS@tcp(127.0.0.1:3306)/bsadapp"
+  link: "mysql:bscDapp:C357TnWe86GWdYfy@tcp(118.89.66.195:3306)/bscdapp"
   maxIdle: "10"
   maxOpen: "100"
   maxLifetime: "30s"
@@ -28,7 +28,7 @@ redis:
 gfcli:
   gen:
     dao:
-      link: "mysql:root:AJCxFf2mJZJEhrjS@tcp(127.0.0.1:3306)/bsadapp"
+      link: "mysql:bscDapp:C357TnWe86GWdYfy@tcp(118.89.66.195:3306)/bscdapp"
 
 
 
