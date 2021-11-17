@@ -8,19 +8,56 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": false,
-				"internalType": "uint64",
-				"name": "id",
-				"type": "uint64"
+				"indexed": true,
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
 			},
+			{
+				"indexed": false,
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint128",
+				"name": "getTicket",
+				"type": "uint128"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint32",
+				"name": "percent",
+				"type": "uint32"
+			}
+		],
+		"name": "buyTicketLog",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
 			{
 				"indexed": true,
 				"internalType": "address",
 				"name": "addr",
 				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint128",
+				"name": "ticketUse",
+				"type": "uint128"
 			}
 		],
-		"name": "join",
+		"name": "joinLog",
 		"type": "event"
 	},
 	{
@@ -33,45 +70,62 @@
 				"type": "uint64"
 			},
 			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint64",
+				"name": "refId",
+				"type": "uint64"
+			}
+		],
+		"name": "registerLog",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "addr",
+				"type": "address"
+			},
+			{
 				"indexed": false,
 				"internalType": "uint128",
 				"name": "_value",
 				"type": "uint128"
-			},
-			{
-				"indexed": false,
-				"internalType": "uint8",
-				"name": "_type",
-				"type": "uint8"
 			}
 		],
-		"name": "paylog",
+		"name": "userGetLog",
 		"type": "event"
 	},
 	{
-		"inputs": [],
-		"name": "SYS_ADDR",
-		"outputs": [
+		"inputs": [
 			{
-				"internalType": "address",
-				"name": "",
-				"type": "address"
+				"internalType": "uint64",
+				"name": "userId",
+				"type": "uint64"
+			},
+			{
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
 			}
 		],
-		"stateMutability": "view",
-		"type": "function"
-	},
-	{
-		"inputs": [],
-		"name": "TUSD_ADDR",
+		"name": "addUserBanlance",
 		"outputs": [
 			{
-				"internalType": "address",
+				"internalType": "bool",
 				"name": "",
-				"type": "address"
+				"type": "bool"
 			}
 		],
-		"stateMutability": "view",
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
@@ -96,14 +150,57 @@
 	{
 		"inputs": [
 			{
+				"internalType": "uint128",
+				"name": "val",
+				"type": "uint128"
+			},
+			{
 				"internalType": "uint8",
-				"name": "_type",
+				"name": "_token_type",
 				"type": "uint8"
 			}
 		],
-		"name": "get",
-		"outputs": [],
+		"name": "adminWithdraw",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint32",
+				"name": "n",
+				"type": "uint32"
+			}
+		],
+		"name": "getBase",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "base",
+				"type": "uint32"
+			}
+		],
+		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getPercent",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "percent",
+				"type": "uint32"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -112,12 +209,12 @@
 		"outputs": [
 			{
 				"internalType": "uint256",
-				"name": "SYS_balance",
+				"name": "ticketBalance",
 				"type": "uint256"
 			},
 			{
 				"internalType": "uint256",
-				"name": "TUSD_balance",
+				"name": "usdBalance",
 				"type": "uint256"
 			}
 		],
@@ -162,22 +259,81 @@
 				"internalType": "uint128",
 				"name": "_value",
 				"type": "uint128"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_type",
-				"type": "uint8"
 			}
 		],
-		"name": "pay",
+		"name": "joinGame",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			}
+		],
+		"name": "payForTickets",
+		"outputs": [],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "ref_addr",
+				"type": "address"
+			}
+		],
+		"name": "register",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{
 		"inputs": [],
-		"name": "register",
-		"outputs": [],
+		"name": "round",
+		"outputs": [
+			{
+				"internalType": "uint16",
+				"name": "",
+				"type": "uint16"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "setRound",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			}
+		],
+		"name": "setSpend",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
 		"stateMutability": "nonpayable",
 		"type": "function"
 	},
@@ -195,19 +351,27 @@
 		"type": "function"
 	},
 	{
-		"inputs": [
+		"inputs": [],
+		"name": "spendTickets",
+		"outputs": [
 			{
-				"internalType": "uint256",
-				"name": "val",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint8",
-				"name": "_token_type",
-				"type": "uint8"
+				"internalType": "uint128",
+				"name": "",
+				"type": "uint128"
 			}
 		],
-		"name": "withdrawAdmin",
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			}
+		],
+		"name": "userWithdraw",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"

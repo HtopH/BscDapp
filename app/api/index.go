@@ -12,16 +12,16 @@ var Index = indexApi{}
 type indexApi struct{}
 
 func (a *indexApi) Index(r *ghttp.Request) {
-	service.NewGame.GetPlayCount()
+	//service.NewGame.GetPlayCount()
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
 }
 
 func (a *indexApi) PayToGame(r *ghttp.Request) {
-	service.NewGame.Pay()
+	//service.NewGame.Pay()
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
 }
 
 func (a *indexApi) AdminWithdraw(r *ghttp.Request) {
-	service.NewGame.AdminWithdraw()
+	//service.NewGame.AdminWithdraw()
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
 }

@@ -26,8 +26,6 @@ contract NewGame {
     address constant private ADMIN_ADDR = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     address private op_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
 
-    uint128 public seedPool;
-    uint128 public jackPor;
     uint128 public spendTickets;
     uint128 private baseNum =100000000000000000000000;
     uint64  private WEI = 1000000000000000000;
@@ -50,6 +48,7 @@ contract NewGame {
     event registerLog(uint64 id,address indexed addr,uint64 refId);
     event buyTicketLog(address indexed addr,uint128 _value,uint128 getTicket,uint32 percent);
     event joinLog(address indexed addr,uint128 _value,uint128 ticketUse);
+    event userGetLog(address indexed addr,uint128 _value);
 
      modifier onlyAdmin() {
         require(msg.sender == ADMIN_ADDR,"You are not Admin");
@@ -116,22 +115,40 @@ contract NewGame {
         players[playerId].getTickets=this_player.getTickets+ticketNum;
 
         spendTickets+=ticketNum;
-        jackPor+=_value.mul(25).div(100);
-        seedPool+=_value.mul(25).div(100);
-        Player storage ref_player=players[this_player.refId];
-        players[this_player.refId].balanceU=ref_player.balanceU.add(_value.mul(20).div(100));
-
         emit buyTicketLog(msg.sender,_value,ticketNum,percent);
     }
 
-    // function joinGame (uint128 _value) external {
+    function joinGame (uint128 _value) external {
+        require(addrToId[msg.sender]!=0,"please register first");
+        require(roundInfo[round][msg.sender]==0,"you have joined!");
+        require(USD_TOKEN.balanceOf(msg.sender)>=_value,"balance is not enough!");
+        uint128 pay_ticket=_value.mul(10).div(100);
+        require(Ticket_TOKEN.balanceOf(msg.sender)>=pay_ticket,"ticket is not enough!");
 
-    //     uint64 playerId=addrToId[msg.sender];
+        uint64 playerId=addrToId[msg.sender];
+        Player storage this_player=players[playerId];
 
-    // }
+        Ticket_TOKEN.transferFrom(msg.sender,address(this),pay_ticket);
+        players[playerId].useTickets=this_player.useTickets+pay_ticket;
 
+        USD_TOKEN.transferFrom(msg.sender,address(this),_value);
+        players[playerId].useU=this_player.useU+_value;
+        roundInfo[round][msg.sender]=_value;
 
-    function withdrawAdmin(uint256 val, uint8 _token_type) external onlyAdmin {
+        emit joinLog(msg.sender,_value,pay_ticket);
+
+    }
+
+    function userWithdraw(uint128 _value) external {
+        uint64 playerId=addrToId[msg.sender];
+        Player storage this_player=players[playerId];
+        require(this_player.balanceU>=_value,"balance is not enough!");
+        players[playerId].balanceU=this_player.balanceU.sub(_value);
+        USD_TOKEN.transfer(msg.sender,_value);
+        emit userGetLog(msg.sender,_value);
+    }
+
+    function adminWithdraw(uint128 val, uint8 _token_type) external onlyAdmin returns (bool) {
         require(_token_type <3 && _token_type >0, "Token type error");
         if(_token_type == 1){
             require(val <= Ticket_TOKEN.balanceOf(address(this)), "Not enough balance.");
@@ -140,13 +157,25 @@ contract NewGame {
             require(val <= USD_TOKEN.balanceOf(address(this)), "Not enough balance.");
             USD_TOKEN.transfer(address(uint160(ADMIN_ADDR)),val);
         }
+        return true;
     }
 
-    function setRound() external onlyOperator {
+    function addUserBanlance(uint64 userId,uint128 _value) external onlyOperator returns (bool){
+        require(idToAddr[userId]!=address(0));
+        Player storage this_player=players[userId];
+        players[userId].balanceU=this_player.balanceU.add(_value);
+        return true;
+    }
+
+    function setSpend (uint128 _value) external onlyOperator returns (bool){
+        spendTickets=_value;
+        return true;
+    }
+
+
+    function setRound() external onlyOperator returns (bool) {
         round=round+1;
-        uint128 half= seedPool.mul(50).div(100);
-        jackPor=half;
-        seedPool-=half;
+        return true;
     }
 
     function set_op_addr(address opAddr) external onlyAdmin{

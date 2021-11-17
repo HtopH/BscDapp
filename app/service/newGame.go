@@ -21,7 +21,7 @@ type newGame struct {
 	Client       *ethclient.Client
 	WsClient     *ethclient.Client
 	TransactOpts *bind.TransactOpts
-	Ctx context.Context
+	Ctx          context.Context
 }
 
 var (
@@ -60,69 +60,81 @@ func (s *newGame) Init() {
 	}
 }
 
-func (s *newGame) GetPlayCount() {
-	res, err := s.Conn.GetPlayerCount(nil)
-	if err != nil {
-		g.Log().Debug("Service NewGame Init WsNewBscGame Err :", err)
-		return
-	}
-	g.Log().Debug("Service NewGame GetPlayCount res:", res)
-}
-
-func (s *newGame) Pay() {
-	auth, err := s.GetTransactOpts()
-	if err != nil {
-		g.Log().Debug("Service NewGame GetTransactOpts Err :", err)
-		return
-	}
-	res, err := s.Conn.Pay(auth, s.GetBigInt(0.5), 2)
-	if err != nil {
-		g.Log().Debug("Service NewGame Pay Err :", err)
-		return
-	}
-	g.Log().Debug("Service NewGame Pay res:", res)
-
-}
-
-func (s *newGame) AdminWithdraw() {
-	auth, err := s.GetTransactOpts()
-	if err != nil {
-		g.Log().Debug("Service NewGame GetTransactOpts Err :", err)
-		return
-	}
-	res, err := s.Conn.WithdrawAdmin(auth, s.GetBigInt(0.4999999999999999), 1)
-	if err != nil {
-		g.Log().Debug("Service NewGame AdminWithdraw Err :", err)
-		return
-	}
-	g.Log().Debug("Service NewGame AdminWithdraw res:", string(res.Data()))
-}
+//func (s *newGame) GetPlayCount() {
+//	res, err := s.Conn.GetPlayerCount(nil)
+//	if err != nil {
+//		g.Log().Debug("Service NewGame Init WsNewBscGame Err :", err)
+//		return
+//	}
+//	g.Log().Debug("Service NewGame GetPlayCount res:", res)
+//}
+//
+//func (s *newGame) Pay() {
+//	auth, err := s.GetTransactOpts()
+//	if err != nil {
+//		g.Log().Debug("Service NewGame GetTransactOpts Err :", err)
+//		return
+//	}
+//	res, err := s.Conn.Pay(auth, s.GetBigInt(0.5), 2)
+//	if err != nil {
+//		g.Log().Debug("Service NewGame Pay Err :", err)
+//		return
+//	}
+//	g.Log().Debug("Service NewGame Pay res:", res)
+//}
 
 func (s *newGame) ListenNewGame() {
-	joinCh := make(chan *chianService.BscGameJoin)
-	joinSub, err := s.WsConn.WatchJoin(&bind.WatchOpts{}, joinCh, nil)
+	//注册
+	registerCh := make(chan *chianService.BscGameRegisterLog)
+	registerSub, err := s.WsConn.WatchRegisterLog(&bind.WatchOpts{}, registerCh, nil)
 	if err != nil {
-		g.Log().Debug("WatchJoin监听合约特定事件失败", err)
+		g.Log().Debug("WatchRegisterLog监听合约特定事件失败", err)
 		return
 	}
-
-	payLogCh := make(chan *chianService.BscGamePaylog)
-	payLogSub, err := s.WsConn.WatchPaylog(&bind.WatchOpts{}, payLogCh)
+	//购买门票
+	buyTicketCh := make(chan *chianService.BscGameBuyTicketLog)
+	buyTicketSub, err := s.WsConn.WatchBuyTicketLog(&bind.WatchOpts{}, buyTicketCh, nil)
 	if err != nil {
-		g.Log().Debug("WatchPayLog监听合约特定事件失败", err)
+		g.Log().Debug("WatchBuyTicketLog监听合约特定事件失败", err)
+		return
+	}
+	//投资
+	joinCh := make(chan *chianService.BscGameJoinLog)
+	joinSub, err := s.WsConn.WatchJoinLog(&bind.WatchOpts{}, joinCh, nil)
+	if err != nil {
+		g.Log().Debug("WatchJoinLog监听合约特定事件失败", err)
+		return
+	}
+	//提现
+	userGetCh := make(chan *chianService.BscGameUserGetLog)
+	userGetSub, err := s.WsConn.WatchUserGetLog(&bind.WatchOpts{}, userGetCh, nil)
+	if err != nil {
+		g.Log().Debug("WatchUserGetLog监听合约特定事件失败", err)
 		return
 	}
 	g.Log().Debug("监听事件堵塞等待：")
 	for {
 		select {
+		case res := <-registerCh:
+			g.Log().Debug("registerCh监听返回一个结果：", res) //该结果已解析
+		case err = <-registerSub.Err():
+			g.Log().Debug("joinSub监听事件结果错误", err)
+			break
+		case res := <-buyTicketCh:
+			g.Log().Debug("buyTicketCh监听返回一个结果：", res) //该结果已解析
+		case err = <-buyTicketSub.Err():
+			g.Log().Debug("buyTicketSub监听事件结果错误", err)
+			break
 		case res := <-joinCh:
-			g.Log().Debug("joinCh监听返回一个结果：", res.Id, res.Addr) //该结果已解析
+			g.Log().Debug("joinCh监听返回一个结果：", res) //该结果已解析
 		case err = <-joinSub.Err():
 			g.Log().Debug("joinSub监听事件结果错误", err)
-		case res := <-payLogCh:
-			g.Log().Debug("payLogCh监听返回一个结果：", res.Id, res.Type, res.Value) //该结果已解析
-		case err = <-payLogSub.Err():
-			g.Log().Debug("payLogSub监听事件结果错误", err)
+			break
+		case res := <-userGetCh:
+			g.Log().Debug("userGetCh监听返回一个结果：", res) //该结果已解析
+		case err = <-userGetSub.Err():
+			g.Log().Debug("userGetSub监听事件结果错误", err)
+			break
 		}
 	}
 }
