@@ -26,11 +26,12 @@ type FaBscCreditDao struct {
 
 // FaBscCreditColumns defines and stores column names for table fa_bsc_credit.
 type faBscCreditColumns struct {
-	Id       string //         
-    Uid      string // 会员ID  
-    Type     string // 类型    
-    Num      string // 数量    
-    Created  string //
+	Id      string //
+	Uid     string // 会员ID
+	Type    string // 类型
+	Num     string // 数量
+	Remark  string // 备注
+	Created string //
 }
 
 var (
@@ -40,11 +41,12 @@ var (
 		DB:    g.DB("default"),
 		Table: "fa_bsc_credit",
 		Columns: faBscCreditColumns{
-			Id:      "id",       
-            Uid:     "uid",      
-            Type:    "type",     
-            Num:     "num",      
-            Created: "created",
+			Id:      "id",
+			Uid:     "uid",
+			Type:    "type",
+			Num:     "num",
+			Remark:  "remark",
+			Created: "created",
 		},
 	}
 )

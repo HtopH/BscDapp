@@ -26,11 +26,11 @@ contract NewGame {
     address constant private ADMIN_ADDR = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     address private op_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
 
-    uint128 public spendTickets;
+    uint128 public  spendTickets;
     uint128 private baseNum =100000000000000000000000;
     uint64  private WEI = 1000000000000000000;
     uint32  private percentWei = 1000000;
-    uint16  public round =1;
+    uint16  public  round =1;
 
     struct Player {
         uint128 getTickets;
@@ -50,7 +50,7 @@ contract NewGame {
     event joinLog(address indexed addr,uint128 _value,uint128 ticketUse);
     event userGetLog(address indexed addr,uint128 _value);
 
-     modifier onlyAdmin() {
+    modifier onlyAdmin() {
         require(msg.sender == ADMIN_ADDR,"You are not Admin");
         _;
     }

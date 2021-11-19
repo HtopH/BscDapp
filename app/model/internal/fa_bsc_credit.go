@@ -4,13 +4,12 @@
 
 package internal
 
-
-
 // FaBscCredit is the golang structure for table fa_bsc_credit.
 type FaBscCredit struct {
-    Id      int     `orm:"id,primary" json:"id"`      //         
-    Uid     int     `orm:"uid"        json:"uid"`     // 会员ID  
-    Type    string  `orm:"type"       json:"type"`    // 类型    
-    Num     float64 `orm:"num"        json:"num"`     // 数量    
-    Created string  `orm:"created"    json:"created"` //         
+	Id      int     `orm:"id,primary" json:"id"`      //
+	Uid     int     `orm:"uid"        json:"uid"`     // 会员ID
+	Type    string  `orm:"type"       json:"type"`    // 类型
+	Num     float64 `orm:"num"        json:"num"`     // 数量
+	Remark  string  `orm:"remark"     json:"remark"`  // 备注
+	Created int     `orm:"created"    json:"created"` //
 }

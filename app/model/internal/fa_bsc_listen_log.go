@@ -9,7 +9,10 @@ type FaBscListenLog struct {
 	Id      int    `orm:"id,primary" json:"id"`      //
 	Type    string `orm:"type"       json:"type"`    // 监听类型
 	Data    string `orm:"data"       json:"data"`    // 获取内容
+	TxHash  string `orm:"tx_hash"    json:"txHash"`  // 交易hash
+	Block   int64  `orm:"block"      json:"block"`   // 块高
 	Status  int    `orm:"status"     json:"status"`  // 状态:0-待处理,1-已处理,2-已失败
+	LogType int    `orm:"logType"    json:"logType"` // 日志类型:1-监听,2-读取
 	Remark  string `orm:"remark"     json:"remark"`  // 备注
 	Created int    `orm:"created"    json:"created"` //
 }

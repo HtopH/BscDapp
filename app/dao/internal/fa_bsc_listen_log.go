@@ -29,7 +29,10 @@ type faBscListenLogColumns struct {
 	Id      string //
 	Type    string // 监听类型
 	Data    string // 获取内容
+	TxHash  string // 交易hash
+	Block   string // 块高
 	Status  string // 状态:0-待处理,1-已处理,2-已失败
+	LogType string // 日志类型:1-监听,2-读取
 	Remark  string // 备注
 	Created string //
 }
@@ -44,7 +47,10 @@ var (
 			Id:      "id",
 			Type:    "type",
 			Data:    "data",
+			TxHash:  "tx_hash",
+			Block:   "block",
 			Status:  "status",
+			LogType: "logType",
 			Remark:  "remark",
 			Created: "created",
 		},

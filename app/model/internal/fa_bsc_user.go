@@ -4,17 +4,18 @@
 
 package internal
 
-
-
 // FaBscUser is the golang structure for table fa_bsc_user.
 type FaBscUser struct {
-    Id        int     `orm:"id,primary" json:"id"`        //               
-    Address   string  `orm:"address"    json:"address"`   // 用户地址      
-    RefId     int     `orm:"ref_id"     json:"refId"`     // 推荐人ID      
-    RefNum    int     `orm:"ref_num"    json:"refNum"`    // 直推人数      
-    TeamNum   int     `orm:"team_num"   json:"teamNum"`   // 团队人数      
-    TicketNum float64 `orm:"ticket_num" json:"ticketNum"` // 兑换的门票数  
-    InvestNum float64 `orm:"invest_num" json:"investNum"` // 投资金额      
-    Credit    float64 `orm:"credit"     json:"credit"`    // U余额         
-    Create    int     `orm:"create"     json:"create"`    // 注册时间      
+	Id          int     `orm:"id,primary"   json:"id"`          //
+	Address     string  `orm:"address"      json:"address"`     // 用户地址
+	RefId       int     `orm:"ref_id"       json:"refId"`       // 推荐人ID
+	RefStr      string  `orm:"ref_str"      json:"refStr"`      // 推荐路径
+	RefNum      int     `orm:"ref_num"      json:"refNum"`      // 直推人数
+	TeamNum     int     `orm:"team_num"     json:"teamNum"`     // 团队人数
+	TicketNum   float64 `orm:"ticket_num"   json:"ticketNum"`   // 兑换的门票数
+	InvestNum   float64 `orm:"invest_num"   json:"investNum"`   // 投资金额
+	Credit      float64 `orm:"credit"       json:"credit"`      // 现有奖励
+	TotalCredit float64 `orm:"total_credit" json:"totalCredit"` // 累计奖励
+	Created     int     `orm:"created"      json:"created"`     // 注册时间
+	Updated     int     `orm:"updated"      json:"updated"`     //
 }

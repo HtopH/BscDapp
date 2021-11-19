@@ -5,7 +5,7 @@ echo *********************begin publish cont*********************
 echo 工作目录:%cd%
 
 set srcfolder=%cd%
-set abigen=D:\Code_world\Golang_code\src\github.com\ethereum\go-ethereum\cmd\abigen\abigen.exe
+set abigen=G:\GoCode\src\github.com\ethereum\go-ethereum\cmd\abigen\abigen.exe
 
 
 
@@ -22,6 +22,6 @@ rem type bscGame	指定合约结构体名称
 rem out bscGame.go	指定合约交互文件名称
 
 
-%abigen% --abi %srcfolder%\myContract.abi --pkg chianService --type bscGame --out bscGame.go
+%abigen% --abi %srcfolder%\newGame.abi --pkg chianService --type bscGame --out bscGame.go
 
 pause

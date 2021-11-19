@@ -20,9 +20,18 @@ func (s *timeTask) ListenTask() {
 	}, "bscListen")
 
 	//定时消费任务
-	_, _ = gcron.AddSingleton("*/5 * * * * *", func() {
+	_, _ = gcron.AddSingleton("*/30 * * * * *", func() {
 		s.FinishBscTask()
 	}, "bscTask")
+
+	//定时检测活动状态
+	_, _ = gcron.AddSingleton("*/5 * * * * *", func() {
+	}, "checkGame")
+}
+
+//监听活动是否结束
+func CheckGameStatus() {
+
 }
 
 //读取队列任务

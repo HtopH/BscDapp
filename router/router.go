@@ -13,7 +13,6 @@ func init() {
 	s.Plugin(&swagger.Swagger{})
 	//初始化合约
 	service.NewGame.Init()
-
 	//定时任务循环处理Bsc
 	service.TimeTask.ListenTask()
 	//需验证控制台登陆状态

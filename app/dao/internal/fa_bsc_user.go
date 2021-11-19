@@ -26,15 +26,18 @@ type FaBscUserDao struct {
 
 // FaBscUserColumns defines and stores column names for table fa_bsc_user.
 type faBscUserColumns struct {
-	Id         string //               
-    Address    string // 用户地址      
-    RefId      string // 推荐人ID      
-    RefNum     string // 直推人数      
-    TeamNum    string // 团队人数      
-    TicketNum  string // 兑换的门票数  
-    InvestNum  string // 投资金额      
-    Credit     string // U余额         
-    Create     string // 注册时间
+	Id          string //
+	Address     string // 用户地址
+	RefId       string // 推荐人ID
+	RefStr      string // 推荐路径
+	RefNum      string // 直推人数
+	TeamNum     string // 团队人数
+	TicketNum   string // 兑换的门票数
+	InvestNum   string // 投资金额
+	Credit      string // 现有奖励
+	TotalCredit string // 累计奖励
+	Created     string // 注册时间
+	Updated     string //
 }
 
 var (
@@ -44,15 +47,18 @@ var (
 		DB:    g.DB("default"),
 		Table: "fa_bsc_user",
 		Columns: faBscUserColumns{
-			Id:        "id",          
-            Address:   "address",     
-            RefId:     "ref_id",      
-            RefNum:    "ref_num",     
-            TeamNum:   "team_num",    
-            TicketNum: "ticket_num",  
-            InvestNum: "invest_num",  
-            Credit:    "credit",      
-            Create:    "create",
+			Id:          "id",
+			Address:     "address",
+			RefId:       "ref_id",
+			RefStr:      "ref_str",
+			RefNum:      "ref_num",
+			TeamNum:     "team_num",
+			TicketNum:   "ticket_num",
+			InvestNum:   "invest_num",
+			Credit:      "credit",
+			TotalCredit: "total_credit",
+			Created:     "created",
+			Updated:     "updated",
 		},
 	}
 )
