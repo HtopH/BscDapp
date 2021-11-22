@@ -9,6 +9,12 @@
 		"inputs": [
 			{
 				"indexed": false,
+				"internalType": "uint8",
+				"name": "doType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint64",
 				"name": "id",
 				"type": "uint64"
@@ -39,10 +45,16 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "addr",
-				"type": "address"
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "doType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint64",
+				"name": "id",
+				"type": "uint64"
 			},
 			{
 				"indexed": false,
@@ -63,6 +75,12 @@
 	{
 		"anonymous": false,
 		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "doType",
+				"type": "uint8"
+			},
 			{
 				"indexed": false,
 				"internalType": "uint64",
@@ -89,10 +107,16 @@
 		"anonymous": false,
 		"inputs": [
 			{
-				"indexed": true,
-				"internalType": "address",
-				"name": "addr",
-				"type": "address"
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "doType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint64",
+				"name": "id",
+				"type": "uint64"
 			},
 			{
 				"indexed": false,

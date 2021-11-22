@@ -20,6 +20,7 @@ type listenTask struct{}
 //处理合约注册
 func (s *listenTask) DealRegister(c context.Context, param *chainService.BscGameRegisterLog) error {
 	return dao.FaBscUser.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
+		//校验参数
 		refInfo, err := dao.FaBscUser.Ctx(ctx).Where("id=?", param.RefId).One()
 		if err != nil || refInfo == nil {
 			g.Log().Debug("Service DealRegister refInfo Find Err:", err)
@@ -141,19 +142,33 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 			g.Log().Debug("Service Task DealGameStatus GameInfo Save Err:", err)
 			return err
 		}
-		return nil
+		//更新合约场次,添加交易任务
+		taskInfo := model.FaBscTask{
+			Type:    model.SendSetRound,
+			Updated: int(time.Now().Unix()),
+		}
+		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		if err != nil {
+			g.Log().Debug("Service Task DealGameStatus Task Save Err:", err)
+		}
+		return err
 	})
 }
 
 //处理会员购买门票
 func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGameBuyTicketLog) error {
 	return dao.FaBscUserTicket.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
-		userInfo, err := dao.FaBscUser.Ctx(ctx).Where("address=?", param.Addr.String()).One()
+		userInfo, err := dao.FaBscUser.Ctx(ctx).Where("id=?", param.Id).One()
 		if err != nil || userInfo == nil {
 			g.Log().Debug("Service DoListenTask DelBuyTicket UserInfo Find Err:", err)
 			return gerror.New("获取会员信息失败：" + err.Error())
 		}
+		g.Log().Debug(param.Value.Uint64())
+		g.Log().Debug(gconv.Float64(model.TokenDecimals))
+		g.Log().Debug(float64(param.Value.Uint64()) / float64(gconv.Float64(model.TokenDecimals)))
+		return gerror.New("测试")
 		num := float64(param.Value.Uint64()) / float64(gconv.Float64(model.TokenDecimals))
+
 		percent := float64(param.Percent) / float64(gconv.Float64(model.PercentDecimals))
 		//插入购买记录
 		buyInfo := model.FaBscUserTicket{
@@ -213,6 +228,13 @@ func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGame
 			g.Log().Debug("Service Task DealGameStatus Task Save Err:", err)
 			return err
 		}
+		//更新系统已兑换门票
+		spendInfo, _ := dao.FaBscBaseInfo.Ctx(ctx).Where("theKey=?", model.BaseSpendKey).One()
+		if spendInfo != nil {
+			spend := num*percent + gconv.Float64(spendInfo.TheValue)
+			_, _ = dao.FaBscBaseInfo.Ctx(ctx).Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": spend, "updated": time.Now().Unix()})
+		}
+		return gerror.New("测试")
 		return err
 	})
 

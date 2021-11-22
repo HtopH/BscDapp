@@ -17,6 +17,7 @@ const (
 
 	//发送交易事件
 	SendAddBalance = "addBalance"
+	SendSetRound   = "setRound"
 
 	//余额变动事件
 	CreditReward    = "reward"    //投资回报

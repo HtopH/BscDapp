@@ -34,8 +34,8 @@ type newGame struct {
 var (
 	rpcHttpUrl           = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
 	rpcWsUrl             = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
-	contractAddr         = common.HexToAddress("0x10aaa4112Cd0B4e27941e3beE286773E784fE317")           //合约地址
-	fromAddr             = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //钱包账户地址
+	contractAddr         = common.HexToAddress("0xb417dB8a271444CaE2bC31FF7aB140Afb715A634")           //合约地址
+	fromAddr             = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
 	privateKey           = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
 	precision    float64 = 18
 )
@@ -101,21 +101,21 @@ func (s *newGame) ListenNewGame() {
 	}
 	//购买门票
 	buyTicketCh := make(chan *chainService.BscGameBuyTicketLog)
-	buyTicketSub, err := s.WsConn.WatchBuyTicketLog(&bind.WatchOpts{}, buyTicketCh, nil)
+	buyTicketSub, err := s.WsConn.WatchBuyTicketLog(&bind.WatchOpts{}, buyTicketCh)
 	if err != nil {
 		g.Log().Debug("WatchBuyTicketLog监听合约特定事件失败", err)
 		return
 	}
 	//投资
 	joinCh := make(chan *chainService.BscGameJoinLog)
-	joinSub, err := s.WsConn.WatchJoinLog(&bind.WatchOpts{}, joinCh, nil)
+	joinSub, err := s.WsConn.WatchJoinLog(&bind.WatchOpts{}, joinCh)
 	if err != nil {
 		g.Log().Debug("WatchJoinLog监听合约特定事件失败", err)
 		return
 	}
 	//提现
 	userGetCh := make(chan *chainService.BscGameUserGetLog)
-	userGetSub, err := s.WsConn.WatchUserGetLog(&bind.WatchOpts{}, userGetCh, nil)
+	userGetSub, err := s.WsConn.WatchUserGetLog(&bind.WatchOpts{}, userGetCh)
 	if err != nil {
 		g.Log().Debug("WatchUserGetLog监听合约特定事件失败", err)
 		return
@@ -238,18 +238,19 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			Status:  0,
 		}
 
-		//尝试解析注册事件
+		//TODO 尝试解析注册事件
 		regEvent := struct {
-			Id    uint64
-			Addr  common.Address
-			RefId uint64
+			DoType uint8
+			Id     uint64
+			Addr   common.Address
+			RefId  uint64
 		}{}
 		err = contractAbi.UnpackIntoInterface(&regEvent, "registerLog", vLog.Data)
+		g.Log().Debug("registerLog 解析日志:", regEvent)
 		//不报错说明是注册事件
-		if err == nil {
+		if err == nil && regEvent.DoType == 1 {
 			//日志解析不到地址,直接通过ID读取会员地址
 			regEvent.Addr = s.IdToAddr(regEvent.Id)
-			g.Log().Debug("registerLog 读取未被监听的日志:", regEvent)
 			regData := &chainService.BscGameRegisterLog{
 				Id:    regEvent.Id,
 				Addr:  regEvent.Addr,
@@ -261,43 +262,38 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 				logData.Remark = err.Error()
 			}
 			logData.Type = model.ListenRegister
-			continue
 		}
 
-		//尝试解析购买门票事件
+		//TODO 尝试解析购买门票事件
 		buyEvent := struct {
-			Addr    common.Address
-			Fee     big.Int
-			Num     big.Int
-			Percent uint32
+			DoType    uint8
+			Id        uint64
+			Value     *big.Int
+			GetTicket *big.Int
+			Percent   uint32
 		}{}
-		err = contractAbi.UnpackIntoInterface(buyEvent, "buyTicketLog", vLog.Data)
+		err = contractAbi.UnpackIntoInterface(&buyEvent, "buyTicketLog", vLog.Data)
+		g.Log().Debug("buyTicketLog 解析日志:", buyEvent)
 		//不报错说明是购买门票事件
-		if err == nil {
+		if err == nil && buyEvent.DoType == 2 {
 			//日志解析不到地址,直接通过ID读取会员地址
-			regEvent.Addr = s.IdToAddr(regEvent.Id)
-			g.Log().Debug("registerLog 读取未被监听的日志:", regEvent)
-			regData := &chainService.BscGameRegisterLog{
-				Id:    regEvent.Id,
-				Addr:  regEvent.Addr,
-				RefId: regEvent.RefId,
+			g.Log().Debug("buyTicketLog 读取未被监听的日志:", buyEvent)
+			buyData := &chainService.BscGameBuyTicketLog{
+				Id:        buyEvent.Id,
+				Value:     buyEvent.Value,
+				GetTicket: buyEvent.GetTicket,
+				Percent:   buyEvent.Percent,
 			}
-			err = ListenTask.DealRegister(context.Background(), regData)
+			err = ListenTask.DelBuyTicket(context.Background(), buyData)
 			if err != nil {
 				logData.Status = 2
 				logData.Remark = err.Error()
 			}
-			logData.Type = model.ListenRegister
-			continue
-		}
+			logData.Type = model.ListenBuy
+			g.Log().Println(logData)
 
-		//res, err = contractAbi.Unpack("userGetLog", vLog.Data)
-		//不报错说明是购买门票事件
-		if err == nil {
-			//g.Log().Debug("registerLog 日志:", res)
-			continue
 		}
-
+		return
 		//将获取到的交易日志存储起来
 		_, err = dao.FaBscListenLog.OmitEmpty().Save(logData)
 		if err != nil {

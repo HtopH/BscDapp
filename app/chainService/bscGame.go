@@ -30,7 +30,7 @@ var (
 
 // BscGameMetaData contains all meta data concerning the BscGame contract.
 var BscGameMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"getTicket\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"name\":\"buyTicketLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"ticketUse\",\"type\":\"uint128\"}],\"name\":\"joinLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"refId\",\"type\":\"uint64\"}],\"name\":\"registerLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userGetLog\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"userId\",\"type\":\"uint64\"},{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"addUserBanlance\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"addrToId\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"val\",\"type\":\"uint128\"},{\"internalType\":\"uint8\",\"name\":\"_token_type\",\"type\":\"uint8\"}],\"name\":\"adminWithdraw\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"n\",\"type\":\"uint32\"}],\"name\":\"getBase\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"base\",\"type\":\"uint32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPercent\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_balance_info\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"ticketBalance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"usdBalance\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_player_count\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"idToAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"joinGame\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"payForTickets\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"ref_addr\",\"type\":\"address\"}],\"name\":\"register\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"round\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setRound\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"setSpend\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"opAddr\",\"type\":\"address\"}],\"name\":\"set_op_addr\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spendTickets\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"getTicket\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"name\":\"buyTicketLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"ticketUse\",\"type\":\"uint128\"}],\"name\":\"joinLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"refId\",\"type\":\"uint64\"}],\"name\":\"registerLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userGetLog\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"userId\",\"type\":\"uint64\"},{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"addUserBanlance\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"addrToId\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"val\",\"type\":\"uint128\"},{\"internalType\":\"uint8\",\"name\":\"_token_type\",\"type\":\"uint8\"}],\"name\":\"adminWithdraw\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"n\",\"type\":\"uint32\"}],\"name\":\"getBase\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"base\",\"type\":\"uint32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPercent\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_balance_info\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"ticketBalance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"usdBalance\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_player_count\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"idToAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"joinGame\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"payForTickets\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"ref_addr\",\"type\":\"address\"}],\"name\":\"register\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"round\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setRound\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"setSpend\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"opAddr\",\"type\":\"address\"}],\"name\":\"set_op_addr\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spendTickets\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // BscGameABI is the input ABI used to generate the binding from.
@@ -699,6 +699,7 @@ func (it *BscGameBuyTicketLogIterator) Close() error {
 
 // BscGameBuyTicketLog represents a BuyTicketLog event raised by the BscGame contract.
 type BscGameBuyTicketLog struct {
+	DoType    uint8
 	Id        uint64
 	Value     *big.Int
 	GetTicket *big.Int
@@ -706,9 +707,9 @@ type BscGameBuyTicketLog struct {
 	Raw       types.Log // Blockchain specific contextual infos
 }
 
-// FilterBuyTicketLog is a free log retrieval operation binding the contract event 0xbd25b1e14fc1b8301cdc0f19719ab134d489f00e766807f65bf2d676f33194a7.
+// FilterBuyTicketLog is a free log retrieval operation binding the contract event 0x49cc93a02c7f8ee300b9532f8fa1682942f92d52b8be40d385a43f66873ffe26.
 //
-// Solidity: event buyTicketLog(uint64 id, uint128 _value, uint128 getTicket, uint32 percent)
+// Solidity: event buyTicketLog(uint8 doType, uint64 id, uint128 _value, uint128 getTicket, uint32 percent)
 func (_BscGame *BscGameFilterer) FilterBuyTicketLog(opts *bind.FilterOpts) (*BscGameBuyTicketLogIterator, error) {
 
 	logs, sub, err := _BscGame.contract.FilterLogs(opts, "buyTicketLog")
@@ -718,9 +719,9 @@ func (_BscGame *BscGameFilterer) FilterBuyTicketLog(opts *bind.FilterOpts) (*Bsc
 	return &BscGameBuyTicketLogIterator{contract: _BscGame.contract, event: "buyTicketLog", logs: logs, sub: sub}, nil
 }
 
-// WatchBuyTicketLog is a free log subscription operation binding the contract event 0xbd25b1e14fc1b8301cdc0f19719ab134d489f00e766807f65bf2d676f33194a7.
+// WatchBuyTicketLog is a free log subscription operation binding the contract event 0x49cc93a02c7f8ee300b9532f8fa1682942f92d52b8be40d385a43f66873ffe26.
 //
-// Solidity: event buyTicketLog(uint64 id, uint128 _value, uint128 getTicket, uint32 percent)
+// Solidity: event buyTicketLog(uint8 doType, uint64 id, uint128 _value, uint128 getTicket, uint32 percent)
 func (_BscGame *BscGameFilterer) WatchBuyTicketLog(opts *bind.WatchOpts, sink chan<- *BscGameBuyTicketLog) (event.Subscription, error) {
 
 	logs, sub, err := _BscGame.contract.WatchLogs(opts, "buyTicketLog")
@@ -755,9 +756,9 @@ func (_BscGame *BscGameFilterer) WatchBuyTicketLog(opts *bind.WatchOpts, sink ch
 	}), nil
 }
 
-// ParseBuyTicketLog is a log parse operation binding the contract event 0xbd25b1e14fc1b8301cdc0f19719ab134d489f00e766807f65bf2d676f33194a7.
+// ParseBuyTicketLog is a log parse operation binding the contract event 0x49cc93a02c7f8ee300b9532f8fa1682942f92d52b8be40d385a43f66873ffe26.
 //
-// Solidity: event buyTicketLog(uint64 id, uint128 _value, uint128 getTicket, uint32 percent)
+// Solidity: event buyTicketLog(uint8 doType, uint64 id, uint128 _value, uint128 getTicket, uint32 percent)
 func (_BscGame *BscGameFilterer) ParseBuyTicketLog(log types.Log) (*BscGameBuyTicketLog, error) {
 	event := new(BscGameBuyTicketLog)
 	if err := _BscGame.contract.UnpackLog(event, "buyTicketLog", log); err != nil {
@@ -836,40 +837,31 @@ func (it *BscGameJoinLogIterator) Close() error {
 
 // BscGameJoinLog represents a JoinLog event raised by the BscGame contract.
 type BscGameJoinLog struct {
-	Addr      common.Address
+	DoType    uint8
+	Id        uint64
 	Value     *big.Int
 	TicketUse *big.Int
 	Raw       types.Log // Blockchain specific contextual infos
 }
 
-// FilterJoinLog is a free log retrieval operation binding the contract event 0xca55e31f801d10ff01ef85a995511feacd522c567125396f1069cf8ac404945a.
+// FilterJoinLog is a free log retrieval operation binding the contract event 0xdd14acb3cb19338bfae15e82551804c2d072066d4cbeeb98e2f13924ebea667b.
 //
-// Solidity: event joinLog(address indexed addr, uint128 _value, uint128 ticketUse)
-func (_BscGame *BscGameFilterer) FilterJoinLog(opts *bind.FilterOpts, addr []common.Address) (*BscGameJoinLogIterator, error) {
+// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint128 ticketUse)
+func (_BscGame *BscGameFilterer) FilterJoinLog(opts *bind.FilterOpts) (*BscGameJoinLogIterator, error) {
 
-	var addrRule []interface{}
-	for _, addrItem := range addr {
-		addrRule = append(addrRule, addrItem)
-	}
-
-	logs, sub, err := _BscGame.contract.FilterLogs(opts, "joinLog", addrRule)
+	logs, sub, err := _BscGame.contract.FilterLogs(opts, "joinLog")
 	if err != nil {
 		return nil, err
 	}
 	return &BscGameJoinLogIterator{contract: _BscGame.contract, event: "joinLog", logs: logs, sub: sub}, nil
 }
 
-// WatchJoinLog is a free log subscription operation binding the contract event 0xca55e31f801d10ff01ef85a995511feacd522c567125396f1069cf8ac404945a.
+// WatchJoinLog is a free log subscription operation binding the contract event 0xdd14acb3cb19338bfae15e82551804c2d072066d4cbeeb98e2f13924ebea667b.
 //
-// Solidity: event joinLog(address indexed addr, uint128 _value, uint128 ticketUse)
-func (_BscGame *BscGameFilterer) WatchJoinLog(opts *bind.WatchOpts, sink chan<- *BscGameJoinLog, addr []common.Address) (event.Subscription, error) {
+// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint128 ticketUse)
+func (_BscGame *BscGameFilterer) WatchJoinLog(opts *bind.WatchOpts, sink chan<- *BscGameJoinLog) (event.Subscription, error) {
 
-	var addrRule []interface{}
-	for _, addrItem := range addr {
-		addrRule = append(addrRule, addrItem)
-	}
-
-	logs, sub, err := _BscGame.contract.WatchLogs(opts, "joinLog", addrRule)
+	logs, sub, err := _BscGame.contract.WatchLogs(opts, "joinLog")
 	if err != nil {
 		return nil, err
 	}
@@ -901,9 +893,9 @@ func (_BscGame *BscGameFilterer) WatchJoinLog(opts *bind.WatchOpts, sink chan<- 
 	}), nil
 }
 
-// ParseJoinLog is a log parse operation binding the contract event 0xca55e31f801d10ff01ef85a995511feacd522c567125396f1069cf8ac404945a.
+// ParseJoinLog is a log parse operation binding the contract event 0xdd14acb3cb19338bfae15e82551804c2d072066d4cbeeb98e2f13924ebea667b.
 //
-// Solidity: event joinLog(address indexed addr, uint128 _value, uint128 ticketUse)
+// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint128 ticketUse)
 func (_BscGame *BscGameFilterer) ParseJoinLog(log types.Log) (*BscGameJoinLog, error) {
 	event := new(BscGameJoinLog)
 	if err := _BscGame.contract.UnpackLog(event, "joinLog", log); err != nil {
@@ -982,15 +974,16 @@ func (it *BscGameRegisterLogIterator) Close() error {
 
 // BscGameRegisterLog represents a RegisterLog event raised by the BscGame contract.
 type BscGameRegisterLog struct {
-	Id    uint64
-	Addr  common.Address
-	RefId uint64
-	Raw   types.Log // Blockchain specific contextual infos
+	DoType uint8
+	Id     uint64
+	Addr   common.Address
+	RefId  uint64
+	Raw    types.Log // Blockchain specific contextual infos
 }
 
-// FilterRegisterLog is a free log retrieval operation binding the contract event 0x4d1c212f9a46ebc531d2b1b1684170e7283678cf5e44c3c5c3c4863d7e62ac80.
+// FilterRegisterLog is a free log retrieval operation binding the contract event 0x7e43c07e66fa0b2486fc06807f3944ca195fe188fae0e7cfa9b768f6fc352dee.
 //
-// Solidity: event registerLog(uint64 id, address indexed addr, uint64 refId)
+// Solidity: event registerLog(uint8 doType, uint64 id, address indexed addr, uint64 refId)
 func (_BscGame *BscGameFilterer) FilterRegisterLog(opts *bind.FilterOpts, addr []common.Address) (*BscGameRegisterLogIterator, error) {
 
 	var addrRule []interface{}
@@ -1005,9 +998,9 @@ func (_BscGame *BscGameFilterer) FilterRegisterLog(opts *bind.FilterOpts, addr [
 	return &BscGameRegisterLogIterator{contract: _BscGame.contract, event: "registerLog", logs: logs, sub: sub}, nil
 }
 
-// WatchRegisterLog is a free log subscription operation binding the contract event 0x4d1c212f9a46ebc531d2b1b1684170e7283678cf5e44c3c5c3c4863d7e62ac80.
+// WatchRegisterLog is a free log subscription operation binding the contract event 0x7e43c07e66fa0b2486fc06807f3944ca195fe188fae0e7cfa9b768f6fc352dee.
 //
-// Solidity: event registerLog(uint64 id, address indexed addr, uint64 refId)
+// Solidity: event registerLog(uint8 doType, uint64 id, address indexed addr, uint64 refId)
 func (_BscGame *BscGameFilterer) WatchRegisterLog(opts *bind.WatchOpts, sink chan<- *BscGameRegisterLog, addr []common.Address) (event.Subscription, error) {
 
 	var addrRule []interface{}
@@ -1047,9 +1040,9 @@ func (_BscGame *BscGameFilterer) WatchRegisterLog(opts *bind.WatchOpts, sink cha
 	}), nil
 }
 
-// ParseRegisterLog is a log parse operation binding the contract event 0x4d1c212f9a46ebc531d2b1b1684170e7283678cf5e44c3c5c3c4863d7e62ac80.
+// ParseRegisterLog is a log parse operation binding the contract event 0x7e43c07e66fa0b2486fc06807f3944ca195fe188fae0e7cfa9b768f6fc352dee.
 //
-// Solidity: event registerLog(uint64 id, address indexed addr, uint64 refId)
+// Solidity: event registerLog(uint8 doType, uint64 id, address indexed addr, uint64 refId)
 func (_BscGame *BscGameFilterer) ParseRegisterLog(log types.Log) (*BscGameRegisterLog, error) {
 	event := new(BscGameRegisterLog)
 	if err := _BscGame.contract.UnpackLog(event, "registerLog", log); err != nil {
@@ -1128,39 +1121,30 @@ func (it *BscGameUserGetLogIterator) Close() error {
 
 // BscGameUserGetLog represents a UserGetLog event raised by the BscGame contract.
 type BscGameUserGetLog struct {
-	Addr  common.Address
-	Value *big.Int
-	Raw   types.Log // Blockchain specific contextual infos
+	DoType uint8
+	Id     uint64
+	Value  *big.Int
+	Raw    types.Log // Blockchain specific contextual infos
 }
 
-// FilterUserGetLog is a free log retrieval operation binding the contract event 0x8062c02b6af0f74c6b8e4b28823b2ba4a651fbc3124bd581d722f752672833d7.
+// FilterUserGetLog is a free log retrieval operation binding the contract event 0xbae0e0291354dfeef36374d68e0b2cb53638cce668f7073a4a65f92a61557dd3.
 //
-// Solidity: event userGetLog(address indexed addr, uint128 _value)
-func (_BscGame *BscGameFilterer) FilterUserGetLog(opts *bind.FilterOpts, addr []common.Address) (*BscGameUserGetLogIterator, error) {
+// Solidity: event userGetLog(uint8 doType, uint64 id, uint128 _value)
+func (_BscGame *BscGameFilterer) FilterUserGetLog(opts *bind.FilterOpts) (*BscGameUserGetLogIterator, error) {
 
-	var addrRule []interface{}
-	for _, addrItem := range addr {
-		addrRule = append(addrRule, addrItem)
-	}
-
-	logs, sub, err := _BscGame.contract.FilterLogs(opts, "userGetLog", addrRule)
+	logs, sub, err := _BscGame.contract.FilterLogs(opts, "userGetLog")
 	if err != nil {
 		return nil, err
 	}
 	return &BscGameUserGetLogIterator{contract: _BscGame.contract, event: "userGetLog", logs: logs, sub: sub}, nil
 }
 
-// WatchUserGetLog is a free log subscription operation binding the contract event 0x8062c02b6af0f74c6b8e4b28823b2ba4a651fbc3124bd581d722f752672833d7.
+// WatchUserGetLog is a free log subscription operation binding the contract event 0xbae0e0291354dfeef36374d68e0b2cb53638cce668f7073a4a65f92a61557dd3.
 //
-// Solidity: event userGetLog(address indexed addr, uint128 _value)
-func (_BscGame *BscGameFilterer) WatchUserGetLog(opts *bind.WatchOpts, sink chan<- *BscGameUserGetLog, addr []common.Address) (event.Subscription, error) {
+// Solidity: event userGetLog(uint8 doType, uint64 id, uint128 _value)
+func (_BscGame *BscGameFilterer) WatchUserGetLog(opts *bind.WatchOpts, sink chan<- *BscGameUserGetLog) (event.Subscription, error) {
 
-	var addrRule []interface{}
-	for _, addrItem := range addr {
-		addrRule = append(addrRule, addrItem)
-	}
-
-	logs, sub, err := _BscGame.contract.WatchLogs(opts, "userGetLog", addrRule)
+	logs, sub, err := _BscGame.contract.WatchLogs(opts, "userGetLog")
 	if err != nil {
 		return nil, err
 	}
@@ -1192,9 +1176,9 @@ func (_BscGame *BscGameFilterer) WatchUserGetLog(opts *bind.WatchOpts, sink chan
 	}), nil
 }
 
-// ParseUserGetLog is a log parse operation binding the contract event 0x8062c02b6af0f74c6b8e4b28823b2ba4a651fbc3124bd581d722f752672833d7.
+// ParseUserGetLog is a log parse operation binding the contract event 0xbae0e0291354dfeef36374d68e0b2cb53638cce668f7073a4a65f92a61557dd3.
 //
-// Solidity: event userGetLog(address indexed addr, uint128 _value)
+// Solidity: event userGetLog(uint8 doType, uint64 id, uint128 _value)
 func (_BscGame *BscGameFilterer) ParseUserGetLog(log types.Log) (*BscGameUserGetLog, error) {
 	event := new(BscGameUserGetLog)
 	if err := _BscGame.contract.UnpackLog(event, "userGetLog", log); err != nil {
