@@ -22,6 +22,6 @@ rem type bscGame	指定合约结构体名称
 rem out bscGame.go	指定合约交互文件名称
 
 
-%abigen% --abi %srcfolder%\newGame.abi --pkg chianService --type bscGame --out bscGame.go
+%abigen% --abi %srcfolder%\newGame.abi --pkg chainService --type bscGame --out bscGame.go
 
 pause
