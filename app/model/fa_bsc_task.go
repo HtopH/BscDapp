@@ -14,6 +14,6 @@ type FaBscTask internal.FaBscTask
 // Fill with you ideas below.
 //增加会员余额任务
 type TaskAddUserBalance struct {
-	UserId int     //会员ID
+	UserId uint64  //会员ID
 	Value  float64 //数值
 }

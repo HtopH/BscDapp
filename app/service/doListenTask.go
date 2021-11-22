@@ -115,7 +115,7 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 					//添加交易任务
 					taskInfo := model.FaBscTask{
 						Type:    model.SendAddBalance,
-						Task:    gconv.String(model.TaskAddUserBalance{UserId: v.Uid, Value: reward}),
+						Task:    gconv.String(model.TaskAddUserBalance{UserId: uint64(v.Uid), Value: reward}),
 						Updated: int(time.Now().Unix()),
 					}
 					_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
@@ -166,7 +166,6 @@ func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGame
 		g.Log().Debug(param.Value.Uint64())
 		g.Log().Debug(gconv.Float64(model.TokenDecimals))
 		g.Log().Debug(float64(param.Value.Uint64()) / float64(gconv.Float64(model.TokenDecimals)))
-		return gerror.New("测试")
 		num := float64(param.Value.Uint64()) / float64(gconv.Float64(model.TokenDecimals))
 
 		percent := float64(param.Percent) / float64(gconv.Float64(model.PercentDecimals))
@@ -178,7 +177,7 @@ func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGame
 			Percent:   percent,
 			Created:   int(time.Now().Unix()),
 		}
-		_, err = dao.FaBscUserTicket.OmitEmpty().Save(buyInfo)
+		_, err = dao.FaBscUserTicket.Ctx(ctx).OmitEmpty().Save(buyInfo)
 		if err != nil || userInfo == nil {
 			g.Log().Debug("Service DoListenTask DelBuyTicket UserTicket Save Err:", err)
 			return gerror.New("会员购买门票信息保存失败：" + err.Error())
@@ -220,7 +219,7 @@ func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGame
 		//添加交易任务
 		taskInfo := model.FaBscTask{
 			Type:    model.SendAddBalance,
-			Task:    gconv.String(model.TaskAddUserBalance{UserId: userInfo.RefId, Value: num * 20 / 100}),
+			Task:    gconv.String(model.TaskAddUserBalance{UserId: uint64(userInfo.RefId), Value: num * 20 / 100}),
 			Updated: int(time.Now().Unix()),
 		}
 		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
@@ -234,7 +233,6 @@ func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGame
 			spend := num*percent + gconv.Float64(spendInfo.TheValue)
 			_, _ = dao.FaBscBaseInfo.Ctx(ctx).Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": spend, "updated": time.Now().Unix()})
 		}
-		return gerror.New("测试")
 		return err
 	})
 

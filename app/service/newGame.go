@@ -67,6 +67,21 @@ func (s *newGame) Init() {
 	}
 }
 
+func (s *newGame) AddUserBalance(param *model.TaskAddUserBalance) (string, error) {
+	auth, err := s.GetTransactOpts()
+	if err != nil {
+		return "", err
+	}
+	res, err := s.Conn.AddUserBanlance(auth, param.UserId, s.GetBigInt(param.Value))
+
+	if err != nil {
+		g.Log().Debug("Service NewGame Pay Err :", err)
+		return "", err
+	}
+
+	return res.Value().String(), nil
+}
+
 //func (s *newGame) Pay() {
 //	auth, err := s.GetTransactOpts()
 //	if err != nil {
@@ -260,6 +275,8 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			if err != nil {
 				logData.Status = 2
 				logData.Remark = err.Error()
+			} else {
+				logData.Status = 1
 			}
 			logData.Type = model.ListenRegister
 		}
@@ -276,8 +293,6 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		g.Log().Debug("buyTicketLog 解析日志:", buyEvent)
 		//不报错说明是购买门票事件
 		if err == nil && buyEvent.DoType == 2 {
-			//日志解析不到地址,直接通过ID读取会员地址
-			g.Log().Debug("buyTicketLog 读取未被监听的日志:", buyEvent)
 			buyData := &chainService.BscGameBuyTicketLog{
 				Id:        buyEvent.Id,
 				Value:     buyEvent.Value,
@@ -288,12 +303,13 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			if err != nil {
 				logData.Status = 2
 				logData.Remark = err.Error()
+			} else {
+				logData.Status = 1
 			}
+
 			logData.Type = model.ListenBuy
-			g.Log().Println(logData)
 
 		}
-		return
 		//将获取到的交易日志存储起来
 		_, err = dao.FaBscListenLog.OmitEmpty().Save(logData)
 		if err != nil {
@@ -312,12 +328,12 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 func (s *newGame) GetTransactOpts() (*bind.TransactOpts, error) {
 	nonce, err := s.Client.PendingNonceAt(s.Ctx, fromAddr)
 	if err != nil {
-		g.Log().Debug("获取nonce错误", err)
+		g.Log().Debug("GetTransactOpts 获取nonce错误", err)
 		return nil, err
 	}
 	gasPrice, err := s.Client.SuggestGasPrice(s.Ctx)
 	if err != nil {
-		g.Log().Debug("Get gasPrice error", err)
+		g.Log().Debug("GetTransactOpts Get gasPrice error", err)
 		return nil, err
 	}
 	priKey, err := crypto.HexToECDSA(privateKey)
