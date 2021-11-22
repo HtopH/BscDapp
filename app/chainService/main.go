@@ -1,4 +1,4 @@
-package chianService
+package chainService
 
 //import (
 //	contractService "BscDapp/contract"

@@ -1,7 +1,7 @@
 package service
 
 import (
-	"BscDapp/app/chianService"
+	"BscDapp/app/chainService"
 	"BscDapp/app/dao"
 	"BscDapp/app/model"
 	"context"
@@ -23,8 +23,8 @@ import (
 var NewGame = newGame{}
 
 type newGame struct {
-	Conn         *chianService.BscGame
-	WsConn       *chianService.BscGame
+	Conn         *chainService.BscGame
+	WsConn       *chainService.BscGame
 	Client       *ethclient.Client
 	WsClient     *ethclient.Client
 	TransactOpts *bind.TransactOpts
@@ -50,7 +50,7 @@ func (s *newGame) Init() {
 		return
 	}
 
-	s.Conn, err = chianService.NewBscGame(contractAddr, s.Client)
+	s.Conn, err = chainService.NewBscGame(contractAddr, s.Client)
 	if err != nil {
 		g.Log().Debug("Service NewGame Init HttpNewBscGame Err :", err)
 		return
@@ -61,7 +61,7 @@ func (s *newGame) Init() {
 		g.Log().Debug("Service NewGame Init WsClient Err :", err)
 		return
 	}
-	s.WsConn, err = chianService.NewBscGame(contractAddr, s.WsClient)
+	s.WsConn, err = chainService.NewBscGame(contractAddr, s.WsClient)
 	if err != nil {
 		g.Log().Debug("Service NewGame Init WsNewBscGame Err :", err)
 	}
@@ -93,28 +93,28 @@ func (s *newGame) IdToAddr(id uint64) common.Address {
 //监听合约事件
 func (s *newGame) ListenNewGame() {
 	//注册
-	registerCh := make(chan *chianService.BscGameRegisterLog)
+	registerCh := make(chan *chainService.BscGameRegisterLog)
 	registerSub, err := s.WsConn.WatchRegisterLog(&bind.WatchOpts{}, registerCh, nil)
 	if err != nil {
 		g.Log().Debug("WatchRegisterLog监听合约特定事件失败", err)
 		return
 	}
 	//购买门票
-	buyTicketCh := make(chan *chianService.BscGameBuyTicketLog)
+	buyTicketCh := make(chan *chainService.BscGameBuyTicketLog)
 	buyTicketSub, err := s.WsConn.WatchBuyTicketLog(&bind.WatchOpts{}, buyTicketCh, nil)
 	if err != nil {
 		g.Log().Debug("WatchBuyTicketLog监听合约特定事件失败", err)
 		return
 	}
 	//投资
-	joinCh := make(chan *chianService.BscGameJoinLog)
+	joinCh := make(chan *chainService.BscGameJoinLog)
 	joinSub, err := s.WsConn.WatchJoinLog(&bind.WatchOpts{}, joinCh, nil)
 	if err != nil {
 		g.Log().Debug("WatchJoinLog监听合约特定事件失败", err)
 		return
 	}
 	//提现
-	userGetCh := make(chan *chianService.BscGameUserGetLog)
+	userGetCh := make(chan *chainService.BscGameUserGetLog)
 	userGetSub, err := s.WsConn.WatchUserGetLog(&bind.WatchOpts{}, userGetCh, nil)
 	if err != nil {
 		g.Log().Debug("WatchUserGetLog监听合约特定事件失败", err)
@@ -134,7 +134,6 @@ func (s *newGame) ListenNewGame() {
 			} else {
 				data.Status = 1
 			}
-
 			//插入监听记录
 			data.Type = model.ListenRegister
 			data.Block = int64(res.Raw.BlockNumber)
@@ -152,7 +151,13 @@ func (s *newGame) ListenNewGame() {
 			break
 		case res := <-buyTicketCh:
 			g.Log().Debug("buyTicketCh监听返回一个结果：", res) //该结果已解析
-
+			err = ListenTask.DelBuyTicket(context.Background(), res)
+			if err != nil {
+				data.Status = 2
+				data.Remark = err.Error()
+			} else {
+				data.Status = 1
+			}
 			//插入监听记录
 			data.Type = model.ListenBuy
 			data.Data = gconv.String(res)
@@ -211,7 +216,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		return
 	}
 
-	contractAbi, err := abi.JSON(strings.NewReader(chianService.BscGameABI))
+	contractAbi, err := abi.JSON(strings.NewReader(chainService.BscGameABI))
 	if err != nil {
 		g.Log().Debug("解析合约abi错误", err)
 		return
@@ -245,7 +250,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			//日志解析不到地址,直接通过ID读取会员地址
 			regEvent.Addr = s.IdToAddr(regEvent.Id)
 			g.Log().Debug("registerLog 读取未被监听的日志:", regEvent)
-			regData := &chianService.BscGameRegisterLog{
+			regData := &chainService.BscGameRegisterLog{
 				Id:    regEvent.Id,
 				Addr:  regEvent.Addr,
 				RefId: regEvent.RefId,
@@ -261,11 +266,28 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 
 		//尝试解析购买门票事件
 		buyEvent := struct {
+			Addr    common.Address
+			Fee     big.Int
+			Num     big.Int
+			Percent uint32
 		}{}
 		err = contractAbi.UnpackIntoInterface(buyEvent, "buyTicketLog", vLog.Data)
 		//不报错说明是购买门票事件
 		if err == nil {
-			//g.Log().Debug("buyTicketLog 日志:", res)
+			//日志解析不到地址,直接通过ID读取会员地址
+			regEvent.Addr = s.IdToAddr(regEvent.Id)
+			g.Log().Debug("registerLog 读取未被监听的日志:", regEvent)
+			regData := &chainService.BscGameRegisterLog{
+				Id:    regEvent.Id,
+				Addr:  regEvent.Addr,
+				RefId: regEvent.RefId,
+			}
+			err = ListenTask.DealRegister(context.Background(), regData)
+			if err != nil {
+				logData.Status = 2
+				logData.Remark = err.Error()
+			}
+			logData.Type = model.ListenRegister
 			continue
 		}
 

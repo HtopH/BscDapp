@@ -1,7 +1,7 @@
 package service
 
 import (
-	"BscDapp/app/chianService"
+	"BscDapp/app/chainService"
 	"BscDapp/app/dao"
 	"BscDapp/app/model"
 	"context"
@@ -18,7 +18,7 @@ var ListenTask = listenTask{}
 type listenTask struct{}
 
 //处理合约注册
-func (s *listenTask) DealRegister(c context.Context, param *chianService.BscGameRegisterLog) error {
+func (s *listenTask) DealRegister(c context.Context, param *chainService.BscGameRegisterLog) error {
 	return dao.FaBscUser.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
 		refInfo, err := dao.FaBscUser.Ctx(ctx).Where("id=?", param.RefId).One()
 		if err != nil || refInfo == nil {
@@ -75,7 +75,10 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 			g.Log().Debug("Service Task DealGameStatus GameInfo Find Err:", err)
 			return err
 		}
-		if gameInfo.Status == 1 {
+		if gameInfo == nil {
+			gameInfo = &model.FaBscGameInfo{}
+		}
+		if gameInfo != nil && gameInfo.Status == 1 {
 			//检查是否到期
 			if gameInfo.EndTime > int(time.Now().Unix()) {
 				//没到期,退出检测
@@ -104,42 +107,20 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 				for _, v := range users {
 					//奖励会员并插入记录
 					reward := gameInfo.JackPool * v.InvestNum / totalNum
-					update := g.Map{
-						"credit": &gdb.Counter{
-							Field: "credit",
-							Value: reward,
-						},
-						"total_credit": &gdb.Counter{
-							Field: "total_credit",
-							Value: reward,
-						},
-						"update": time.Now().Unix(),
-					}
-					_, err = dao.FaBscUser.Ctx(ctx).Where("id=?", v.Uid).Update(update)
+					err = User.ChangeCredit(ctx, v.Uid, reward, model.CreditPool)
 					if err != nil {
-						g.Log().Debug("Service Task DealGameStatus User Update Err:", err)
-						return err
-					}
-					creditInfo := model.FaBscCredit{
-						Uid:     v.Uid,
-						Type:    model.CreditPool,
-						Num:     reward,
-						Created: int(time.Now().Unix()),
-					}
-					_, err = dao.FaBscCredit.Ctx(ctx).OmitEmpty().Save(creditInfo)
-					if err != nil {
-						g.Log().Debug("Service Task DealGameStatus Credit Save Err:", err)
 						return err
 					}
 					//添加交易任务
 					taskInfo := model.FaBscTask{
 						Type:    model.SendAddBalance,
-						Task:    gconv.String(model.AddUserBalance{Uid: v.Uid, Value: reward}),
+						Task:    gconv.String(model.TaskAddUserBalance{UserId: v.Uid, Value: reward}),
 						Updated: int(time.Now().Unix()),
 					}
 					_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
 					if err != nil {
 						g.Log().Debug("Service Task DealGameStatus Task Save Err:", err)
+						return err
 					}
 				}
 			}
@@ -154,18 +135,18 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 			Updated:  int(time.Now().Unix()),
 			Created:  int(time.Now().Unix()),
 		}
+		g.Log().Println(insertInfo)
 		_, err = dao.FaBscGameInfo.Ctx(ctx).OmitEmpty().Save(insertInfo)
 		if err != nil {
 			g.Log().Debug("Service Task DealGameStatus GameInfo Save Err:", err)
 			return err
 		}
-
 		return nil
 	})
 }
 
 //处理会员购买门票
-func (s *listenTask) DelBuyTicket(c context.Context, param *chianService.BscGameBuyTicketLog) error {
+func (s *listenTask) DelBuyTicket(c context.Context, param *chainService.BscGameBuyTicketLog) error {
 	return dao.FaBscUserTicket.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
 		userInfo, err := dao.FaBscUser.Ctx(ctx).Where("address=?", param.Addr.String()).One()
 		if err != nil || userInfo == nil {
@@ -187,16 +168,52 @@ func (s *listenTask) DelBuyTicket(c context.Context, param *chianService.BscGame
 			g.Log().Debug("Service DoListenTask DelBuyTicket UserTicket Save Err:", err)
 			return gerror.New("会员购买门票信息保存失败：" + err.Error())
 		}
-
+		err = User.ChangeCredit(ctx, userInfo.Id, num*percent, model.CreditBuyTicket)
+		if err != nil {
+			return err
+		}
 		//注入奖池
-		//jackNum:=num*25/100
-
+		jackNum := num * 25 / 100
 		//注入种子池
-		//seedNum:=num*25/100
-
+		seedNum := num * 25 / 100
+		gameInfo, err := dao.FaBscGameInfo.Ctx(ctx).Where("status=1").One()
+		if err != nil || gameInfo == nil {
+			g.Log().Debug("Service DoListenTask DelBuyTicket GameInfo One Err:", err)
+			return gerror.New("活动信息查询失败：" + err.Error())
+		}
+		updateGame := g.Map{
+			"seed_pool": &gdb.Counter{
+				Field: "seed_pool",
+				Value: seedNum,
+			},
+			"jack_pool": &gdb.Counter{
+				Field: "jack_pool",
+				Value: jackNum,
+			},
+			"updated": time.Now().Unix(),
+		}
+		_, err = dao.FaBscGameInfo.Ctx(ctx).Where("id=?", gameInfo.Id).Update(updateGame)
+		if err != nil || gameInfo == nil {
+			g.Log().Debug("Service DoListenTask DelBuyTicket GameInfo Update Err:", err)
+			return gerror.New("活动奖池跟新失败：" + err.Error())
+		}
 		//奖励推荐人
-
-		return nil
+		err = User.ChangeCredit(ctx, userInfo.RefId, num*20/100, model.CreditRefReward)
+		if err != nil {
+			return err
+		}
+		//添加交易任务
+		taskInfo := model.FaBscTask{
+			Type:    model.SendAddBalance,
+			Task:    gconv.String(model.TaskAddUserBalance{UserId: userInfo.RefId, Value: num * 20 / 100}),
+			Updated: int(time.Now().Unix()),
+		}
+		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		if err != nil {
+			g.Log().Debug("Service Task DealGameStatus Task Save Err:", err)
+			return err
+		}
+		return err
 	})
 
 }

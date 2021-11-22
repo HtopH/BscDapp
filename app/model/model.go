@@ -19,6 +19,8 @@ const (
 	SendAddBalance = "addBalance"
 
 	//余额变动事件
-	CreditReward = "reward" //投资回报
-	CreditPool   = "pool"   //奖池奖励
+	CreditReward    = "reward"    //投资回报
+	CreditPool      = "pool"      //奖池奖励
+	CreditRefReward = "refReward" //推荐奖励
+	CreditBuyTicket = "buyTicket" //兑换门票
 )

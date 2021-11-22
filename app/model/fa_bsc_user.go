@@ -12,7 +12,3 @@ import (
 type FaBscUser internal.FaBscUser
 
 // Fill with you ideas below.
-type AddUserBalance struct {
-	Uid   int
-	Value float64
-}
