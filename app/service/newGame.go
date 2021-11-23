@@ -14,8 +14,8 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
-	"math"
 	"math/big"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -32,12 +32,12 @@ type newGame struct {
 }
 
 var (
-	rpcHttpUrl           = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
-	rpcWsUrl             = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
-	contractAddr         = common.HexToAddress("0xb417dB8a271444CaE2bC31FF7aB140Afb715A634")           //合约地址
-	fromAddr             = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
-	privateKey           = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
-	precision    float64 = 18
+	rpcHttpUrl   = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
+	rpcWsUrl     = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
+	contractAddr = common.HexToAddress("0xb417dB8a271444CaE2bC31FF7aB140Afb715A634")           //合约地址
+	fromAddr     = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
+	privateKey   = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
+	decimals     = "1000000000000000000"                                                       //代币精度
 )
 
 func (s *newGame) Init() {
@@ -346,6 +346,9 @@ func (s *newGame) GetTransactOpts() (*bind.TransactOpts, error) {
 }
 
 func (s *newGame) GetBigInt(num float64) *big.Int {
-	res := num * math.Pow(10, precision)
-	return big.NewInt(int64(res))
+	decimals, _ := strconv.Atoi(decimals) // 兑换比例精度
+	temp := num * float64(decimals)
+	float := strconv.FormatFloat(temp, 'f', -1, 64)
+	res, _ := new(big.Int).SetString(float, 10)
+	return res
 }

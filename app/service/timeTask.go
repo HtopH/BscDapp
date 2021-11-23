@@ -52,8 +52,9 @@ func (s *timeTask) FinishBscTask() {
 	task, err := dao.FaBscTask.Ctx(ctx).Where("status=0").Order("id asc").One()
 	if err != nil {
 		g.Log().Debug("Service TimeTask FinishBscTask Task Find Err:", err)
+		return
 	}
-	for task.Status == 0 {
+	for task != nil {
 		var (
 			res    string
 			err    error

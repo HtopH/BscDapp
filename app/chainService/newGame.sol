@@ -111,7 +111,7 @@ contract NewGame {
         players[playerId].useU=this_player.useU+_value;
 
         uint32 percent=getPercent();
-        uint128 ticketNum= _value.mul(percent).div(percent);
+        uint128 ticketNum= _value.mul(percent).div(percentWei);
         Ticket_TOKEN.transfer(msg.sender,ticketNum);
         players[playerId].getTickets=this_player.getTickets+ticketNum;
 
