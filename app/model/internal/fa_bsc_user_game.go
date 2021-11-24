@@ -4,15 +4,15 @@
 
 package internal
 
-
-
 // FaBscUserGame is the golang structure for table fa_bsc_user_game.
 type FaBscUserGame struct {
-    Id        int     `orm:"id,primary" json:"id"`        //           
-    Uid       int     `orm:"uid"        json:"uid"`       // 会员ID    
-    GameId    int     `orm:"game_id"    json:"gameId"`    // 场次ID    
-    InvestNum float64 `orm:"invest_num" json:"investNum"` // 投资金额  
-    TicketNum float64 `orm:"ticket_num" json:"ticketNum"` // 门票金额  
-    AwardNum  float64 `orm:"award_num"  json:"awardNum"`  // 奖励金额  
-    Created   int     `orm:"created"    json:"created"`   //           
+	Id        int     `orm:"id,primary" json:"id"`        //
+	Uid       int     `orm:"uid"        json:"uid"`       // 会员ID
+	GameRound int     `orm:"game_round" json:"gameRound"` // 场次Round
+	InvestNum float64 `orm:"invest_num" json:"investNum"` // 投资金额
+	TicketNum float64 `orm:"ticket_num" json:"ticketNum"` // 门票金额
+	AwardNum  float64 `orm:"award_num"  json:"awardNum"`  // 奖励金额(奖池)
+	ReturnNum float64 `orm:"return_num" json:"returnNum"` // 可回报金额(投资)
+	Status    int     `orm:"status"     json:"status"`    // 1:进行中,2:已出局
+	Created   int     `orm:"created"    json:"created"`   //
 }

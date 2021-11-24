@@ -27,11 +27,12 @@ contract NewGame {
     address private op_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     
     uint128 public  spendTickets;
+    uint128 public  joinBase = 10000000000000000000;
     uint128 private baseNum =100000000000000000000000;
     uint64  private WEI = 1000000000000000000;
     uint32  private percentWei = 1000000;
-    uint16  public  round =1;
- 
+    uint32  public  round =0;
+
     struct Player {
         uint128 getTickets;
         uint128 useTickets;
@@ -43,11 +44,11 @@ contract NewGame {
     Player[] private players;
     mapping (address => uint64) public addrToId;
     mapping (uint64 => address) public idToAddr;
-    mapping (uint16=>mapping(address=>uint128)) roundInfo;
-    
+    mapping (uint32=>mapping(address=>uint128)) roundInfo;
+
     event registerLog(uint8 doType,uint64 id,address indexed addr,uint64 refId);
     event buyTicketLog(uint8 doType,uint64 id,uint128 _value,uint128 getTicket,uint32 percent);
-    event joinLog(uint8 doType,uint64 id,uint128 _value,uint128 ticketUse);
+    event joinLog(uint8 doType,uint64 id,uint128 _value,uint32 _round);
     event userGetLog(uint8 doType,uint64 id,uint128 _value);
 
     modifier onlyAdmin() {
@@ -79,7 +80,7 @@ contract NewGame {
     }
 
     function register(address ref_addr) external {
-        require(ref_addr==msg.sender,"ref_addr can not be self!");
+        require(ref_addr!=msg.sender,"ref_addr can not be self!");
         require(addrToId[msg.sender]==0,"user is exit!");
         uint64 refId;
 
@@ -122,21 +123,22 @@ contract NewGame {
     function joinGame (uint128 _value) external {
         require(addrToId[msg.sender]!=0,"please register first");
         require(roundInfo[round][msg.sender]==0,"you have joined!");
+        require(_value>=joinBase,"amount is too low!");
         require(USD_TOKEN.balanceOf(msg.sender)>=_value,"balance is not enough!");
+
         uint128 pay_ticket=_value.mul(10).div(100);
         require(Ticket_TOKEN.balanceOf(msg.sender)>=pay_ticket,"ticket is not enough!");
 
+        Ticket_TOKEN.transferFrom(msg.sender,address(this),pay_ticket);
+        USD_TOKEN.transferFrom(msg.sender,address(this),_value);
+
         uint64 playerId=addrToId[msg.sender];
         Player storage this_player=players[playerId];
-
-        Ticket_TOKEN.transferFrom(msg.sender,address(this),pay_ticket);
         players[playerId].useTickets=this_player.useTickets+pay_ticket;
-
-        USD_TOKEN.transferFrom(msg.sender,address(this),_value);
         players[playerId].useU=this_player.useU+_value;
         roundInfo[round][msg.sender]=_value;
 
-        emit joinLog(3,playerId,_value,pay_ticket);
+        emit joinLog(3,playerId,_value,round);
 
     }
 
@@ -160,20 +162,40 @@ contract NewGame {
         }
         return true;
     }
-    
+
+    function getUserInfo(uint64 _id) external view onlyOperator returns (uint128 _getTickets,
+            uint128 _useTickets,
+            uint128 _balanceU,
+            uint128 _useU,
+            uint128 _refId){
+            require(idToAddr[_id]!=address(0),"user is no exit!");
+            Player storage this_player=players[_id];
+            _getTickets=this_player.getTickets;
+            _useTickets=this_player.useTickets;
+            _balanceU=this_player.balanceU;
+            _useU=this_player.useU;
+            _refId=this_player.refId;
+    }
+
     function addUserBanlance(uint64 userId,uint128 _value) external onlyOperator returns (bool){
         require(idToAddr[userId]!=address(0));
         Player storage this_player=players[userId];
         players[userId].balanceU=this_player.balanceU.add(_value);
+
         return true;
     }
-    
+
+    function userOut(uint64 userId,uint32 _round) external onlyOperator returns(bool){
+        require(idToAddr[userId]!=address(0));
+        roundInfo[_round][idToAddr[userId]]=0;
+    }
+
     function setSpend (uint128 _value) external onlyOperator returns (bool){
         spendTickets=_value;
         return true;
     }
 
-    
+
     function setRound() external onlyOperator returns (bool) {
         round=round+1;
         return true;
@@ -183,33 +205,34 @@ contract NewGame {
         require(opAddr!=address(0),"Address error");
         op_addr = opAddr;
     }
-    
+
     function getPercent() public view returns (uint32 percent) {
         uint32 n=getNo();
         uint32 base=getBase(n);
         if (n==1){
             percent=percentWei;
-        }else if(n<1&&n<11){
+        }else if(n>1&&n<11){
             percent=uint32(percentWei-percentWei*(n-1)/base);
         }else{
             if ((n-10)%9>0){
-                percent=uint32(percentWei*10/base-percentWei*((n-10)%9)/base); 
+                percent=uint32(percentWei*10/base-percentWei*((n-10)%9)/base);
             }else{
-              percent=uint32(percentWei*10/base-percentWei*9/base); 
+              percent=uint32(percentWei*10/base-percentWei*9/base);
             }
         }
         return percent;
     }
-    
-    function getBase(uint32 n) public pure returns(uint32 base){
-        base=10;
+
+    function getBase(uint32 n) public pure returns(uint32){
+        uint128 base=10;
         if (n>10){
-            base=10**((n-11)/9+2);
+            uint128 b=uint128((n-11)/9+2);
+            base=base.power(b);
         }
-        return base;
+        return uint32(base);
     }
-    
-    function getNo() internal view returns(uint32 n){
+
+    function getNo() public view returns(uint32 n){
         if (spendTickets>0){
             n=uint32((spendTickets.sub(1)).div(baseNum).add(1));
         }else{
@@ -246,6 +269,14 @@ library SafeMath {
     function div(uint128 a, uint128 b) internal pure returns (uint128 c) {
         require(b > 0,'ds-math-div-overflow');
         c = a / b;
+    }
+    function power(uint128 a,uint128 b)internal pure returns (uint128 c){
+        if (a==0) return 0;
+        if (b==0) return 1;
+        c = 1;
+        for (uint128 i=0;i<b;i++){
+            c=mul(c,a);
+        }
     }
 }
 

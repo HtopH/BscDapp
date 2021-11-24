@@ -14,7 +14,7 @@ func init() {
 	//初始化合约
 	service.NewGame.Init()
 	//定时任务循环处理Bsc
-	//service.TimeTask.ListenTask()
+	service.TimeTask.ListenTask()
 	//需验证控制台登陆状态
 	s.Group("/api", func(group *ghttp.RouterGroup) {
 		group.ALL("/index", &api.Index)

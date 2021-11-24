@@ -17,3 +17,9 @@ type TaskAddUserBalance struct {
 	UserId uint64  //会员ID
 	Value  float64 //数值
 }
+
+//会员出局
+type TaskUserOut struct {
+	UserId uint64
+	Round  uint32
+}

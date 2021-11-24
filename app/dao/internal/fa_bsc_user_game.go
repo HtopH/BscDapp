@@ -26,13 +26,15 @@ type FaBscUserGameDao struct {
 
 // FaBscUserGameColumns defines and stores column names for table fa_bsc_user_game.
 type faBscUserGameColumns struct {
-	Id         string //           
-    Uid        string // 会员ID    
-    GameId     string // 场次ID    
-    InvestNum  string // 投资金额  
-    TicketNum  string // 门票金额  
-    AwardNum   string // 奖励金额  
-    Created    string //
+	Id        string //
+	Uid       string // 会员ID
+	GameRound string // 场次Round
+	InvestNum string // 投资金额
+	TicketNum string // 门票金额
+	AwardNum  string // 奖励金额(奖池)
+	ReturnNum string // 可回报金额(投资)
+	Status    string // 1:进行中,2:已出局
+	Created   string //
 }
 
 var (
@@ -42,13 +44,15 @@ var (
 		DB:    g.DB("default"),
 		Table: "fa_bsc_user_game",
 		Columns: faBscUserGameColumns{
-			Id:        "id",          
-            Uid:       "uid",         
-            GameId:    "game_id",     
-            InvestNum: "invest_num",  
-            TicketNum: "ticket_num",  
-            AwardNum:  "award_num",   
-            Created:   "created",
+			Id:        "id",
+			Uid:       "uid",
+			GameRound: "game_round",
+			InvestNum: "invest_num",
+			TicketNum: "ticket_num",
+			AwardNum:  "award_num",
+			ReturnNum: "return_num",
+			Status:    "status",
+			Created:   "created",
 		},
 	}
 )

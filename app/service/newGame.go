@@ -34,7 +34,7 @@ type newGame struct {
 var (
 	rpcHttpUrl   = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
 	rpcWsUrl     = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
-	contractAddr = common.HexToAddress("0xb417dB8a271444CaE2bC31FF7aB140Afb715A634")           //合约地址
+	contractAddr = common.HexToAddress("0x8420B5E3875592372c41B86Eb30c80c158464860")           //合约地址
 	fromAddr     = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
 	privateKey   = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
 	decimals     = "1000000000000000000"                                                       //代币精度
@@ -73,28 +73,38 @@ func (s *newGame) AddUserBalance(param *model.TaskAddUserBalance) (string, error
 		return "", err
 	}
 	res, err := s.Conn.AddUserBanlance(auth, param.UserId, s.GetBigInt(param.Value))
-
 	if err != nil {
 		g.Log().Debug("Service NewGame Pay Err :", err)
 		return "", err
 	}
-
 	return res.Value().String(), nil
 }
 
-//func (s *newGame) Pay() {
-//	auth, err := s.GetTransactOpts()
-//	if err != nil {
-//		g.Log().Debug("Service NewGame GetTransactOpts Err :", err)
-//		return
-//	}
-//	res, err := s.Conn.Pay(auth, s.GetBigInt(0.5), 2)
-//	if err != nil {
-//		g.Log().Debug("Service NewGame Pay Err :", err)
-//		return
-//	}
-//	g.Log().Debug("Service NewGame Pay res:", res)
-//}
+func (s *newGame) SetRound() (string, error) {
+	auth, err := s.GetTransactOpts()
+	if err != nil {
+		return "", err
+	}
+	res, err := s.Conn.SetRound(auth)
+	if err != nil {
+		g.Log().Debug("Service NewGame SetRound Err :", err)
+		return "", err
+	}
+	return res.Value().String(), nil
+}
+
+func (s *newGame) UserOut(param *model.TaskUserOut) (string, error) {
+	auth, err := s.GetTransactOpts()
+	if err != nil {
+		return "", err
+	}
+	res, err := s.Conn.UserOut(auth, param.UserId, param.Round)
+	if err != nil {
+		g.Log().Debug("Service NewGame UserOut Err :", err)
+		return "", err
+	}
+	return res.Value().String(), nil
+}
 
 //通过ID获取地址
 func (s *newGame) IdToAddr(id uint64) common.Address {
@@ -121,7 +131,7 @@ func (s *newGame) ListenNewGame() {
 		g.Log().Debug("WatchBuyTicketLog监听合约特定事件失败", err)
 		return
 	}
-	//投资
+	//参与活动
 	joinCh := make(chan *chainService.BscGameJoinLog)
 	joinSub, err := s.WsConn.WatchJoinLog(&bind.WatchOpts{}, joinCh)
 	if err != nil {
@@ -138,6 +148,8 @@ func (s *newGame) ListenNewGame() {
 	g.Log().Debug("监听事件堵塞等待：")
 	run := true
 	for run {
+		//监听前先消费任务
+		TimeTask.FinishBscTask()
 		data := model.FaBscListenLog{}
 		select {
 		case res := <-registerCh:
@@ -158,7 +170,7 @@ func (s *newGame) ListenNewGame() {
 
 			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
 			if err != nil {
-				g.Log().Debug("ListenNewGame Err:", err)
+				g.Log().Debug("ListenNewGame registerCh ListenLog Save Err:", err)
 			}
 		case err = <-registerSub.Err():
 			g.Log().Debug("joinSub监听事件结果错误", err)
@@ -166,7 +178,7 @@ func (s *newGame) ListenNewGame() {
 			break
 		case res := <-buyTicketCh:
 			g.Log().Debug("buyTicketCh监听返回一个结果：", res) //该结果已解析
-			err = ListenTask.DelBuyTicket(context.Background(), res)
+			err = ListenTask.DealBuyTicket(context.Background(), res)
 			if err != nil {
 				data.Status = 2
 				data.Remark = err.Error()
@@ -176,12 +188,12 @@ func (s *newGame) ListenNewGame() {
 			//插入监听记录
 			data.Type = model.ListenBuy
 			data.Data = gconv.String(res)
+			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
-			data.Data = gconv.String(res)
 			data.Created = int(time.Now().Unix())
 			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
 			if err != nil {
-				g.Log().Debug("ListenNewGame Err:", err)
+				g.Log().Debug("ListenNewGame buyTicketCh ListenLog Save Err:", err)
 			}
 		case err = <-buyTicketSub.Err():
 			g.Log().Debug("buyTicketSub监听事件结果错误", err)
@@ -189,8 +201,24 @@ func (s *newGame) ListenNewGame() {
 			break
 		case res := <-joinCh:
 			g.Log().Debug("joinCh监听返回一个结果：", res) //该结果已解析
+			err = ListenTask.DealUserJoinGame(context.Background(), res)
+			if err != nil {
+				data.Status = 2
+				data.Remark = err.Error()
+			} else {
+				data.Status = 1
+			}
+			//插入监听记录
 			data.Type = model.ListenJoin
 			data.Data = gconv.String(res)
+			data.Block = int64(res.Raw.BlockNumber)
+			data.TxHash = res.Raw.TxHash.String()
+			data.Created = int(time.Now().Unix())
+			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
+			if err != nil {
+				g.Log().Debug("ListenNewGame joinCh ListenLog Save Err:", err)
+			}
+
 		case err = <-joinSub.Err():
 			g.Log().Debug("joinSub监听事件结果错误", err)
 			run = false
@@ -299,7 +327,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 				GetTicket: buyEvent.GetTicket,
 				Percent:   buyEvent.Percent,
 			}
-			err = ListenTask.DelBuyTicket(context.Background(), buyData)
+			err = ListenTask.DealBuyTicket(context.Background(), buyData)
 			if err != nil {
 				logData.Status = 2
 				logData.Remark = err.Error()
@@ -310,14 +338,44 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			logData.Type = model.ListenBuy
 
 		}
+
+		//TODO 尝试解析参与活动事件
+		joinEvent := struct {
+			DoType uint8
+			Id     uint64
+			Value  *big.Int
+			Round  uint32
+		}{}
+		err = contractAbi.UnpackIntoInterface(&joinEvent, "joinLog", vLog.Data)
+		g.Log().Debug("joinLog 解析日志:", buyEvent)
+		if err == nil && joinEvent.DoType == 3 {
+			joinData := &chainService.BscGameJoinLog{
+				Id:    buyEvent.Id,
+				Value: buyEvent.Value,
+				Round: joinEvent.Round,
+			}
+			err = ListenTask.DealUserJoinGame(context.Background(), joinData)
+			if err != nil {
+				logData.Status = 2
+				logData.Remark = err.Error()
+			} else {
+				logData.Status = 1
+			}
+			logData.Type = model.ListenBuy
+		}
+
 		//将获取到的交易日志存储起来
+		if err != nil {
+			logData.Status = 2
+			logData.Remark = err.Error()
+		}
 		_, err = dao.FaBscListenLog.OmitEmpty().Save(logData)
 		if err != nil {
 			g.Log().Debug("ReadBlockLog registerLog save err:", err)
 		}
 	}
 	//更新拉取区块高度起始点
-	dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": endBlock + 1})
+	_, _ = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": endBlock + 1})
 	//结束的区块还不是最新的，继续拉取
 	if maxBlockNum > uint64(endBlock+1) {
 		s.ReadBlockLog(endBlock + 1)
@@ -346,8 +404,8 @@ func (s *newGame) GetTransactOpts() (*bind.TransactOpts, error) {
 }
 
 func (s *newGame) GetBigInt(num float64) *big.Int {
-	decimals, _ := strconv.Atoi(decimals) // 兑换比例精度
-	temp := num * float64(decimals)
+	dec, _ := strconv.Atoi(decimals) // 兑换比例精度
+	temp := num * float64(dec)
 	float := strconv.FormatFloat(temp, 'f', -1, 64)
 	res, _ := new(big.Int).SetString(float, 10)
 	return res

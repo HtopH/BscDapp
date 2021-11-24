@@ -64,9 +64,9 @@
 			},
 			{
 				"indexed": false,
-				"internalType": "uint128",
-				"name": "ticketUse",
-				"type": "uint128"
+				"internalType": "uint32",
+				"name": "_round",
+				"type": "uint32"
 			}
 		],
 		"name": "joinLog",
@@ -207,11 +207,24 @@
 		"outputs": [
 			{
 				"internalType": "uint32",
-				"name": "base",
+				"name": "",
 				"type": "uint32"
 			}
 		],
 		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [],
+		"name": "getNo",
+		"outputs": [
+			{
+				"internalType": "uint32",
+				"name": "n",
+				"type": "uint32"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -222,6 +235,45 @@
 				"internalType": "uint32",
 				"name": "percent",
 				"type": "uint32"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint64",
+				"name": "_id",
+				"type": "uint64"
+			}
+		],
+		"name": "getUserInfo",
+		"outputs": [
+			{
+				"internalType": "uint128",
+				"name": "_getTickets",
+				"type": "uint128"
+			},
+			{
+				"internalType": "uint128",
+				"name": "_useTickets",
+				"type": "uint128"
+			},
+			{
+				"internalType": "uint128",
+				"name": "_balanceU",
+				"type": "uint128"
+			},
+			{
+				"internalType": "uint128",
+				"name": "_useU",
+				"type": "uint128"
+			},
+			{
+				"internalType": "uint128",
+				"name": "_refId",
+				"type": "uint128"
 			}
 		],
 		"stateMutability": "view",
@@ -278,6 +330,19 @@
 		"type": "function"
 	},
 	{
+		"inputs": [],
+		"name": "joinBase",
+		"outputs": [
+			{
+				"internalType": "uint128",
+				"name": "",
+				"type": "uint128"
+			}
+		],
+		"stateMutability": "view",
+		"type": "function"
+	},
+	{
 		"inputs": [
 			{
 				"internalType": "uint128",
@@ -321,9 +386,9 @@
 		"name": "round",
 		"outputs": [
 			{
-				"internalType": "uint16",
+				"internalType": "uint32",
 				"name": "",
-				"type": "uint16"
+				"type": "uint32"
 			}
 		],
 		"stateMutability": "view",
@@ -385,6 +450,30 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint64",
+				"name": "userId",
+				"type": "uint64"
+			},
+			{
+				"internalType": "uint32",
+				"name": "_round",
+				"type": "uint32"
+			}
+		],
+		"name": "userOut",
+		"outputs": [
+			{
+				"internalType": "bool",
+				"name": "",
+				"type": "bool"
+			}
+		],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

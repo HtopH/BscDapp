@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/os/gcron"
 	"github.com/gogf/gf/util/gconv"
+	"strconv"
 	"time"
 )
 
@@ -14,14 +15,19 @@ var TimeTask = timeTask{}
 
 type timeTask struct{}
 
-//循环监听
+//定时任务
 func (s *timeTask) ListenTask() {
 	//循环监听BSC日志
 	_, _ = gcron.AddSingleton("1 */1 * * * *", func() {
 		//监听之前先补全为监听到的日志
 		baseInfo, _ := dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).One()
-		NewGame.ReadBlockLog(gconv.Int64(baseInfo.TheValue))
-
+		num, err := strconv.Atoi(baseInfo.TheValue)
+		if err != nil {
+			num = 1
+			g.Log().Debug("Service ListenTask strconv Err:", err)
+		}
+		NewGame.ReadBlockLog(int64(num))
+		s.FinishBscTask()
 		//开始监听
 		NewGame.ListenNewGame()
 
@@ -30,20 +36,19 @@ func (s *timeTask) ListenTask() {
 		NewGame.Client.Close()
 		NewGame.Init()
 	}, "bscListen")
-
-	//定时消费任务
-	_, _ = gcron.AddSingleton("*/30 * * * * *", func() {
-		g.Log().Debug("Task BscTask Begin")
-		s.FinishBscTask()
-		g.Log().Debug("Task BscTask End")
-	}, "bscTask")
-
 	//定时检测活动状态
 	_, _ = gcron.AddSingleton("*/30 * * * * *", func() {
 		g.Log().Debug("Task CheckGame Begin")
 		_ = ListenTask.DealGameStatus(context.Background())
 		g.Log().Debug("Task CheckGame End")
 	}, "checkGame")
+
+	////定时消费任务
+	//_, _ = gcron.AddSingleton("*/31 * * * * *", func() {
+	//	g.Log().Debug("Task BscTask Begin")
+	//	s.FinishBscTask()
+	//	g.Log().Debug("Task BscTask End")
+	//}, "bscTask")
 }
 
 //读取队列任务
@@ -58,7 +63,7 @@ func (s *timeTask) FinishBscTask() {
 		var (
 			res    string
 			err    error
-			update g.Map
+			update = g.Map{"updated": time.Now().Unix()}
 		)
 		switch task.Type {
 		case model.SendAddBalance:
@@ -68,19 +73,22 @@ func (s *timeTask) FinishBscTask() {
 				g.Log().Debug("Service TimeTask FinishBscTask SendAddBalance Struct Err:", err)
 			}
 			res, err = NewGame.AddUserBalance(&param)
+		case model.SendSetRound:
+			res, err = NewGame.SetRound()
+		case model.SendUserOut:
+			var param model.TaskUserOut
+			err = gconv.Struct(task.Task, &param)
+			if err != nil {
+				g.Log().Debug("Service TimeTask FinishBscTask SendAddBalance Struct Err:", err)
+			}
+			res, err = NewGame.UserOut(&param)
 		}
 		if err != nil {
-			update = g.Map{
-				"remark":  err.Error(),
-				"updated": time.Now().Unix(),
-				"status":  2,
-			}
+			update["remark"] = err.Error()
+			update["status"] = 2
 		} else {
-			update = g.Map{
-				"remark":  res,
-				"updated": time.Now().Unix(),
-				"status":  1,
-			}
+			update["remark"] = res
+			update["status"] = 1
 		}
 		_, err = dao.FaBscTask.Ctx(ctx).Where("id=?", task.Id).Update(update)
 		if err != nil {

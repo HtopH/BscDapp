@@ -30,7 +30,7 @@ var (
 
 // BscGameMetaData contains all meta data concerning the BscGame contract.
 var BscGameMetaData = &bind.MetaData{
-	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"getTicket\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"name\":\"buyTicketLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"ticketUse\",\"type\":\"uint128\"}],\"name\":\"joinLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"refId\",\"type\":\"uint64\"}],\"name\":\"registerLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userGetLog\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"userId\",\"type\":\"uint64\"},{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"addUserBanlance\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"addrToId\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"val\",\"type\":\"uint128\"},{\"internalType\":\"uint8\",\"name\":\"_token_type\",\"type\":\"uint8\"}],\"name\":\"adminWithdraw\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"n\",\"type\":\"uint32\"}],\"name\":\"getBase\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"base\",\"type\":\"uint32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPercent\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_balance_info\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"ticketBalance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"usdBalance\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_player_count\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"idToAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"joinGame\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"payForTickets\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"ref_addr\",\"type\":\"address\"}],\"name\":\"register\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"round\",\"outputs\":[{\"internalType\":\"uint16\",\"name\":\"\",\"type\":\"uint16\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setRound\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"setSpend\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"opAddr\",\"type\":\"address\"}],\"name\":\"set_op_addr\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spendTickets\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
+	ABI: "[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"getTicket\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"name\":\"buyTicketLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"},{\"indexed\":false,\"internalType\":\"uint32\",\"name\":\"_round\",\"type\":\"uint32\"}],\"name\":\"joinLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"addr\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"refId\",\"type\":\"uint64\"}],\"name\":\"registerLog\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"doType\",\"type\":\"uint8\"},{\"indexed\":false,\"internalType\":\"uint64\",\"name\":\"id\",\"type\":\"uint64\"},{\"indexed\":false,\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userGetLog\",\"type\":\"event\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"userId\",\"type\":\"uint64\"},{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"addUserBanlance\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"name\":\"addrToId\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"val\",\"type\":\"uint128\"},{\"internalType\":\"uint8\",\"name\":\"_token_type\",\"type\":\"uint8\"}],\"name\":\"adminWithdraw\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint32\",\"name\":\"n\",\"type\":\"uint32\"}],\"name\":\"getBase\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"pure\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getNo\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"n\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"getPercent\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"percent\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"_id\",\"type\":\"uint64\"}],\"name\":\"getUserInfo\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"_getTickets\",\"type\":\"uint128\"},{\"internalType\":\"uint128\",\"name\":\"_useTickets\",\"type\":\"uint128\"},{\"internalType\":\"uint128\",\"name\":\"_balanceU\",\"type\":\"uint128\"},{\"internalType\":\"uint128\",\"name\":\"_useU\",\"type\":\"uint128\"},{\"internalType\":\"uint128\",\"name\":\"_refId\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_balance_info\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"ticketBalance\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"usdBalance\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"get_player_count\",\"outputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"\",\"type\":\"uint64\"}],\"name\":\"idToAddr\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"joinBase\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"joinGame\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"payForTickets\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"ref_addr\",\"type\":\"address\"}],\"name\":\"register\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"round\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"setRound\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"setSpend\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"opAddr\",\"type\":\"address\"}],\"name\":\"set_op_addr\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"spendTickets\",\"outputs\":[{\"internalType\":\"uint128\",\"name\":\"\",\"type\":\"uint128\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint64\",\"name\":\"userId\",\"type\":\"uint64\"},{\"internalType\":\"uint32\",\"name\":\"_round\",\"type\":\"uint32\"}],\"name\":\"userOut\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint128\",\"name\":\"_value\",\"type\":\"uint128\"}],\"name\":\"userWithdraw\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}]",
 }
 
 // BscGameABI is the input ABI used to generate the binding from.
@@ -212,7 +212,7 @@ func (_BscGame *BscGameCallerSession) AddrToId(arg0 common.Address) (uint64, err
 
 // GetBase is a free data retrieval call binding the contract method 0xd9ff56bd.
 //
-// Solidity: function getBase(uint32 n) pure returns(uint32 base)
+// Solidity: function getBase(uint32 n) pure returns(uint32)
 func (_BscGame *BscGameCaller) GetBase(opts *bind.CallOpts, n uint32) (uint32, error) {
 	var out []interface{}
 	err := _BscGame.contract.Call(opts, &out, "getBase", n)
@@ -229,16 +229,47 @@ func (_BscGame *BscGameCaller) GetBase(opts *bind.CallOpts, n uint32) (uint32, e
 
 // GetBase is a free data retrieval call binding the contract method 0xd9ff56bd.
 //
-// Solidity: function getBase(uint32 n) pure returns(uint32 base)
+// Solidity: function getBase(uint32 n) pure returns(uint32)
 func (_BscGame *BscGameSession) GetBase(n uint32) (uint32, error) {
 	return _BscGame.Contract.GetBase(&_BscGame.CallOpts, n)
 }
 
 // GetBase is a free data retrieval call binding the contract method 0xd9ff56bd.
 //
-// Solidity: function getBase(uint32 n) pure returns(uint32 base)
+// Solidity: function getBase(uint32 n) pure returns(uint32)
 func (_BscGame *BscGameCallerSession) GetBase(n uint32) (uint32, error) {
 	return _BscGame.Contract.GetBase(&_BscGame.CallOpts, n)
+}
+
+// GetNo is a free data retrieval call binding the contract method 0x9f0314fc.
+//
+// Solidity: function getNo() view returns(uint32 n)
+func (_BscGame *BscGameCaller) GetNo(opts *bind.CallOpts) (uint32, error) {
+	var out []interface{}
+	err := _BscGame.contract.Call(opts, &out, "getNo")
+
+	if err != nil {
+		return *new(uint32), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
+
+	return out0, err
+
+}
+
+// GetNo is a free data retrieval call binding the contract method 0x9f0314fc.
+//
+// Solidity: function getNo() view returns(uint32 n)
+func (_BscGame *BscGameSession) GetNo() (uint32, error) {
+	return _BscGame.Contract.GetNo(&_BscGame.CallOpts)
+}
+
+// GetNo is a free data retrieval call binding the contract method 0x9f0314fc.
+//
+// Solidity: function getNo() view returns(uint32 n)
+func (_BscGame *BscGameCallerSession) GetNo() (uint32, error) {
+	return _BscGame.Contract.GetNo(&_BscGame.CallOpts)
 }
 
 // GetPercent is a free data retrieval call binding the contract method 0x2a6dd8c9.
@@ -270,6 +301,66 @@ func (_BscGame *BscGameSession) GetPercent() (uint32, error) {
 // Solidity: function getPercent() view returns(uint32 percent)
 func (_BscGame *BscGameCallerSession) GetPercent() (uint32, error) {
 	return _BscGame.Contract.GetPercent(&_BscGame.CallOpts)
+}
+
+// GetUserInfo is a free data retrieval call binding the contract method 0xb495763b.
+//
+// Solidity: function getUserInfo(uint64 _id) view returns(uint128 _getTickets, uint128 _useTickets, uint128 _balanceU, uint128 _useU, uint128 _refId)
+func (_BscGame *BscGameCaller) GetUserInfo(opts *bind.CallOpts, _id uint64) (struct {
+	GetTickets *big.Int
+	UseTickets *big.Int
+	BalanceU   *big.Int
+	UseU       *big.Int
+	RefId      *big.Int
+}, error) {
+	var out []interface{}
+	err := _BscGame.contract.Call(opts, &out, "getUserInfo", _id)
+
+	outstruct := new(struct {
+		GetTickets *big.Int
+		UseTickets *big.Int
+		BalanceU   *big.Int
+		UseU       *big.Int
+		RefId      *big.Int
+	})
+	if err != nil {
+		return *outstruct, err
+	}
+
+	outstruct.GetTickets = *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+	outstruct.UseTickets = *abi.ConvertType(out[1], new(*big.Int)).(**big.Int)
+	outstruct.BalanceU = *abi.ConvertType(out[2], new(*big.Int)).(**big.Int)
+	outstruct.UseU = *abi.ConvertType(out[3], new(*big.Int)).(**big.Int)
+	outstruct.RefId = *abi.ConvertType(out[4], new(*big.Int)).(**big.Int)
+
+	return *outstruct, err
+
+}
+
+// GetUserInfo is a free data retrieval call binding the contract method 0xb495763b.
+//
+// Solidity: function getUserInfo(uint64 _id) view returns(uint128 _getTickets, uint128 _useTickets, uint128 _balanceU, uint128 _useU, uint128 _refId)
+func (_BscGame *BscGameSession) GetUserInfo(_id uint64) (struct {
+	GetTickets *big.Int
+	UseTickets *big.Int
+	BalanceU   *big.Int
+	UseU       *big.Int
+	RefId      *big.Int
+}, error) {
+	return _BscGame.Contract.GetUserInfo(&_BscGame.CallOpts, _id)
+}
+
+// GetUserInfo is a free data retrieval call binding the contract method 0xb495763b.
+//
+// Solidity: function getUserInfo(uint64 _id) view returns(uint128 _getTickets, uint128 _useTickets, uint128 _balanceU, uint128 _useU, uint128 _refId)
+func (_BscGame *BscGameCallerSession) GetUserInfo(_id uint64) (struct {
+	GetTickets *big.Int
+	UseTickets *big.Int
+	BalanceU   *big.Int
+	UseU       *big.Int
+	RefId      *big.Int
+}, error) {
+	return _BscGame.Contract.GetUserInfo(&_BscGame.CallOpts, _id)
 }
 
 // GetBalanceInfo is a free data retrieval call binding the contract method 0x8a63891e.
@@ -379,18 +470,49 @@ func (_BscGame *BscGameCallerSession) IdToAddr(arg0 uint64) (common.Address, err
 	return _BscGame.Contract.IdToAddr(&_BscGame.CallOpts, arg0)
 }
 
+// JoinBase is a free data retrieval call binding the contract method 0x9d254940.
+//
+// Solidity: function joinBase() view returns(uint128)
+func (_BscGame *BscGameCaller) JoinBase(opts *bind.CallOpts) (*big.Int, error) {
+	var out []interface{}
+	err := _BscGame.contract.Call(opts, &out, "joinBase")
+
+	if err != nil {
+		return *new(*big.Int), err
+	}
+
+	out0 := *abi.ConvertType(out[0], new(*big.Int)).(**big.Int)
+
+	return out0, err
+
+}
+
+// JoinBase is a free data retrieval call binding the contract method 0x9d254940.
+//
+// Solidity: function joinBase() view returns(uint128)
+func (_BscGame *BscGameSession) JoinBase() (*big.Int, error) {
+	return _BscGame.Contract.JoinBase(&_BscGame.CallOpts)
+}
+
+// JoinBase is a free data retrieval call binding the contract method 0x9d254940.
+//
+// Solidity: function joinBase() view returns(uint128)
+func (_BscGame *BscGameCallerSession) JoinBase() (*big.Int, error) {
+	return _BscGame.Contract.JoinBase(&_BscGame.CallOpts)
+}
+
 // Round is a free data retrieval call binding the contract method 0x146ca531.
 //
-// Solidity: function round() view returns(uint16)
-func (_BscGame *BscGameCaller) Round(opts *bind.CallOpts) (uint16, error) {
+// Solidity: function round() view returns(uint32)
+func (_BscGame *BscGameCaller) Round(opts *bind.CallOpts) (uint32, error) {
 	var out []interface{}
 	err := _BscGame.contract.Call(opts, &out, "round")
 
 	if err != nil {
-		return *new(uint16), err
+		return *new(uint32), err
 	}
 
-	out0 := *abi.ConvertType(out[0], new(uint16)).(*uint16)
+	out0 := *abi.ConvertType(out[0], new(uint32)).(*uint32)
 
 	return out0, err
 
@@ -398,15 +520,15 @@ func (_BscGame *BscGameCaller) Round(opts *bind.CallOpts) (uint16, error) {
 
 // Round is a free data retrieval call binding the contract method 0x146ca531.
 //
-// Solidity: function round() view returns(uint16)
-func (_BscGame *BscGameSession) Round() (uint16, error) {
+// Solidity: function round() view returns(uint32)
+func (_BscGame *BscGameSession) Round() (uint32, error) {
 	return _BscGame.Contract.Round(&_BscGame.CallOpts)
 }
 
 // Round is a free data retrieval call binding the contract method 0x146ca531.
 //
-// Solidity: function round() view returns(uint16)
-func (_BscGame *BscGameCallerSession) Round() (uint16, error) {
+// Solidity: function round() view returns(uint32)
+func (_BscGame *BscGameCallerSession) Round() (uint32, error) {
 	return _BscGame.Contract.Round(&_BscGame.CallOpts)
 }
 
@@ -607,6 +729,27 @@ func (_BscGame *BscGameSession) SetOpAddr(opAddr common.Address) (*types.Transac
 // Solidity: function set_op_addr(address opAddr) returns()
 func (_BscGame *BscGameTransactorSession) SetOpAddr(opAddr common.Address) (*types.Transaction, error) {
 	return _BscGame.Contract.SetOpAddr(&_BscGame.TransactOpts, opAddr)
+}
+
+// UserOut is a paid mutator transaction binding the contract method 0xb62a0b39.
+//
+// Solidity: function userOut(uint64 userId, uint32 _round) returns(bool)
+func (_BscGame *BscGameTransactor) UserOut(opts *bind.TransactOpts, userId uint64, _round uint32) (*types.Transaction, error) {
+	return _BscGame.contract.Transact(opts, "userOut", userId, _round)
+}
+
+// UserOut is a paid mutator transaction binding the contract method 0xb62a0b39.
+//
+// Solidity: function userOut(uint64 userId, uint32 _round) returns(bool)
+func (_BscGame *BscGameSession) UserOut(userId uint64, _round uint32) (*types.Transaction, error) {
+	return _BscGame.Contract.UserOut(&_BscGame.TransactOpts, userId, _round)
+}
+
+// UserOut is a paid mutator transaction binding the contract method 0xb62a0b39.
+//
+// Solidity: function userOut(uint64 userId, uint32 _round) returns(bool)
+func (_BscGame *BscGameTransactorSession) UserOut(userId uint64, _round uint32) (*types.Transaction, error) {
+	return _BscGame.Contract.UserOut(&_BscGame.TransactOpts, userId, _round)
 }
 
 // UserWithdraw is a paid mutator transaction binding the contract method 0x7ccf264d.
@@ -837,16 +980,16 @@ func (it *BscGameJoinLogIterator) Close() error {
 
 // BscGameJoinLog represents a JoinLog event raised by the BscGame contract.
 type BscGameJoinLog struct {
-	DoType    uint8
-	Id        uint64
-	Value     *big.Int
-	TicketUse *big.Int
-	Raw       types.Log // Blockchain specific contextual infos
+	DoType uint8
+	Id     uint64
+	Value  *big.Int
+	Round  uint32
+	Raw    types.Log // Blockchain specific contextual infos
 }
 
-// FilterJoinLog is a free log retrieval operation binding the contract event 0xdd14acb3cb19338bfae15e82551804c2d072066d4cbeeb98e2f13924ebea667b.
+// FilterJoinLog is a free log retrieval operation binding the contract event 0x3f0a3a2cbe132c424167bcd3a5cf80c5e7dca8ffbb4f72c72eb9ed2b6b1be526.
 //
-// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint128 ticketUse)
+// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint32 _round)
 func (_BscGame *BscGameFilterer) FilterJoinLog(opts *bind.FilterOpts) (*BscGameJoinLogIterator, error) {
 
 	logs, sub, err := _BscGame.contract.FilterLogs(opts, "joinLog")
@@ -856,9 +999,9 @@ func (_BscGame *BscGameFilterer) FilterJoinLog(opts *bind.FilterOpts) (*BscGameJ
 	return &BscGameJoinLogIterator{contract: _BscGame.contract, event: "joinLog", logs: logs, sub: sub}, nil
 }
 
-// WatchJoinLog is a free log subscription operation binding the contract event 0xdd14acb3cb19338bfae15e82551804c2d072066d4cbeeb98e2f13924ebea667b.
+// WatchJoinLog is a free log subscription operation binding the contract event 0x3f0a3a2cbe132c424167bcd3a5cf80c5e7dca8ffbb4f72c72eb9ed2b6b1be526.
 //
-// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint128 ticketUse)
+// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint32 _round)
 func (_BscGame *BscGameFilterer) WatchJoinLog(opts *bind.WatchOpts, sink chan<- *BscGameJoinLog) (event.Subscription, error) {
 
 	logs, sub, err := _BscGame.contract.WatchLogs(opts, "joinLog")
@@ -893,9 +1036,9 @@ func (_BscGame *BscGameFilterer) WatchJoinLog(opts *bind.WatchOpts, sink chan<- 
 	}), nil
 }
 
-// ParseJoinLog is a log parse operation binding the contract event 0xdd14acb3cb19338bfae15e82551804c2d072066d4cbeeb98e2f13924ebea667b.
+// ParseJoinLog is a log parse operation binding the contract event 0x3f0a3a2cbe132c424167bcd3a5cf80c5e7dca8ffbb4f72c72eb9ed2b6b1be526.
 //
-// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint128 ticketUse)
+// Solidity: event joinLog(uint8 doType, uint64 id, uint128 _value, uint32 _round)
 func (_BscGame *BscGameFilterer) ParseJoinLog(log types.Log) (*BscGameJoinLog, error) {
 	event := new(BscGameJoinLog)
 	if err := _BscGame.contract.UnpackLog(event, "joinLog", log); err != nil {
