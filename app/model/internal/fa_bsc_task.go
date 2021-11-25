@@ -6,10 +6,12 @@ package internal
 
 // FaBscTask is the golang structure for table fa_bsc_task.
 type FaBscTask struct {
-	Id      int    `orm:"id,primary" json:"id"`      //
-	Type    string `orm:"type"       json:"type"`    // 任务类型
-	Task    string `orm:"task"       json:"task"`    // 任务内容
-	Remark  string `orm:"remark"     json:"remark"`  // 备注
-	Status  int    `orm:"status"     json:"status"`  // 状态:0-待完成,1-已完成,2-失败
-	Updated int    `orm:"updated"    json:"updated"` //
+	Id       int    `orm:"id,primary" json:"id"`       //
+	Type     string `orm:"type"       json:"type"`     // 任务类型
+	Task     string `orm:"task"       json:"task"`     // 任务内容
+	Remark   string `orm:"remark"     json:"remark"`   // 备注
+	Status   int    `orm:"status"     json:"status"`   // 状态:0-待完成,1-已完成,2-失败
+	Created  int    `orm:"created"    json:"created"`  //
+	TaskNum  int    `orm:"task_num"   json:"taskNum"`  // 重复任务次数
+	TaskTime int    `orm:"task_time"  json:"taskTime"` // 任务开始时间
 }

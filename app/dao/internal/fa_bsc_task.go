@@ -26,12 +26,14 @@ type FaBscTaskDao struct {
 
 // FaBscTaskColumns defines and stores column names for table fa_bsc_task.
 type faBscTaskColumns struct {
-	Id      string //
-	Type    string // 任务类型
-	Task    string // 任务内容
-	Remark  string // 备注
-	Status  string // 状态:0-待完成,1-已完成,2-失败
-	Updated string //
+	Id       string //
+	Type     string // 任务类型
+	Task     string // 任务内容
+	Remark   string // 备注
+	Status   string // 状态:0-待完成,1-已完成,2-失败
+	Created  string //
+	TaskNum  string // 重复任务次数
+	TaskTime string // 任务开始时间
 }
 
 var (
@@ -41,12 +43,14 @@ var (
 		DB:    g.DB("default"),
 		Table: "fa_bsc_task",
 		Columns: faBscTaskColumns{
-			Id:      "id",
-			Type:    "type",
-			Task:    "task",
-			Remark:  "remark",
-			Status:  "status",
-			Updated: "updated",
+			Id:       "id",
+			Type:     "type",
+			Task:     "task",
+			Remark:   "remark",
+			Status:   "status",
+			Created:  "created",
+			TaskNum:  "task_num",
+			TaskTime: "task_time",
 		},
 	}
 )

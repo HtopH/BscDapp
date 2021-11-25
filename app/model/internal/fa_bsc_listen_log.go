@@ -7,6 +7,7 @@ package internal
 // FaBscListenLog is the golang structure for table fa_bsc_listen_log.
 type FaBscListenLog struct {
 	Id      int    `orm:"id,primary" json:"id"`      //
+	Uid     int    `orm:"uid"        json:"uid"`     //
 	Type    string `orm:"type"       json:"type"`    // 监听类型
 	Data    string `orm:"data"       json:"data"`    // 获取内容
 	TxHash  string `orm:"tx_hash"    json:"txHash"`  // 交易hash

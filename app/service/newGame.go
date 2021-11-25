@@ -15,7 +15,6 @@ import (
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
 	"math/big"
-	"strconv"
 	"strings"
 	"time"
 )
@@ -34,10 +33,9 @@ type newGame struct {
 var (
 	rpcHttpUrl   = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
 	rpcWsUrl     = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
-	contractAddr = common.HexToAddress("0x8420B5E3875592372c41B86Eb30c80c158464860")           //合约地址
+	contractAddr = common.HexToAddress("0xbB85b0CFc6D68dcDCDab0e9f52f992f30e6DC479")           //合约地址
 	fromAddr     = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
 	privateKey   = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
-	decimals     = "1000000000000000000"                                                       //代币精度
 )
 
 func (s *newGame) Init() {
@@ -67,17 +65,18 @@ func (s *newGame) Init() {
 	}
 }
 
-func (s *newGame) AddUserBalance(param *model.TaskAddUserBalance) (string, error) {
+//系统支付给用户
+func (s *newGame) Pay(param *model.TaskAddUserBalance) (string, error) {
 	auth, err := s.GetTransactOpts()
 	if err != nil {
 		return "", err
 	}
-	res, err := s.Conn.AddUserBanlance(auth, param.UserId, s.GetBigInt(param.Value))
+	res, err := s.Conn.Pay(auth, param.UserId, GetBigInt(param.Value, model.TokenDecimals))
 	if err != nil {
 		g.Log().Debug("Service NewGame Pay Err :", err)
 		return "", err
 	}
-	return res.Value().String(), nil
+	return res.Hash().String(), nil
 }
 
 func (s *newGame) SetRound() (string, error) {
@@ -90,7 +89,7 @@ func (s *newGame) SetRound() (string, error) {
 		g.Log().Debug("Service NewGame SetRound Err :", err)
 		return "", err
 	}
-	return res.Value().String(), nil
+	return res.Hash().String(), nil
 }
 
 func (s *newGame) UserOut(param *model.TaskUserOut) (string, error) {
@@ -149,7 +148,6 @@ func (s *newGame) ListenNewGame() {
 	run := true
 	for run {
 		//监听前先消费任务
-		TimeTask.FinishBscTask()
 		data := model.FaBscListenLog{}
 		select {
 		case res := <-registerCh:
@@ -225,8 +223,22 @@ func (s *newGame) ListenNewGame() {
 			break
 		case res := <-userGetCh:
 			g.Log().Debug("userGetCh监听返回一个结果：", res) //该结果已解析
+			err = ListenTask.DealUserWithdraw(context.Background(), res)
+			if err != nil {
+				data.Status = 2
+				data.Remark = err.Error()
+			} else {
+				data.Status = 1
+			}
 			data.Type = model.ListenWithdrawal
 			data.Data = gconv.String(res)
+			data.Block = int64(res.Raw.BlockNumber)
+			data.TxHash = res.Raw.TxHash.String()
+			data.Created = int(time.Now().Unix())
+			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
+			if err != nil {
+				g.Log().Debug("ListenNewGame userGetCh ListenLog Save Err:", err)
+			}
 		case err = <-userGetSub.Err():
 			g.Log().Debug("userGetSub监听事件结果错误", err)
 			run = false
@@ -266,14 +278,12 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 	}
 
 	for _, vLog := range logs {
-		g.Log().Debug("vLog TxHash:", vLog.TxHash.String())
 		count, err := dao.FaBscListenLog.Where("tx_hash=?", vLog.TxHash.String()).Count()
 		//没有记录,说明没有监听到,需要补足
 		if count > 0 {
 			continue
 		}
 		logData := model.FaBscListenLog{
-			Data:    gconv.String(vLog),
 			TxHash:  vLog.TxHash.String(),
 			Block:   int64(vLog.BlockNumber),
 			LogType: 2,
@@ -299,6 +309,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 				Addr:  regEvent.Addr,
 				RefId: regEvent.RefId,
 			}
+
 			err = ListenTask.DealRegister(context.Background(), regData)
 			if err != nil {
 				logData.Status = 2
@@ -306,6 +317,8 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			} else {
 				logData.Status = 1
 			}
+			logData.Uid = int(regEvent.Id)
+			logData.Data = gconv.String(regData)
 			logData.Type = model.ListenRegister
 		}
 
@@ -327,6 +340,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 				GetTicket: buyEvent.GetTicket,
 				Percent:   buyEvent.Percent,
 			}
+			logData.Data = gconv.String(buyData)
 			err = ListenTask.DealBuyTicket(context.Background(), buyData)
 			if err != nil {
 				logData.Status = 2
@@ -334,7 +348,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			} else {
 				logData.Status = 1
 			}
-
+			logData.Uid = int(buyEvent.Id)
 			logData.Type = model.ListenBuy
 
 		}
@@ -347,13 +361,14 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			Round  uint32
 		}{}
 		err = contractAbi.UnpackIntoInterface(&joinEvent, "joinLog", vLog.Data)
-		g.Log().Debug("joinLog 解析日志:", buyEvent)
+		g.Log().Debug("joinLog 解析日志:", joinEvent)
 		if err == nil && joinEvent.DoType == 3 {
 			joinData := &chainService.BscGameJoinLog{
-				Id:    buyEvent.Id,
-				Value: buyEvent.Value,
+				Id:    joinEvent.Id,
+				Value: joinEvent.Value,
 				Round: joinEvent.Round,
 			}
+			logData.Data = gconv.String(joinData)
 			err = ListenTask.DealUserJoinGame(context.Background(), joinData)
 			if err != nil {
 				logData.Status = 2
@@ -361,7 +376,33 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			} else {
 				logData.Status = 1
 			}
+			logData.Uid = int(joinEvent.Id)
 			logData.Type = model.ListenBuy
+		}
+
+		//TODO 尝试解析提现请求
+		getEvent := struct {
+			DoType uint8
+			Id     uint64
+			Value  *big.Int
+		}{}
+		err = contractAbi.UnpackIntoInterface(&getEvent, "userGetLog", vLog.Data)
+		g.Log().Debug("userGetLog 解析日志:", getEvent)
+		if err == nil && getEvent.DoType == 4 {
+			getData := &chainService.BscGameUserGetLog{
+				Id:    getEvent.Id,
+				Value: getEvent.Value,
+			}
+			logData.Data = gconv.String(getData)
+			err = ListenTask.DealUserWithdraw(context.Background(), getData)
+			if err != nil {
+				logData.Status = 2
+				logData.Remark = err.Error()
+			} else {
+				logData.Status = 1
+			}
+			logData.Uid = int(getEvent.Id)
+			logData.Type = model.ListenWithdrawal
 		}
 
 		//将获取到的交易日志存储起来
@@ -401,12 +442,4 @@ func (s *newGame) GetTransactOpts() (*bind.TransactOpts, error) {
 	auth.GasLimit = uint64(300000)
 	auth.GasPrice = gasPrice
 	return auth, nil
-}
-
-func (s *newGame) GetBigInt(num float64) *big.Int {
-	dec, _ := strconv.Atoi(decimals) // 兑换比例精度
-	temp := num * float64(dec)
-	float := strconv.FormatFloat(temp, 'f', -1, 64)
-	res, _ := new(big.Int).SetString(float, 10)
-	return res
 }

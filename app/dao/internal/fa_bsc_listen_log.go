@@ -27,6 +27,7 @@ type FaBscListenLogDao struct {
 // FaBscListenLogColumns defines and stores column names for table fa_bsc_listen_log.
 type faBscListenLogColumns struct {
 	Id      string //
+	Uid     string //
 	Type    string // 监听类型
 	Data    string // 获取内容
 	TxHash  string // 交易hash
@@ -45,6 +46,7 @@ var (
 		Table: "fa_bsc_listen_log",
 		Columns: faBscListenLogColumns{
 			Id:      "id",
+			Uid:     "uid",
 			Type:    "type",
 			Data:    "data",
 			TxHash:  "tx_hash",

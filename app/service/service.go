@@ -2,6 +2,9 @@ package service
 
 import (
 	"BscDapp/app/model"
+	"github.com/gogf/gf/util/gconv"
+	"math/big"
+	"strconv"
 	"time"
 )
 
@@ -26,4 +29,16 @@ func GetGameEndTime(gameInfo *model.FaBscGameInfo, nowSeed float64) int {
 		newEnd = int(now.Unix() + model.GameLevelFiveTime)
 	}
 	return newEnd
+}
+
+func GetBigInt(num float64, decimals string) *big.Int {
+	dec, _ := strconv.Atoi(decimals) // 兑换比例精度
+	temp := num * float64(dec)
+	float := strconv.FormatFloat(temp, 'f', -1, 64)
+	res, _ := new(big.Int).SetString(float, 10)
+	return res
+}
+
+func BigIntToF(num *big.Int, decimals string) float64 {
+	return gconv.Float64(num.String()) / gconv.Float64(decimals)
 }

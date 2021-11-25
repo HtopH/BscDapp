@@ -12,19 +12,20 @@ const (
 	BaseSpendKey = "spendTicket"
 
 	//精度
-	TokenDecimals   = "1000000000000000000"
-	PercentDecimals = "1000000"
+	TokenDecimals   = "1000000000000000000" //代币精度
+	PercentDecimals = "1000000"             //比例精度
 
 	//发送交易事件
-	SendAddBalance = "addBalance"
-	SendSetRound   = "setRound"
-	SendUserOut    = "userOut"
+	SendPay      = "pay"
+	SendSetRound = "setRound"
+	SendUserOut  = "userOut"
 
 	//余额变动事件
-	CreditReward    = "reward"    //投资回报
-	CreditPool      = "pool"      //奖池奖励
-	CreditRefReward = "refReward" //推荐奖励
-	CreditBuyTicket = "buyTicket" //兑换门票
+	CreditReward    = "returnReward"   //投资回报
+	CreditPool      = "poolReward"     //奖池奖励
+	CreditRefReward = "referrerReward" //推荐奖励
+	CreditBuyTicket = "buyTicket"      //兑换门票
+	CreditWithdraw  = "withdraw"       //兑换门票
 
 	//数值比例设置
 	PercentBase       = 100 //基础数值
@@ -45,4 +46,6 @@ const (
 	GameLevelFivePool  = 400000
 	GameLevelFiveTime  = 60 * 90
 	GameBaseTime       = 60 * 10
+
+	TaskLateTime = 60 * 15 //任务延迟等待时间
 )

@@ -81,7 +81,7 @@ contract NewGame {
 
     function register(address ref_addr) external {
         require(ref_addr!=msg.sender,"ref_addr can not be self!");
-        require(addrToId[msg.sender]==0,"user is exit!");
+        require(addrToId[msg.sender]==0,"user is exist!");
         uint64 refId;
 
         if (addrToId[ref_addr]!=0){
@@ -143,12 +143,17 @@ contract NewGame {
     }
 
     function userWithdraw(uint128 _value) external {
-        uint64 playerId=addrToId[msg.sender];
-        Player storage this_player=players[playerId];
-        require(this_player.balanceU>=_value,"balance is not enough!");
-        players[playerId].balanceU=this_player.balanceU.sub(_value);
-        USD_TOKEN.transfer(msg.sender,_value);
-        emit userGetLog(4,playerId,_value);
+        require(addrToId[msg.sender]!=0,"iser is not exist!");
+        require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance!");
+        emit userGetLog(4,addrToId[msg.sender],_value);
+    }
+
+    function pay(uint64 _id,uint128 _value) external onlyOperator{
+        require(idToAddr[_id]!=address(0),"User is not exist!");
+        require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance.");
+        USD_TOKEN.transferFrom(address(this),idToAddr[_id],_value);
+        Player storage this_player=players[_id];
+        players[_id].balanceU=this_player.balanceU.add(_value);
     }
 
     function adminWithdraw(uint128 val, uint8 _token_type) external onlyAdmin returns (bool) {
@@ -175,14 +180,6 @@ contract NewGame {
             _balanceU=this_player.balanceU;
             _useU=this_player.useU;
             _refId=this_player.refId;
-    }
-
-    function addUserBanlance(uint64 userId,uint128 _value) external onlyOperator returns (bool){
-        require(idToAddr[userId]!=address(0));
-        Player storage this_player=players[userId];
-        players[userId].balanceU=this_player.balanceU.add(_value);
-
-        return true;
     }
 
     function userOut(uint64 userId,uint32 _round) external onlyOperator returns(bool){

@@ -33,19 +33,26 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			},
 			"updated": time.Now().Unix(),
 		}
-
+	} else if doType == model.CreditWithdraw {
+		update = g.Map{
+			"credit": &gdb.Counter{
+				Field: "credit",
+				Value: amount,
+			},
+			"updated": time.Now().Unix(),
+		}
 		//添加任务发放到合约
 		taskInfo := model.FaBscTask{
-			Type:    model.SendAddBalance,
-			Task:    gconv.String(model.TaskAddUserBalance{UserId: uint64(uid), Value: amount}),
-			Updated: int(time.Now().Unix()),
+			Type:     model.SendPay,
+			Task:     gconv.String(model.TaskAddUserBalance{UserId: uint64(uid), Value: -amount}),
+			Created:  int(time.Now().Unix()),
+			TaskTime: int(time.Now().Unix()),
 		}
 		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
 		if err != nil {
 			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
 			return err
 		}
-
 	} else if doType == model.CreditBuyTicket {
 		update = g.Map{
 			"ticket_num": &gdb.Counter{
