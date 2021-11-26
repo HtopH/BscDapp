@@ -33,7 +33,7 @@ type newGame struct {
 var (
 	rpcHttpUrl   = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
 	rpcWsUrl     = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
-	contractAddr = common.HexToAddress("0xbB85b0CFc6D68dcDCDab0e9f52f992f30e6DC479")           //合约地址
+	contractAddr = common.HexToAddress("0x6b2FAA2733746a735363bfD426C38B1AC3cfAB3c")           //合约地址
 	fromAddr     = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
 	privateKey   = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
 )
@@ -79,6 +79,7 @@ func (s *newGame) Pay(param *model.TaskAddUserBalance) (string, error) {
 	return res.Hash().String(), nil
 }
 
+//更新当前活动场次
 func (s *newGame) SetRound() (string, error) {
 	auth, err := s.GetTransactOpts()
 	if err != nil {
@@ -92,6 +93,7 @@ func (s *newGame) SetRound() (string, error) {
 	return res.Hash().String(), nil
 }
 
+//会员出局
 func (s *newGame) UserOut(param *model.TaskUserOut) (string, error) {
 	auth, err := s.GetTransactOpts()
 	if err != nil {
@@ -102,14 +104,23 @@ func (s *newGame) UserOut(param *model.TaskUserOut) (string, error) {
 		g.Log().Debug("Service NewGame UserOut Err :", err)
 		return "", err
 	}
-	return res.Value().String(), nil
+	return res.Hash().String(), nil
+}
+
+//获取兑换比例
+func (s *newGame) GetPercent() (uint32, error) {
+	res, err := s.Conn.GetPercent(nil)
+	if err != nil {
+		g.Log().Debug("Service NewGame GetPercent Err:", err)
+	}
+	return res, err
 }
 
 //通过ID获取地址
 func (s *newGame) IdToAddr(id uint64) common.Address {
 	res, err := s.Conn.IdToAddr(nil, id)
 	if err != nil {
-		g.Log().Debug("Service NewGame Init WsNewBscGame Err :", err)
+		g.Log().Debug("Service NewGame IdToAddr Err :", err)
 	}
 	return res
 }
@@ -137,7 +148,7 @@ func (s *newGame) ListenNewGame() {
 		g.Log().Debug("WatchJoinLog监听合约特定事件失败", err)
 		return
 	}
-	//提现
+	//会员提现
 	userGetCh := make(chan *chainService.BscGameUserGetLog)
 	userGetSub, err := s.WsConn.WatchUserGetLog(&bind.WatchOpts{}, userGetCh)
 	if err != nil {
@@ -161,6 +172,7 @@ func (s *newGame) ListenNewGame() {
 			}
 			//插入监听记录
 			data.Type = model.ListenRegister
+			data.Uid = int(res.Id)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
 			data.Data = gconv.String(res)
@@ -185,6 +197,7 @@ func (s *newGame) ListenNewGame() {
 			}
 			//插入监听记录
 			data.Type = model.ListenBuy
+			data.Uid = int(res.Id)
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
@@ -208,6 +221,7 @@ func (s *newGame) ListenNewGame() {
 			}
 			//插入监听记录
 			data.Type = model.ListenJoin
+			data.Uid = int(res.Id)
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
@@ -216,7 +230,6 @@ func (s *newGame) ListenNewGame() {
 			if err != nil {
 				g.Log().Debug("ListenNewGame joinCh ListenLog Save Err:", err)
 			}
-
 		case err = <-joinSub.Err():
 			g.Log().Debug("joinSub监听事件结果错误", err)
 			run = false
@@ -231,6 +244,7 @@ func (s *newGame) ListenNewGame() {
 				data.Status = 1
 			}
 			data.Type = model.ListenWithdrawal
+			data.Uid = int(res.Id)
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
@@ -305,9 +319,10 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			//日志解析不到地址,直接通过ID读取会员地址
 			regEvent.Addr = s.IdToAddr(regEvent.Id)
 			regData := &chainService.BscGameRegisterLog{
-				Id:    regEvent.Id,
-				Addr:  regEvent.Addr,
-				RefId: regEvent.RefId,
+				DoType: regEvent.DoType,
+				Id:     regEvent.Id,
+				Addr:   regEvent.Addr,
+				RefId:  regEvent.RefId,
 			}
 
 			err = ListenTask.DealRegister(context.Background(), regData)
@@ -335,6 +350,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		//不报错说明是购买门票事件
 		if err == nil && buyEvent.DoType == 2 {
 			buyData := &chainService.BscGameBuyTicketLog{
+				DoType:    buyEvent.DoType,
 				Id:        buyEvent.Id,
 				Value:     buyEvent.Value,
 				GetTicket: buyEvent.GetTicket,
@@ -364,9 +380,10 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		g.Log().Debug("joinLog 解析日志:", joinEvent)
 		if err == nil && joinEvent.DoType == 3 {
 			joinData := &chainService.BscGameJoinLog{
-				Id:    joinEvent.Id,
-				Value: joinEvent.Value,
-				Round: joinEvent.Round,
+				DoType: joinEvent.DoType,
+				Id:     joinEvent.Id,
+				Value:  joinEvent.Value,
+				Round:  joinEvent.Round,
 			}
 			logData.Data = gconv.String(joinData)
 			err = ListenTask.DealUserJoinGame(context.Background(), joinData)
@@ -377,7 +394,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 				logData.Status = 1
 			}
 			logData.Uid = int(joinEvent.Id)
-			logData.Type = model.ListenBuy
+			logData.Type = model.ListenJoin
 		}
 
 		//TODO 尝试解析提现请求
@@ -390,8 +407,9 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		g.Log().Debug("userGetLog 解析日志:", getEvent)
 		if err == nil && getEvent.DoType == 4 {
 			getData := &chainService.BscGameUserGetLog{
-				Id:    getEvent.Id,
-				Value: getEvent.Value,
+				DoType: getEvent.DoType,
+				Id:     getEvent.Id,
+				Value:  getEvent.Value,
 			}
 			logData.Data = gconv.String(getData)
 			err = ListenTask.DealUserWithdraw(context.Background(), getData)
@@ -412,11 +430,11 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		}
 		_, err = dao.FaBscListenLog.OmitEmpty().Save(logData)
 		if err != nil {
-			g.Log().Debug("ReadBlockLog registerLog save err:", err)
+			g.Log().Debug("ReadBlockLog ListenLog Save err:", err)
 		}
 	}
 	//更新拉取区块高度起始点
-	_, _ = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": endBlock + 1})
+	_, _ = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": endBlock + 1, "updated": time.Now().Unix()})
 	//结束的区块还不是最新的，继续拉取
 	if maxBlockNum > uint64(endBlock+1) {
 		s.ReadBlockLog(endBlock + 1)

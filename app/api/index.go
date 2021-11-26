@@ -2,6 +2,7 @@ package api
 
 import (
 	"BscDapp/app/common"
+	"BscDapp/app/dao"
 	"BscDapp/app/service"
 	"github.com/gogf/gf/net/ghttp"
 	"net/http"
@@ -21,4 +22,30 @@ func (a *indexApi) Test(r *ghttp.Request) {
 	//service.NewGame.ReadBlockLog(int64(num))
 	//service.ListenTask.DealGameStatus(r.Context())
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+}
+
+// @summary 基础配置
+// @tags    系统信息
+// @produce json
+// @router  /api/index/base-info   [GET]
+// @success 200 {object} model.BscBaseInfo "执行结果"
+func (a *indexApi) BaseInfo(r *ghttp.Request) {
+	res, err := service.Index.GetBaseInfo()
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+}
+
+// @summary 场次信息
+// @tags    系统信息
+// @produce json
+// @router  /api/index/game-info   [GET]
+// @success 200 {object} model.FaBscGameInfo "执行结果"
+func (a *indexApi) GameInfo(r *ghttp.Request) {
+	res, err := dao.FaBscGameInfo.Where("status=1").Order("round desc").One()
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }

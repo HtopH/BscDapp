@@ -25,7 +25,7 @@ contract NewGame {
 
     address constant private ADMIN_ADDR = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     address private op_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
-    
+
     uint128 public  spendTickets;
     uint128 public  joinBase = 10000000000000000000;
     uint128 private baseNum =100000000000000000000000;
@@ -143,7 +143,7 @@ contract NewGame {
     }
 
     function userWithdraw(uint128 _value) external {
-        require(addrToId[msg.sender]!=0,"iser is not exist!");
+        require(addrToId[msg.sender]!=0,"user is not exist!");
         require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance!");
         emit userGetLog(4,addrToId[msg.sender],_value);
     }
@@ -151,7 +151,7 @@ contract NewGame {
     function pay(uint64 _id,uint128 _value) external onlyOperator{
         require(idToAddr[_id]!=address(0),"User is not exist!");
         require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance.");
-        USD_TOKEN.transferFrom(address(this),idToAddr[_id],_value);
+        USD_TOKEN.transfer(idToAddr[_id],_value);
         Player storage this_player=players[_id];
         players[_id].balanceU=this_player.balanceU.add(_value);
     }

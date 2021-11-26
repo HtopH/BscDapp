@@ -7,6 +7,7 @@ import (
 	"github.com/gogf/gf/database/gdb"
 	"github.com/gogf/gf/errors/gerror"
 	"github.com/gogf/gf/frame/g"
+	"github.com/gogf/gf/net/ghttp"
 	"github.com/gogf/gf/util/gconv"
 	"time"
 )
@@ -15,12 +16,25 @@ var User = user{}
 
 type user struct{}
 
+//获取登陆会员信息
+func (s *user) GetUser(r *ghttp.Request) *model.FaBscUser {
+	user := new(model.FaBscUser)
+	data := r.GetCtxVar("user")
+	if err := gconv.Struct(data, user); err != nil {
+		g.Log().Debug("Service User GetUser Err:", err)
+		return nil
+	}
+	return user
+}
+
 //修改会员余额
 func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType string) error {
 	var (
-		update = g.Map{}
-		err    error
+		update   = g.Map{}
+		err      error
+		filename = model.UserCreditOne
 	)
+
 	if doType == model.CreditPool || doType == model.CreditRefReward || doType == model.CreditReward {
 		update = g.Map{
 			"credit": &gdb.Counter{
@@ -61,6 +75,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			},
 			"updated": time.Now().Unix(),
 		}
+		filename = model.UserCreditTwo
 	} else {
 		return gerror.New("Service User ChangeCredit Err:会员余额事件不存在")
 	}
@@ -71,10 +86,11 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 		return err
 	}
 	creditInfo := model.FaBscCredit{
-		Uid:     uid,
-		Type:    doType,
-		Num:     amount,
-		Created: int(time.Now().Unix()),
+		Uid:      uid,
+		FileName: filename,
+		Type:     doType,
+		Num:      amount,
+		Created:  int(time.Now().Unix()),
 	}
 	_, err = dao.FaBscCredit.Ctx(ctx).OmitEmpty().Save(creditInfo)
 	if err != nil {

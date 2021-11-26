@@ -76,7 +76,9 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 			g.Log().Debug("Service Task DealGameStatus GameInfo Find Err:", err)
 			return err
 		}
-
+		if gameInfo == nil {
+			gameInfo = &model.FaBscGameInfo{}
+		}
 		if gameInfo != nil && gameInfo.Status == 1 {
 			//检查是否到期
 			if gameInfo.EndTime > int(time.Now().Unix()) {
@@ -207,10 +209,13 @@ func (s *listenTask) DealBuyTicket(c context.Context, param *chainService.BscGam
 			return gerror.New("活动奖池更新失败：" + err.Error())
 		}
 		//奖励推荐人
-		err = User.ChangeCredit(ctx, userInfo.RefId, num*20/100, model.CreditRefReward)
-		if err != nil {
-			return err
+		if userInfo.RefId > 0 {
+			err = User.ChangeCredit(ctx, userInfo.RefId, num*20/100, model.CreditRefReward)
+			if err != nil {
+				return err
+			}
 		}
+
 		//更新系统已兑换门票
 		spendInfo, _ := dao.FaBscBaseInfo.Ctx(ctx).Where("theKey=?", model.BaseSpendKey).One()
 		if spendInfo != nil {
@@ -247,11 +252,19 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 			Status:    1,
 			Created:   int(now.Unix()),
 		}
+
 		_, err = dao.FaBscUserGame.Ctx(ctx).OmitEmpty().Save(insertUserGame)
 		if err != nil || gameInfo == nil {
 			g.Log().Debug("Service DoListenTask DealUserJoinGame UserGame Save Err:", err)
 			return gerror.New("插入活动参与记录失败:" + err.Error())
 		}
+		//更新会员投资金额
+		_, err = dao.FaBscUser.Ctx(ctx).Where("id=?", userInfo.Id).Increment(dao.FaBscUser.Columns.InvestNum, num)
+		if err != nil {
+			g.Log().Debug("Service DoListenTask DealUserJoinGame User Increment Err:", err)
+			return gerror.New("更新会员投资金额失败:" + err.Error())
+		}
+
 		//会员参与活动,更新活动信息
 		nowJack := gameInfo.JackPool + num*model.PercentJoinToJack/model.PercentBase
 		nowSeed := gameInfo.JackPool + num*model.PercentJoinToSeed/model.PercentBase
@@ -334,11 +347,10 @@ func (s *listenTask) DealUserWithdraw(c context.Context, param *chainService.Bsc
 			g.Log().Debug("Service DoListenTask DealUserWithdraw UserInfo Find Err:", err)
 			return gerror.New("获取会员信息失败：" + err.Error())
 		}
-		num := BigIntToF(param.Value, model.TokenDecimals)
-		if num > userInfo.Credit {
+		if userInfo.Credit <= 0 {
 			return gerror.New("会员余额不足")
 		}
-		err = User.ChangeCredit(ctx, userInfo.Id, -num, model.CreditWithdraw)
+		err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.Credit, model.CreditWithdraw)
 		return nil
 	})
 

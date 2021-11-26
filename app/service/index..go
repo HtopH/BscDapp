@@ -1,0 +1,30 @@
+package service
+
+import (
+	"BscDapp/app/dao"
+	"BscDapp/app/model"
+	"github.com/gogf/gf/errors/gerror"
+	"github.com/gogf/gf/frame/g"
+	"github.com/gogf/gf/util/gconv"
+)
+
+var Index = indexService{}
+
+type indexService struct {
+}
+
+//获取系统基本信息
+func (s *indexService) GetBaseInfo() (*model.BscBaseInfo, error) {
+	var data = &model.BscBaseInfo{}
+	spendInfo, err := dao.FaBscBaseInfo.Where("theKey=?", model.BaseSpendKey).One()
+	if err != nil || spendInfo == nil {
+		g.Log().Debug("Service Index GetBaseInfo spendInfo Find err:", err)
+		return nil, gerror.New("门票信息查询失败")
+	}
+	data.SpendTicket = gconv.Float64(spendInfo.TheValue)
+	data.TokenDecimal = model.TokenDecimals
+	percent, err := NewGame.GetPercent()
+	data.TicketPercent = float64(percent) * 100 / gconv.Float64(model.PercentDecimals)
+	data.JoinPercent = model.PercentBase / model.PercentJoinTicket
+	return data, err
+}

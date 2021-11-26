@@ -27,6 +27,10 @@ const (
 	CreditBuyTicket = "buyTicket"      //兑换门票
 	CreditWithdraw  = "withdraw"       //兑换门票
 
+	//余额字段类型
+	UserCreditOne = "credit" //U
+	UserCreditTwo = "ticket" //门票
+
 	//数值比例设置
 	PercentBase       = 100 //基础数值
 	PercentJoinTicket = 10  //投资消耗门票比例

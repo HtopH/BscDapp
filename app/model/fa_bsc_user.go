@@ -12,3 +12,15 @@ import (
 type FaBscUser internal.FaBscUser
 
 // Fill with you ideas below.
+type UserInfo struct {
+	Id          int     `orm:"id,primary"   json:"id"`          //
+	Address     string  `orm:"address"      json:"address"`     // 用户地址
+	RefNum      int     `orm:"ref_num"      json:"refNum"`      // 直推人数
+	TeamNum     int     `orm:"team_num"     json:"teamNum"`     // 团队人数
+	TicketNum   float64 `orm:"ticket_num"   json:"ticketNum"`   // 兑换的门票数
+	InvestNum   float64 `orm:"invest_num"   json:"investNum"`   // 投资金额
+	Credit      float64 `orm:"credit"       json:"credit"`      // 现有奖励
+	TotalCredit float64 `orm:"total_credit" json:"totalCredit"` // 累计奖励
+	Created     int     `orm:"created"      json:"created"`     // 注册时间
+	Updated     int     `orm:"updated"      json:"updated"`     //
+}
