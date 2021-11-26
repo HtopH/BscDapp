@@ -60,6 +60,118 @@
                     }
                 }
             }
+        },
+        "/joinGame": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "合约接口"
+                ],
+                "summary": "投资",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "支付金额,big.int,需乘精度",
+                        "name": "_value",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/payForTickets": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "合约接口"
+                ],
+                "summary": "购买门票",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "支付金额,big.int,需乘精度",
+                        "name": "_value",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/register": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "合约接口"
+                ],
+                "summary": "注册",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "推荐人地址,无则传空字符串 ",
+                        "name": "ref_addr",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/userWithdraw": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "合约接口"
+                ],
+                "summary": "会员提现",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "提现金额,big.int,需乘精度,不需用户填,直接传会员余额",
+                        "name": "_value",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -166,6 +278,23 @@
                 },
                 "updated": {
                     "type": "integer"
+                }
+            }
+        },
+        "service.JsonResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "错误码",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "返回数据",
+                    "type": "object"
+                },
+                "message": {
+                    "description": "提示信息",
+                    "type": "string"
                 }
             }
         }
