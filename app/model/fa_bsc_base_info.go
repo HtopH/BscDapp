@@ -14,6 +14,7 @@ type FaBscBaseInfo internal.FaBscBaseInfo
 // Fill with you ideas below.
 //系统基本信息
 type BscBaseInfo struct {
+	OwnAddr       string  //根节点地址
 	TokenDecimal  string  //代币精度
 	TicketPercent float64 //门票兑换比例-100%
 	SpendTicket   float64 //已兑换门票

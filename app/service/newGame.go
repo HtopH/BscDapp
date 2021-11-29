@@ -30,36 +30,29 @@ type newGame struct {
 	Ctx          context.Context
 }
 
-var (
-	rpcHttpUrl   = "https://data-seed-prebsc-1-s1.binance.org:8545/"                           //合约http连接
-	rpcWsUrl     = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws" //合约ws连接
-	contractAddr = common.HexToAddress("0x6b2FAA2733746a735363bfD426C38B1AC3cfAB3c")           //合约地址
-	fromAddr     = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")           //操作员钱包账户地址
-	privateKey   = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"          //钱包账户
-)
-
 func (s *newGame) Init() {
+	g.Log().Debug("newGame Init Start")
 	var err error
 	s.Ctx = context.Background()
-	s.Client, err = ethclient.Dial(rpcHttpUrl)
+	s.Client, err = ethclient.Dial(model.RpcHttpUrl)
 	if err != nil {
 		g.Log().Debug("Service NewGame Init HttpClient Err :", err)
 		fmt.Println("连接网络失败", err)
 		return
 	}
 
-	s.Conn, err = chainService.NewBscGame(contractAddr, s.Client)
+	s.Conn, err = chainService.NewBscGame(model.ContractAddr, s.Client)
 	if err != nil {
 		g.Log().Debug("Service NewGame Init HttpNewBscGame Err :", err)
 		return
 	}
 
-	s.WsClient, err = ethclient.Dial(rpcWsUrl)
+	s.WsClient, err = ethclient.Dial(model.RpcWsUrl)
 	if err != nil {
 		g.Log().Debug("Service NewGame Init WsClient Err :", err)
 		return
 	}
-	s.WsConn, err = chainService.NewBscGame(contractAddr, s.WsClient)
+	s.WsConn, err = chainService.NewBscGame(model.ContractAddr, s.WsClient)
 	if err != nil {
 		g.Log().Debug("Service NewGame Init WsNewBscGame Err :", err)
 	}
@@ -134,6 +127,7 @@ func (s *newGame) ListenNewGame() {
 		g.Log().Debug("WatchRegisterLog监听合约特定事件失败", err)
 		return
 	}
+
 	//购买门票
 	buyTicketCh := make(chan *chainService.BscGameBuyTicketLog)
 	buyTicketSub, err := s.WsConn.WatchBuyTicketLog(&bind.WatchOpts{}, buyTicketCh)
@@ -276,7 +270,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 		FromBlock: big.NewInt(startBlock),
 		ToBlock:   big.NewInt(endBlock),
 		Addresses: []common.Address{
-			contractAddr,
+			model.ContractAddr,
 		},
 	}
 	logs, err := s.Client.FilterLogs(s.Ctx, query)
@@ -443,7 +437,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 
 //组装写入合约的auth（需要消耗邮费）
 func (s *newGame) GetTransactOpts() (*bind.TransactOpts, error) {
-	nonce, err := s.Client.PendingNonceAt(s.Ctx, fromAddr)
+	nonce, err := s.Client.PendingNonceAt(s.Ctx, model.FromAddr)
 	if err != nil {
 		g.Log().Debug("GetTransactOpts 获取nonce错误", err)
 		return nil, err
@@ -453,7 +447,7 @@ func (s *newGame) GetTransactOpts() (*bind.TransactOpts, error) {
 		g.Log().Debug("GetTransactOpts Get gasPrice error", err)
 		return nil, err
 	}
-	priKey, err := crypto.HexToECDSA(privateKey)
+	priKey, err := crypto.HexToECDSA(model.PrivateKey)
 	auth := bind.NewKeyedTransactor(priKey)
 	auth.Nonce = big.NewInt(int64(nonce))
 	auth.Value = big.NewInt(0)

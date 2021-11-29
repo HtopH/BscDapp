@@ -26,5 +26,6 @@ func (s *indexService) GetBaseInfo() (*model.BscBaseInfo, error) {
 	percent, err := NewGame.GetPercent()
 	data.TicketPercent = float64(percent) * 100 / gconv.Float64(model.PercentDecimals)
 	data.JoinPercent = model.PercentBase / model.PercentJoinTicket
+	data.OwnAddr = model.OwnAddr
 	return data, err
 }

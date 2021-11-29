@@ -1,5 +1,26 @@
 package model
 
+import "github.com/ethereum/go-ethereum/common"
+
+var (
+	//合约地址
+	ContractAddr = common.HexToAddress("0x6b2FAA2733746a735363bfD426C38B1AC3cfAB3c")
+	//操作员地址
+	FromAddr = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")
+)
+
+//币安链DApp基础信息
+const (
+	//根节点地址
+	OwnAddr = "0x125a0daEE26BD73B37A3c2a86c84426c68743750"
+	//币安http连接
+	RpcHttpUrl = "https://data-seed-prebsc-1-s1.binance.org:8545/"
+	//币安ws连接
+	RpcWsUrl = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws"
+	//钱包账户私钥
+	PrivateKey = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"
+)
+
 const (
 	//监听类型
 	ListenRegister   = "register"
