@@ -149,6 +149,9 @@ func (s *newGame) ListenNewGame() {
 		g.Log().Debug("WatchUserGetLog监听合约特定事件失败", err)
 		return
 	}
+	//门票转账
+	transferCh := make(chan *chainService.BscGameTransferLog)
+	transferSub, err := s.WsConn.WatchTransferLog(&bind.WatchOpts{}, transferCh)
 	g.Log().Debug("监听事件堵塞等待：")
 	run := true
 	for run {
@@ -251,6 +254,29 @@ func (s *newGame) ListenNewGame() {
 			g.Log().Debug("userGetSub监听事件结果错误", err)
 			run = false
 			break
+		case res := <-transferCh:
+			g.Log().Debug("transferCh监听返回一个结果：", res) //该结果已解析
+			err = ListenTask.DealTransfer(context.Background(), res)
+			if err != nil {
+				data.Status = 2
+				data.Remark = err.Error()
+			} else {
+				data.Status = 1
+			}
+			data.Type = model.ListenTransfer
+			data.Data = gconv.String(res)
+			data.Block = int64(res.Raw.BlockNumber)
+			data.TxHash = res.Raw.TxHash.String()
+			data.Created = int(time.Now().Unix())
+			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
+			if err != nil {
+				g.Log().Debug("ListenNewGame transferCh ListenLog Save Err:", err)
+			}
+		case err = <-transferSub.Err():
+			g.Log().Debug("transferSub监听事件结果错误", err)
+			run = false
+			break
+
 		}
 
 	}

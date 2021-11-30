@@ -355,3 +355,8 @@ func (s *listenTask) DealUserWithdraw(c context.Context, param *chainService.Bsc
 	})
 
 }
+
+//处理门票转账
+func (s *listenTask) DealTransfer(c context.Context, param *chainService.BscGameTransferLog) error {
+	return nil
+}

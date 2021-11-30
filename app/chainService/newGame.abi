@@ -114,6 +114,37 @@
 			},
 			{
 				"indexed": false,
+				"internalType": "address",
+				"name": "fromAddr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "address",
+				"name": "toAddr",
+				"type": "address"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			}
+		],
+		"name": "transferLog",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": false,
+				"internalType": "uint8",
+				"name": "doType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint64",
 				"name": "id",
 				"type": "uint64"
@@ -444,6 +475,24 @@
 			}
 		],
 		"stateMutability": "view",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "address",
+				"name": "_addr",
+				"type": "address"
+			},
+			{
+				"internalType": "uint128",
+				"name": "_value",
+				"type": "uint128"
+			}
+		],
+		"name": "transferToUser",
+		"outputs": [],
+		"stateMutability": "nonpayable",
 		"type": "function"
 	},
 	{

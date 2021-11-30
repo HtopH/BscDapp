@@ -50,6 +50,7 @@ contract NewGame {
     event buyTicketLog(uint8 doType,uint64 id,uint128 _value,uint128 getTicket,uint32 percent);
     event joinLog(uint8 doType,uint64 id,uint128 _value,uint32 _round);
     event userGetLog(uint8 doType,uint64 id,uint128 _value);
+    event transferLog(uint8 doType,address fromAddr,address toAddr,uint128 _value);
 
     modifier onlyAdmin() {
         require(msg.sender == ADMIN_ADDR,"You are not Admin");
@@ -146,6 +147,12 @@ contract NewGame {
         require(addrToId[msg.sender]!=0,"user is not exist!");
         require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance!");
         emit userGetLog(4,addrToId[msg.sender],_value);
+    }
+
+    function transferToUser(address _addr,uint128 _value) external{
+        require(Ticket_TOKEN.balanceOf(msg.sender)>=_value,"ticket is not enough!");
+        Ticket_TOKEN.transferFrom(msg.sender,_addr,_value);
+        emit transferLog(5,msg.sender,_addr, _value);
     }
 
     function pay(uint64 _id,uint128 _value) external onlyOperator{

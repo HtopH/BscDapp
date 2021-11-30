@@ -27,6 +27,7 @@ const (
 	ListenBuy        = "buyTicket"
 	ListenJoin       = "join"
 	ListenWithdrawal = "withdrawal"
+	ListenTransfer   = "transfer"
 
 	//系统基础信息key
 	BaseReadKey  = "readBlock"
