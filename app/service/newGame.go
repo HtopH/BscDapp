@@ -419,17 +419,19 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 
 		//TODO 尝试解析提现请求
 		getEvent := struct {
-			DoType uint8
-			Id     uint64
-			Value  *big.Int
+			DoType     uint8
+			RewardType uint8
+			Id         uint64
+			Value      *big.Int
 		}{}
 		err = contractAbi.UnpackIntoInterface(&getEvent, "userGetLog", vLog.Data)
 		g.Log().Debug("userGetLog 解析日志:", getEvent)
 		if err == nil && getEvent.DoType == 4 {
 			getData := &chainService.BscGameUserGetLog{
-				DoType: getEvent.DoType,
-				Id:     getEvent.Id,
-				Value:  getEvent.Value,
+				DoType:     getEvent.DoType,
+				RewardType: getEvent.RewardType,
+				Id:         getEvent.Id,
+				Value:      getEvent.Value,
 			}
 			logData.Data = gconv.String(getData)
 			err = ListenTask.DealUserWithdraw(context.Background(), getData)
@@ -441,6 +443,33 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			}
 			logData.Uid = int(getEvent.Id)
 			logData.Type = model.ListenWithdrawal
+		}
+
+		//TODO 尝试解析转账请求
+		transferEvent := struct {
+			DoType   uint8
+			FromAddr common.Address
+			ToAddr   common.Address
+			Value    *big.Int
+		}{}
+		err = contractAbi.UnpackIntoInterface(&transferEvent, "transferLog", vLog.Data)
+		g.Log().Debug("transferLog 解析日志:", transferEvent)
+		if err == nil && transferEvent.DoType == 5 {
+			getData := &chainService.BscGameTransferLog{
+				DoType:   transferEvent.DoType,
+				FromAddr: transferEvent.FromAddr,
+				ToAddr:   transferEvent.ToAddr,
+				Value:    transferEvent.Value,
+			}
+			logData.Data = gconv.String(getData)
+			err = ListenTask.DealTransfer(context.Background(), getData)
+			if err != nil {
+				logData.Status = 2
+				logData.Remark = err.Error()
+			} else {
+				logData.Status = 1
+			}
+			logData.Type = model.ListenTransfer
 		}
 
 		//将获取到的交易日志存储起来

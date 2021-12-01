@@ -49,7 +49,7 @@ contract NewGame {
     event registerLog(uint8 doType,uint64 id,address indexed addr,uint64 refId);
     event buyTicketLog(uint8 doType,uint64 id,uint128 _value,uint128 getTicket,uint32 percent);
     event joinLog(uint8 doType,uint64 id,uint128 _value,uint32 _round);
-    event userGetLog(uint8 doType,uint64 id,uint128 _value);
+    event userGetLog(uint8 doType,uint8 rewardType,uint64 id,uint128 _value);
     event transferLog(uint8 doType,address fromAddr,address toAddr,uint128 _value);
 
     modifier onlyAdmin() {
@@ -143,10 +143,11 @@ contract NewGame {
 
     }
 
-    function userWithdraw(uint128 _value) external {
+    function userWithdraw(uint8 _type,uint128 _value) external {
+        require(_type>0 && _type<3,"type is wrong!");
         require(addrToId[msg.sender]!=0,"user is not exist!");
         require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance!");
-        emit userGetLog(4,addrToId[msg.sender],_value);
+        emit userGetLog(4,_type,addrToId[msg.sender],_value);
     }
 
     function transferToUser(address _addr,uint128 _value) external{

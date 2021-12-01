@@ -145,6 +145,12 @@
 			},
 			{
 				"indexed": false,
+				"internalType": "uint8",
+				"name": "rewardType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
 				"internalType": "uint64",
 				"name": "id",
 				"type": "uint64"
@@ -521,6 +527,11 @@
 	},
 	{
 		"inputs": [
+			{
+				"internalType": "uint8",
+				"name": "_type",
+				"type": "uint8"
+			},
 			{
 				"internalType": "uint128",
 				"name": "_value",

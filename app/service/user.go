@@ -35,7 +35,8 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 		filename = model.UserCreditOne
 	)
 
-	if doType == model.CreditPool || doType == model.CreditRefReward || doType == model.CreditReward {
+	switch doType {
+	case model.CreditPool:
 		update = g.Map{
 			"credit": &gdb.Counter{
 				Field: "credit",
@@ -47,7 +48,31 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			},
 			"updated": time.Now().Unix(),
 		}
-	} else if doType == model.CreditWithdraw {
+	case model.CreditRefReward:
+		update = g.Map{
+			"credit": &gdb.Counter{
+				Field: "credit",
+				Value: amount,
+			},
+			"total_credit": &gdb.Counter{
+				Field: "total_credit",
+				Value: amount,
+			},
+			"updated": time.Now().Unix(),
+		}
+	case model.CreditReward:
+		update = g.Map{
+			"credit": &gdb.Counter{
+				Field: "credit",
+				Value: amount,
+			},
+			"total_credit": &gdb.Counter{
+				Field: "total_credit",
+				Value: amount,
+			},
+			"updated": time.Now().Unix(),
+		}
+	case model.CreditWithdraw:
 		update = g.Map{
 			"credit": &gdb.Counter{
 				Field: "credit",
@@ -67,7 +92,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
 			return err
 		}
-	} else if doType == model.CreditBuyTicket {
+	case model.CreditBuyTicket:
 		update = g.Map{
 			"ticket_num": &gdb.Counter{
 				Field: "ticket_num",
@@ -76,10 +101,9 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			"updated": time.Now().Unix(),
 		}
 		filename = model.UserCreditTwo
-	} else {
+	default:
 		return gerror.New("Service User ChangeCredit Err:会员余额事件不存在")
 	}
-
 	_, err = dao.FaBscUser.Ctx(ctx).Where("id=?", uid).Update(update)
 	if err != nil {
 		g.Log().Debug("Service User ChangeCredit User Update Err:", err)

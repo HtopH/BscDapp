@@ -358,15 +358,18 @@ func (s *listenTask) DealUserWithdraw(c context.Context, param *chainService.Bsc
 
 //处理门票转账
 func (s *listenTask) DealTransfer(c context.Context, param *chainService.BscGameTransferLog) error {
-	data := &model.FaBscTransfer{
-		From:    param.FromAddr.String(),
-		To:      param.ToAddr.String(),
-		Amount:  BigIntToF(param.Value, model.TokenDecimals),
-		Created: int(time.Now().Unix()),
-	}
-	_, err := dao.FaBscTransfer.Ctx(c).OmitEmpty().Save(data)
-	if err != nil {
-		g.Log().Debug("Service DoListenTask DealTransfer Transfer Save Err:", err)
-	}
-	return err
+	return dao.FaBscTransfer.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
+		data := &model.FaBscTransfer{
+			From:    param.FromAddr.String(),
+			To:      param.ToAddr.String(),
+			Amount:  BigIntToF(param.Value, model.TokenDecimals),
+			Created: int(time.Now().Unix()),
+		}
+		_, err := dao.FaBscTransfer.Ctx(ctx).OmitEmpty().Save(data)
+		if err != nil {
+			g.Log().Debug("Service DoListenTask DealTransfer Transfer Save Err:", err)
+		}
+		return err
+	})
+
 }
