@@ -130,7 +130,6 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 			Updated:  int(time.Now().Unix()),
 			Created:  int(time.Now().Unix()),
 		}
-		g.Log().Println(insertInfo)
 		_, err = dao.FaBscGameInfo.Ctx(ctx).OmitEmpty().Save(insertInfo)
 		if err != nil {
 			g.Log().Debug("Service Task DealGameStatus GameInfo Save Err:", err)
@@ -145,7 +144,11 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
 		if err != nil {
 			g.Log().Debug("Service Task DealGameStatus Task Save Err:", err)
+			return err
+
 		}
+		//将上场活动没结束的会员更新到最新活动
+		_, err = dao.FaBscUserGame.Ctx(ctx).Where("status=1 and game_round=?", gameInfo.Round).Update(g.Map{"gameInfo.Round": gameInfo.Round + 1})
 		return err
 	})
 }
@@ -248,6 +251,7 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 			GameRound: gameInfo.Round,
 			InvestNum: num,
 			TicketNum: ticket,
+			WillNum:   num * model.PercentJoinReturn / model.PercentBase,
 			ReturnNum: num * model.PercentJoinReturn / model.PercentBase,
 			Status:    1,
 			Created:   int(now.Unix()),
@@ -284,7 +288,7 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 			g.Log().Debug("Service DoListenTask DealUserJoinGame GameInfo Update Err:", err)
 			return gerror.New("更新活动信息失败:" + err.Error())
 		}
-		//70%反馈给前面投资者
+		//70%反馈给前面投资者,但是只有出局才可到余额
 		reward := num * model.PercentJoinOut / model.PercentBase
 		userGame, err := dao.FaBscUserGame.Ctx(ctx).Where("game_round=? and return_num>0 and status=1", gameInfo.Round).Order("created asc").One()
 		if err != nil {
@@ -303,18 +307,20 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 				reward = reward - userGame.ReturnNum
 				//满足出局条件
 				updateUserGame["status"] = 2
-				//添加任务通知合约会员出局
-				taskInfo := model.FaBscTask{
-					Type:     model.SendUserOut,
-					Task:     gconv.String(model.TaskUserOut{UserId: uint64(userGame.Uid), Round: uint32(gameInfo.Round)}),
-					Created:  int(time.Now().Unix()),
-					TaskTime: int(time.Now().Unix()),
-				}
-				_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
-				if err != nil {
-					g.Log().Debug("Service DoListenTask DealUserJoinGame Task Save Err:", err)
-					return err
-				}
+				//发放到账户
+				err = User.ChangeCredit(ctx, userGame.Uid, userGame.WillNum, model.CreditReward)
+				////添加任务通知合约会员出局
+				//taskInfo := model.FaBscTask{
+				//	Type:     model.SendUserOut,
+				//	Task:     gconv.String(model.TaskUserOut{UserId: uint64(userGame.Uid), Round: uint32(gameInfo.Round)}),
+				//	Created:  int(time.Now().Unix()),
+				//	TaskTime: int(time.Now().Unix()),
+				//}
+				//_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+				//if err != nil {
+				//	g.Log().Debug("Service DoListenTask DealUserJoinGame Task Save Err:", err)
+				//	return err
+				//}
 			}
 			updateUserGame["return_num"] = userGame.ReturnNum - canGet
 			_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", userGame.Id).Update(updateUserGame)
@@ -322,8 +328,6 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 				g.Log().Debug("Service DoListenTask DealUserJoinGame userGame Update Err:", err)
 				return err
 			}
-			//发放到账户
-			err = User.ChangeCredit(ctx, userGame.Uid, canGet, model.CreditReward)
 
 			if reward > 0 {
 				//查询下一个记录
@@ -347,10 +351,21 @@ func (s *listenTask) DealUserWithdraw(c context.Context, param *chainService.Bsc
 			g.Log().Debug("Service DoListenTask DealUserWithdraw UserInfo Find Err:", err)
 			return gerror.New("获取会员信息失败：" + err.Error())
 		}
-		if userInfo.Credit <= 0 {
-			return gerror.New("会员余额不足")
+		switch param.RewardType {
+		case model.WithdrawCreditType:
+			if userInfo.Credit <= 0 {
+				return gerror.New("会员余额不足")
+			}
+			err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.Credit, model.CreditWithdraw)
+		case model.WithdrawPoolType:
+			if userInfo.PoolCredit <= 0 {
+				return gerror.New("会员余额不足")
+			}
+			err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.Credit, model.CreditPoolWithdraw)
+		default:
+			return gerror.New("提现类型错误:" + gconv.String(param.RewardType))
 		}
-		err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.Credit, model.CreditWithdraw)
+
 		return nil
 	})
 

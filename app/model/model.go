@@ -43,15 +43,21 @@ const (
 	SendUserOut  = "userOut"
 
 	//余额变动事件
-	CreditReward    = "returnReward"   //投资回报
-	CreditPool      = "poolReward"     //奖池奖励
-	CreditRefReward = "referrerReward" //推荐奖励
-	CreditBuyTicket = "buyTicket"      //兑换门票
-	CreditWithdraw  = "withdraw"       //兑换门票
+	CreditReward       = "returnReward"   //投资回报
+	CreditPool         = "poolReward"     //奖池奖励
+	CreditRefReward    = "referrerReward" //推荐奖励
+	CreditBuyTicket    = "buyTicket"      //兑换门票
+	CreditWithdraw     = "withdraw"       //提现投资回报
+	CreditPoolWithdraw = "poolWithdraw"   //提现奖池奖励
+
+	//提现类型
+	WithdrawPoolType   = 2 //奖池提现
+	WithdrawCreditType = 1 //投资回报和推荐奖提现
 
 	//余额字段类型
-	UserCreditOne = "credit" //U
-	UserCreditTwo = "ticket" //门票
+	UserCreditOne   = "credit" //投资回报
+	UserCreditTwo   = "ticket" //门票
+	UserCreditThree = "pool"   //奖池奖励
 
 	//数值比例设置
 	PercentBase       = 100 //基础数值

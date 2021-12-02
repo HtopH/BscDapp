@@ -21,11 +21,11 @@ func (s *indexService) GetBaseInfo() (*model.BscBaseInfo, error) {
 		g.Log().Debug("Service Index GetBaseInfo spendInfo Find err:", err)
 		return nil, gerror.New("门票信息查询失败")
 	}
-	data.SpendTicket = gconv.Float64(spendInfo.TheValue)
 	data.TokenDecimal = model.TokenDecimals
-	percent, err := NewGame.GetPercent()
-	data.TicketPercent = float64(percent) * 100 / gconv.Float64(model.PercentDecimals)
 	data.JoinPercent = model.PercentBase / model.PercentJoinTicket
 	data.OwnAddr = model.OwnAddr
+	data.SpendTicket = gconv.Float64(spendInfo.TheValue)
+	data.TicketPercent = GetPercent()
+	data.SpendNum = GetNo() - 1
 	return data, err
 }

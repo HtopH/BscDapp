@@ -36,7 +36,7 @@
                     "200": {
                         "description": "执行结果",
                         "schema": {
-                            "$ref": "#/definitions/model.FaBscGameInfo"
+                            "$ref": "#/definitions/model.GameIndexInfo"
                         }
                     }
                 }
@@ -179,15 +179,23 @@
             "type": "object",
             "properties": {
                 "joinPercent": {
-                    "description": "参与活动金额与门票比例",
+                    "description": "参与活动金额与门票比例-100:JoinPercent",
                     "type": "number"
+                },
+                "ownAddr": {
+                    "description": "根节点地址",
+                    "type": "string"
+                },
+                "spendNum": {
+                    "description": "缩减次数",
+                    "type": "integer"
                 },
                 "spendTicket": {
                     "description": "已兑换门票",
                     "type": "number"
                 },
                 "ticketPercent": {
-                    "description": "门票兑换比例-100%",
+                    "description": "门票兑换比例- 1:TicketPercent",
                     "type": "number"
                 },
                 "tokenDecimal": {
@@ -196,7 +204,62 @@
                 }
             }
         },
-        "model.FaBscGameInfo": {
+        "model.FaBscUser": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "用户地址",
+                    "type": "string"
+                },
+                "created": {
+                    "description": "注册时间",
+                    "type": "integer"
+                },
+                "credit": {
+                    "description": "回报奖励",
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "investNum": {
+                    "description": "投资金额",
+                    "type": "number"
+                },
+                "poolCredit": {
+                    "description": "奖池奖励",
+                    "type": "number"
+                },
+                "refId": {
+                    "description": "推荐人ID",
+                    "type": "integer"
+                },
+                "refNum": {
+                    "description": "直推人数",
+                    "type": "integer"
+                },
+                "refStr": {
+                    "description": "推荐路径",
+                    "type": "string"
+                },
+                "teamNum": {
+                    "description": "团队人数",
+                    "type": "integer"
+                },
+                "ticketNum": {
+                    "description": "兑换的门票数",
+                    "type": "number"
+                },
+                "totalCredit": {
+                    "description": "累计奖励",
+                    "type": "number"
+                },
+                "updated": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.GameIndexInfo": {
             "type": "object",
             "properties": {
                 "created": {
@@ -225,55 +288,8 @@
                     "description": "状态-1:进行中,2:已结束",
                     "type": "integer"
                 },
-                "updated": {
-                    "type": "integer"
-                }
-            }
-        },
-        "model.FaBscUser": {
-            "type": "object",
-            "properties": {
-                "address": {
-                    "description": "用户地址",
-                    "type": "string"
-                },
-                "created": {
-                    "description": "注册时间",
-                    "type": "integer"
-                },
-                "credit": {
-                    "description": "现有奖励",
-                    "type": "number"
-                },
-                "id": {
-                    "type": "integer"
-                },
-                "investNum": {
-                    "description": "投资金额",
-                    "type": "number"
-                },
-                "refId": {
-                    "description": "推荐人ID",
-                    "type": "integer"
-                },
-                "refNum": {
-                    "description": "直推人数",
-                    "type": "integer"
-                },
-                "refStr": {
-                    "description": "推荐路径",
-                    "type": "string"
-                },
-                "teamNum": {
-                    "description": "团队人数",
-                    "type": "integer"
-                },
-                "ticketNum": {
-                    "description": "兑换的门票数",
-                    "type": "number"
-                },
-                "totalCredit": {
-                    "description": "累计奖励",
+                "totalInvest": {
+                    "description": "总投资",
                     "type": "number"
                 },
                 "updated": {

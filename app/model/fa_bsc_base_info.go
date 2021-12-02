@@ -16,7 +16,8 @@ type FaBscBaseInfo internal.FaBscBaseInfo
 type BscBaseInfo struct {
 	OwnAddr       string  //根节点地址
 	TokenDecimal  string  //代币精度
-	TicketPercent float64 //门票兑换比例-100%
+	TicketPercent float64 //门票兑换比例- 1:TicketPercent
 	SpendTicket   float64 //已兑换门票
-	JoinPercent   float64 //参与活动金额与门票比例
+	SpendNum      int     //缩减次数
+	JoinPercent   float64 //参与活动金额与门票比例-100:JoinPercent
 }

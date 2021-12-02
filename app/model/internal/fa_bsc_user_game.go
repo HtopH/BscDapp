@@ -12,7 +12,8 @@ type FaBscUserGame struct {
 	InvestNum float64 `orm:"invest_num" json:"investNum"` // 投资金额
 	TicketNum float64 `orm:"ticket_num" json:"ticketNum"` // 门票金额
 	AwardNum  float64 `orm:"award_num"  json:"awardNum"`  // 奖励金额(奖池)
-	ReturnNum float64 `orm:"return_num" json:"returnNum"` // 可回报金额(投资)
+	ReturnNum float64 `orm:"return_num" json:"returnNum"` // 剩余回报金额(投资)
+	WillNum   float64 `orm:"will_num"   json:"willNum"`   // 可获得回报
 	Status    int     `orm:"status"     json:"status"`    // 1:进行中,2:已出局
 	Created   int     `orm:"created"    json:"created"`   //
 }

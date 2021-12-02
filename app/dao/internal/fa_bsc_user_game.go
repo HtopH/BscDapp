@@ -32,7 +32,8 @@ type faBscUserGameColumns struct {
 	InvestNum string // 投资金额
 	TicketNum string // 门票金额
 	AwardNum  string // 奖励金额(奖池)
-	ReturnNum string // 可回报金额(投资)
+	ReturnNum string // 剩余回报金额(投资)
+	WillNum   string // 可获得回报
 	Status    string // 1:进行中,2:已出局
 	Created   string //
 }
@@ -51,6 +52,7 @@ var (
 			TicketNum: "ticket_num",
 			AwardNum:  "award_num",
 			ReturnNum: "return_num",
+			WillNum:   "will_num",
 			Status:    "status",
 			Created:   "created",
 		},

@@ -36,7 +36,20 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 	)
 
 	switch doType {
-	case model.CreditPool:
+	case model.CreditPool: //奖池奖励
+		update = g.Map{
+			"pool_credit": &gdb.Counter{
+				Field: "pool_credit",
+				Value: amount,
+			},
+			"total_credit": &gdb.Counter{
+				Field: "total_credit",
+				Value: amount,
+			},
+			"updated": time.Now().Unix(),
+		}
+		filename = model.UserCreditThree
+	case model.CreditRefReward: //推荐奖励
 		update = g.Map{
 			"credit": &gdb.Counter{
 				Field: "credit",
@@ -48,7 +61,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			},
 			"updated": time.Now().Unix(),
 		}
-	case model.CreditRefReward:
+	case model.CreditReward: //投资回报
 		update = g.Map{
 			"credit": &gdb.Counter{
 				Field: "credit",
@@ -60,19 +73,28 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			},
 			"updated": time.Now().Unix(),
 		}
-	case model.CreditReward:
+	case model.CreditPoolWithdraw: //奖池提现
 		update = g.Map{
-			"credit": &gdb.Counter{
-				Field: "credit",
-				Value: amount,
-			},
-			"total_credit": &gdb.Counter{
-				Field: "total_credit",
+			"pool_credit": &gdb.Counter{
+				Field: "pool_credit",
 				Value: amount,
 			},
 			"updated": time.Now().Unix(),
 		}
-	case model.CreditWithdraw:
+		//添加任务发放到合约
+		taskInfo := model.FaBscTask{
+			Type:     model.SendPay,
+			Task:     gconv.String(model.TaskAddUserBalance{UserId: uint64(uid), Value: -amount}),
+			Created:  int(time.Now().Unix()),
+			TaskTime: int(time.Now().Unix()),
+		}
+		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		if err != nil {
+			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
+			return err
+		}
+		filename = model.UserCreditThree
+	case model.CreditWithdraw: //投资回报提现
 		update = g.Map{
 			"credit": &gdb.Counter{
 				Field: "credit",
@@ -92,7 +114,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
 			return err
 		}
-	case model.CreditBuyTicket:
+	case model.CreditBuyTicket: //购买门票
 		update = g.Map{
 			"ticket_num": &gdb.Counter{
 				Field: "ticket_num",

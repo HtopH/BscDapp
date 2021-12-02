@@ -1,11 +1,19 @@
 package service
 
 import (
+	"BscDapp/app/dao"
 	"BscDapp/app/model"
+	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
+	"github.com/shopspring/decimal"
+	"math"
 	"math/big"
 	"strconv"
 	"time"
+)
+
+var (
+	baseNum float64 = 100000 //计算门票兑换变化基数
 )
 
 type JsonResponse struct {
@@ -41,4 +49,52 @@ func GetBigInt(num float64, decimals string) *big.Int {
 
 func BigIntToF(num *big.Int, decimals string) float64 {
 	return gconv.Float64(num.String()) / gconv.Float64(decimals)
+}
+
+func GetPercent() float64 {
+	var percent float64
+	tempN := GetNo()
+	base := float64(GetBase(tempN))
+	n := float64(tempN)
+	//直接算浮点会丢失精度,需要用函数处理浮点和运算
+	decimalBase := decimal.NewFromFloat(base)
+	if tempN == 1 {
+		percent = 1
+	} else if n > 1 && n < 11 {
+		percent, _ = decimal.NewFromFloat(1).Sub(decimal.NewFromFloat(float64(tempN - 1)).Div(decimalBase)).Float64()
+		//percent = 1 - float64(tempN-1)/base
+	} else {
+		if (tempN-10)%9 > 0 {
+			percent, _ = decimal.NewFromFloat(10).Div(decimalBase).Sub(decimal.NewFromFloat(float64((tempN - 10) % 9)).Div(decimalBase)).Float64()
+			//percent = 10/base - float64((tempN-10)%9)/base
+		} else {
+			percent, _ = decimal.NewFromFloat(1).Div(decimalBase).Float64()
+			//percent = 1 / base
+		}
+	}
+	return percent
+}
+
+func GetBase(n int) int {
+	var base float64 = 10
+	if n > 10 {
+		b := float64((n-11)/9 + 2)
+		base = math.Pow(base, b)
+	}
+	return int(base)
+}
+
+func GetNo() int {
+	var n int
+	spendTickets, err := dao.FaBscBaseInfo.Where(dao.FaBscBaseInfo.Columns.TheKey, model.BaseSpendKey).Value(dao.FaBscBaseInfo.Columns.TheValue)
+	if err != nil {
+		g.Log().Debug("Service service GetNo BaseInfo Value Err:", err)
+		return n
+	}
+	if spendTickets.Float64() > 0 {
+		n = int(math.Ceil(spendTickets.Float64() / baseNum))
+	} else {
+		n = 1
+	}
+	return n
 }
