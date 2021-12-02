@@ -504,30 +504,6 @@
 	{
 		"inputs": [
 			{
-				"internalType": "uint64",
-				"name": "userId",
-				"type": "uint64"
-			},
-			{
-				"internalType": "uint32",
-				"name": "_round",
-				"type": "uint32"
-			}
-		],
-		"name": "userOut",
-		"outputs": [
-			{
-				"internalType": "bool",
-				"name": "",
-				"type": "bool"
-			}
-		],
-		"stateMutability": "nonpayable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
 				"internalType": "uint8",
 				"name": "_type",
 				"type": "uint8"

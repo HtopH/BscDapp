@@ -44,7 +44,7 @@ contract NewGame {
     Player[] private players;
     mapping (address => uint64) public addrToId;
     mapping (uint64 => address) public idToAddr;
-    mapping (uint32=>mapping(address=>uint128)) roundInfo;
+    // mapping (uint32=>mapping(address=>uint128)) roundInfo;
 
     event registerLog(uint8 doType,uint64 id,address indexed addr,uint64 refId);
     event buyTicketLog(uint8 doType,uint64 id,uint128 _value,uint128 getTicket,uint32 percent);
@@ -123,7 +123,7 @@ contract NewGame {
 
     function joinGame (uint128 _value) external {
         require(addrToId[msg.sender]!=0,"please register first");
-        require(roundInfo[round][msg.sender]==0,"you have joined!");
+        // require(roundInfo[round][msg.sender]==0,"you have joined!");
         require(_value>=joinBase,"amount is too low!");
         require(USD_TOKEN.balanceOf(msg.sender)>=_value,"balance is not enough!");
 
@@ -137,7 +137,7 @@ contract NewGame {
         Player storage this_player=players[playerId];
         players[playerId].useTickets=this_player.useTickets+pay_ticket;
         players[playerId].useU=this_player.useU+_value;
-        roundInfo[round][msg.sender]=_value;
+        // roundInfo[round][msg.sender]=_value;
 
         emit joinLog(3,playerId,_value,round);
 
@@ -190,10 +190,10 @@ contract NewGame {
             _refId=this_player.refId;
     }
 
-    function userOut(uint64 userId,uint32 _round) external onlyOperator returns(bool){
-        require(idToAddr[userId]!=address(0));
-        roundInfo[_round][idToAddr[userId]]=0;
-    }
+    // function userOut(uint64 userId,uint32 _round) external onlyOperator returns(bool){
+    //     require(idToAddr[userId]!=address(0));
+    //     roundInfo[_round][idToAddr[userId]]=0;
+    // }
 
     function setSpend (uint128 _value) external onlyOperator returns (bool){
         spendTickets=_value;
