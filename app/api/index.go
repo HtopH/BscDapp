@@ -65,3 +65,24 @@ func (a *indexApi) GameInfo(r *ghttp.Request) {
 	}
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
 }
+
+// @summary 收益排行
+// @tags    系统信息
+// @produce json
+// @param   page formData int false "页码"
+// @param   size formData int false "每页数量"
+// @router  /api/index/get-reward-top  [GET]
+// @success 200 {object} model.UserRewardTop "执行结果"
+func (a *indexApi) GetRewardTop(r *ghttp.Request) {
+	var (
+		req *model.PageReq
+	)
+	if err := r.Parse(&req); err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	data, err := service.User.RewardTop(r.Context(), req)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+}

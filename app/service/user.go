@@ -144,3 +144,114 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 	}
 	return err
 }
+
+//收益排行榜
+func (s *user) RewardTop(ctx context.Context, req *model.PageReq) (*model.UserRewardTop, error) {
+	var (
+		data = new(model.UserRewardTop)
+		err  error
+		sql  = dao.FaBscUser.Ctx(ctx).Order("total_credit desc")
+	)
+	data.Total, err = sql.Count()
+	if err != nil {
+		g.Log().Debug("Service User RewardTop Count Err:", err)
+		return nil, err
+	}
+	data.Page = req.Page
+	data.Size = req.Size
+	err = sql.Page(req.Page, req.Size).Scan(&data.List)
+	if err != nil {
+		g.Log().Debug("Service User RewardTop Scan Err:", err)
+		return nil, err
+	}
+	if len(data.List) > 0 {
+		base := (req.Page - 1) * req.Size
+		for k, _ := range data.List {
+			data.List[k].Rank = base + k + 1
+		}
+	}
+	return data, err
+}
+
+//转账记录
+func (s *user) TransferList(ctx context.Context, req *model.UserInfoRep) (*model.UserTransferList, error) {
+	var (
+		data = new(model.UserTransferList)
+		err  error
+		sql  = dao.FaBscTransfer.Ctx(ctx).Where("fromAddr=? or toAddr=?", req.UserAddr, req.UserAddr).Order("created desc")
+	)
+	data.Total, err = sql.Count()
+	if err != nil {
+		g.Log().Debug("Service User TransferList Count Err:", err)
+		return nil, err
+	}
+	data.Page = req.Page
+	data.Size = req.Size
+	err = sql.Page(req.Page, req.Size).Scan(&data.List)
+	if err != nil {
+		g.Log().Debug("Service User TransferList Scan Err:", err)
+		return nil, err
+	}
+	if len(data.List) > 0 {
+		for k, v := range data.List {
+			if v.FromAddr == req.UserAddr {
+				data.List[k].TransferType = 2
+			} else {
+				data.List[k].TransferType = 1
+			}
+		}
+	}
+	return data, err
+}
+
+//粮草兑换记录
+func (s *user) TicketList(ctx context.Context, req *model.UserInfoRep) (*model.UserTickerList, error) {
+	var (
+		data = new(model.UserTickerList)
+		err  error
+		sql  = dao.FaBscUserTicket.Ctx(ctx).Where("uid=?", req.UserId).Order("created desc")
+	)
+	data.Total, err = sql.Count()
+	if err != nil {
+		g.Log().Debug("Service User TicketList Count Err:", err)
+		return nil, err
+	}
+	data.Page = req.Page
+	data.Size = req.Size
+	err = sql.Page(req.Page, req.Size).Scan(&data.List)
+	if err != nil {
+		g.Log().Debug("Service User TicketList Scan Err:", err)
+		return nil, err
+	}
+	return data, nil
+}
+
+//一级直推会员
+func (s *user) FirstLevelTeam(ctx context.Context, req *model.UserInfoRep) (*model.TeamUserList, error) {
+	var (
+		data = new(model.TeamUserList)
+		err  error
+		sql  = dao.FaBscUser.Ctx(ctx).Where("ref_id=?", req.UserId).Order("created desc")
+	)
+	data.Total, err = sql.Count()
+	if err != nil {
+		g.Log().Debug("Service User FirstLevelTeam Count Err:", err)
+		return nil, err
+	}
+	data.Page = req.Page
+	data.Size = req.Size
+	err = sql.Page(req.Page, req.Size).Scan(&data.List)
+	if err != nil {
+		g.Log().Debug("Service User FirstLevelTeam Scan Err:", err)
+		return nil, err
+	}
+	if len(data.List) > 0 {
+		for k, v := range data.List {
+			data.List[k].Num, err = dao.FaBscUserTicket.Ctx(ctx).Where("uid=?", v.Id).Sum(dao.FaBscUserTicket.Columns.PayNum)
+			if err != nil {
+				g.Log().Debug("Service User FirstLevelTeam UserTicket Sum Err:", err)
+			}
+		}
+	}
+	return data, err
+}

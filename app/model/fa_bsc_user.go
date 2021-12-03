@@ -13,14 +13,58 @@ type FaBscUser internal.FaBscUser
 
 // Fill with you ideas below.
 type UserInfo struct {
-	Id          int     `orm:"id,primary"   json:"id"`          //
+	*FaBscUser
+	ReferReward float64 //推荐奖励
+}
+
+//会员收益排行
+type UserReward struct {
+	Rank        int     //排名
 	Address     string  `orm:"address"      json:"address"`     // 用户地址
-	RefNum      int     `orm:"ref_num"      json:"refNum"`      // 直推人数
-	TeamNum     int     `orm:"team_num"     json:"teamNum"`     // 团队人数
-	TicketNum   float64 `orm:"ticket_num"   json:"ticketNum"`   // 兑换的门票数
-	InvestNum   float64 `orm:"invest_num"   json:"investNum"`   // 投资金额
-	Credit      float64 `orm:"credit"       json:"credit"`      // 现有奖励
 	TotalCredit float64 `orm:"total_credit" json:"totalCredit"` // 累计奖励
-	Created     int     `orm:"created"      json:"created"`     // 注册时间
-	Updated     int     `orm:"updated"      json:"updated"`     //
+}
+
+//会员收益排行列表
+type UserRewardTop struct {
+	List []*UserReward
+	ListOutPut
+}
+
+//会员记录查询条件
+type UserInfoRep struct {
+	PageReq
+	UserAddr string //钱包地址
+	UserId   int
+}
+
+//转账信息
+type TransferInfo struct {
+	FaBscTransfer
+	TransferType int //转账类型:1-入,2-出
+}
+
+//会员转账列表
+type UserTransferList struct {
+	List []*TransferInfo
+	ListOutPut
+}
+
+//会员门票兑换记录
+type UserTickerList struct {
+	List []*FaBscUserTicket
+	ListOutPut
+}
+
+//团队会员信息
+type TeamUserInfo struct {
+	Id      int     `orm:"id,primary"   json:"id"`
+	Address string  `orm:"address"      json:"address"` // 用户地址
+	Created int     `orm:"created"      json:"created"` // 注册时间
+	Num     float64 //消耗数
+}
+
+//团队会员信息列表
+type TeamUserList struct {
+	List []*TeamUserInfo
+	ListOutPut
 }

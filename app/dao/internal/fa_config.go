@@ -15,36 +15,48 @@ import (
 	"BscDapp/app/model"
 )
 
-// FaBscTransferDao is the manager for logic model data accessing
+// FaConfigDao is the manager for logic model data accessing
 // and custom defined data operations functions management.
-type FaBscTransferDao struct {
+type FaConfigDao struct {
 	gmvc.M
 	DB      gdb.DB
 	Table   string
-	Columns faBscTransferColumns
+	Columns faConfigColumns
 }
 
-// FaBscTransferColumns defines and stores column names for table fa_bsc_transfer.
-type faBscTransferColumns struct {
-	Id       string //
-	FromAddr string // 转账地址
-	ToAddr   string // 接收地址
-	Amount   string // 数量
-	Created  string //
+// FaConfigColumns defines and stores column names for table fa_config.
+type faConfigColumns struct {
+	Id      string //
+	Name    string // 变量名
+	Group   string // 分组
+	Title   string // 变量标题
+	Tip     string // 变量描述
+	Type    string // 类型:string,text,int,bool,array,datetime,date,file
+	Value   string // 变量值
+	Content string // 变量字典数据
+	Rule    string // 验证规则
+	Extend  string // 扩展属性
+	Setting string // 配置
 }
 
 var (
-	// FaBscTransfer is globally public accessible object for table fa_bsc_transfer operations.
-	FaBscTransfer = FaBscTransferDao{
-		M:     g.DB("default").Model("fa_bsc_transfer").Safe(),
+	// FaConfig is globally public accessible object for table fa_config operations.
+	FaConfig = FaConfigDao{
+		M:     g.DB("default").Model("fa_config").Safe(),
 		DB:    g.DB("default"),
-		Table: "fa_bsc_transfer",
-		Columns: faBscTransferColumns{
-			Id:       "id",
-			FromAddr: "fromAddr",
-			ToAddr:   "toAddr",
-			Amount:   "amount",
-			Created:  "created",
+		Table: "fa_config",
+		Columns: faConfigColumns{
+			Id:      "id",
+			Name:    "name",
+			Group:   "group",
+			Title:   "title",
+			Tip:     "tip",
+			Type:    "type",
+			Value:   "value",
+			Content: "content",
+			Rule:    "rule",
+			Extend:  "extend",
+			Setting: "setting",
 		},
 	}
 )
@@ -53,34 +65,34 @@ var (
 // of current DB object and with given context in it.
 // Note that this returned DB object can be used only once, so do not assign it to
 // a global or package variable for long using.
-func (d *FaBscTransferDao) Ctx(ctx context.Context) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Ctx(ctx)}
+func (d *FaConfigDao) Ctx(ctx context.Context) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Ctx(ctx)}
 }
 
 // As sets an alias name for current table.
-func (d *FaBscTransferDao) As(as string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.As(as)}
+func (d *FaConfigDao) As(as string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.As(as)}
 }
 
 // TX sets the transaction for current operation.
-func (d *FaBscTransferDao) TX(tx *gdb.TX) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.TX(tx)}
+func (d *FaConfigDao) TX(tx *gdb.TX) *FaConfigDao {
+	return &FaConfigDao{M: d.M.TX(tx)}
 }
 
 // Master marks the following operation on master node.
-func (d *FaBscTransferDao) Master() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Master()}
+func (d *FaConfigDao) Master() *FaConfigDao {
+	return &FaConfigDao{M: d.M.Master()}
 }
 
 // Slave marks the following operation on slave node.
 // Note that it makes sense only if there's any slave node configured.
-func (d *FaBscTransferDao) Slave() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Slave()}
+func (d *FaConfigDao) Slave() *FaConfigDao {
+	return &FaConfigDao{M: d.M.Slave()}
 }
 
 // Args sets custom arguments for model operation.
-func (d *FaBscTransferDao) Args(args ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Args(args...)}
+func (d *FaConfigDao) Args(args ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Args(args...)}
 }
 
 // LeftJoin does "LEFT JOIN ... ON ..." statement on the model.
@@ -88,8 +100,8 @@ func (d *FaBscTransferDao) Args(args ...interface{}) *FaBscTransferDao {
 // and also with its alias name, like:
 // Table("user").LeftJoin("user_detail", "user_detail.uid=user.uid")
 // Table("user", "u").LeftJoin("user_detail", "ud", "ud.uid=u.uid")
-func (d *FaBscTransferDao) LeftJoin(table ...string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.LeftJoin(table...)}
+func (d *FaConfigDao) LeftJoin(table ...string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.LeftJoin(table...)}
 }
 
 // RightJoin does "RIGHT JOIN ... ON ..." statement on the model.
@@ -97,8 +109,8 @@ func (d *FaBscTransferDao) LeftJoin(table ...string) *FaBscTransferDao {
 // and also with its alias name, like:
 // Table("user").RightJoin("user_detail", "user_detail.uid=user.uid")
 // Table("user", "u").RightJoin("user_detail", "ud", "ud.uid=u.uid")
-func (d *FaBscTransferDao) RightJoin(table ...string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.RightJoin(table...)}
+func (d *FaConfigDao) RightJoin(table ...string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.RightJoin(table...)}
 }
 
 // InnerJoin does "INNER JOIN ... ON ..." statement on the model.
@@ -106,36 +118,36 @@ func (d *FaBscTransferDao) RightJoin(table ...string) *FaBscTransferDao {
 // and also with its alias name, like:
 // Table("user").InnerJoin("user_detail", "user_detail.uid=user.uid")
 // Table("user", "u").InnerJoin("user_detail", "ud", "ud.uid=u.uid")
-func (d *FaBscTransferDao) InnerJoin(table ...string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.InnerJoin(table...)}
+func (d *FaConfigDao) InnerJoin(table ...string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.InnerJoin(table...)}
 }
 
 // Fields sets the operation fields of the model, multiple fields joined using char ','.
 // The parameter <fieldNamesOrMapStruct> can be type of string/map/*map/struct/*struct.
-func (d *FaBscTransferDao) Fields(fieldNamesOrMapStruct ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Fields(fieldNamesOrMapStruct...)}
+func (d *FaConfigDao) Fields(fieldNamesOrMapStruct ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Fields(fieldNamesOrMapStruct...)}
 }
 
 // FieldsEx sets the excluded operation fields of the model, multiple fields joined using char ','.
 // The parameter <fieldNamesOrMapStruct> can be type of string/map/*map/struct/*struct.
-func (d *FaBscTransferDao) FieldsEx(fieldNamesOrMapStruct ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.FieldsEx(fieldNamesOrMapStruct...)}
+func (d *FaConfigDao) FieldsEx(fieldNamesOrMapStruct ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.FieldsEx(fieldNamesOrMapStruct...)}
 }
 
 // Option sets the extra operation option for the model.
-func (d *FaBscTransferDao) Option(option int) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Option(option)}
+func (d *FaConfigDao) Option(option int) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Option(option)}
 }
 
 // OmitEmpty sets OPTION_OMITEMPTY option for the model, which automatically filers
 // the data and where attributes for empty values.
-func (d *FaBscTransferDao) OmitEmpty() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.OmitEmpty()}
+func (d *FaConfigDao) OmitEmpty() *FaConfigDao {
+	return &FaConfigDao{M: d.M.OmitEmpty()}
 }
 
 // Filter marks filtering the fields which does not exist in the fields of the operated table.
-func (d *FaBscTransferDao) Filter() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Filter()}
+func (d *FaConfigDao) Filter() *FaConfigDao {
+	return &FaConfigDao{M: d.M.Filter()}
 }
 
 // Where sets the condition statement for the model. The parameter <where> can be type of
@@ -149,8 +161,8 @@ func (d *FaBscTransferDao) Filter() *FaBscTransferDao {
 // Where("status IN (?)", g.Slice{1,2,3})
 // Where("age IN(?,?)", 18, 50)
 // Where(User{ Id : 1, UserName : "john"})
-func (d *FaBscTransferDao) Where(where interface{}, args ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Where(where, args...)}
+func (d *FaConfigDao) Where(where interface{}, args ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Where(where, args...)}
 }
 
 // WherePri does the same logic as M.Where except that if the parameter <where>
@@ -158,54 +170,54 @@ func (d *FaBscTransferDao) Where(where interface{}, args ...interface{}) *FaBscT
 // key value. That is, if primary key is "id" and given <where> parameter as "123", the
 // WherePri function treats the condition as "id=123", but M.Where treats the condition
 // as string "123".
-func (d *FaBscTransferDao) WherePri(where interface{}, args ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.WherePri(where, args...)}
+func (d *FaConfigDao) WherePri(where interface{}, args ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.WherePri(where, args...)}
 }
 
 // And adds "AND" condition to the where statement.
-func (d *FaBscTransferDao) And(where interface{}, args ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.And(where, args...)}
+func (d *FaConfigDao) And(where interface{}, args ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.And(where, args...)}
 }
 
 // Or adds "OR" condition to the where statement.
-func (d *FaBscTransferDao) Or(where interface{}, args ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Or(where, args...)}
+func (d *FaConfigDao) Or(where interface{}, args ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Or(where, args...)}
 }
 
 // Group sets the "GROUP BY" statement for the model.
-func (d *FaBscTransferDao) Group(groupBy string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Group(groupBy)}
+func (d *FaConfigDao) Group(groupBy string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Group(groupBy)}
 }
 
 // Order sets the "ORDER BY" statement for the model.
-func (d *FaBscTransferDao) Order(orderBy ...string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Order(orderBy...)}
+func (d *FaConfigDao) Order(orderBy ...string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Order(orderBy...)}
 }
 
 // Limit sets the "LIMIT" statement for the model.
 // The parameter <limit> can be either one or two number, if passed two number is passed,
 // it then sets "LIMIT limit[0],limit[1]" statement for the model, or else it sets "LIMIT limit[0]"
 // statement.
-func (d *FaBscTransferDao) Limit(limit ...int) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Limit(limit...)}
+func (d *FaConfigDao) Limit(limit ...int) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Limit(limit...)}
 }
 
 // Offset sets the "OFFSET" statement for the model.
 // It only makes sense for some databases like SQLServer, PostgreSQL, etc.
-func (d *FaBscTransferDao) Offset(offset int) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Offset(offset)}
+func (d *FaConfigDao) Offset(offset int) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Offset(offset)}
 }
 
 // Page sets the paging number for the model.
 // The parameter <page> is started from 1 for paging.
 // Note that, it differs that the Limit function start from 0 for "LIMIT" statement.
-func (d *FaBscTransferDao) Page(page, limit int) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Page(page, limit)}
+func (d *FaConfigDao) Page(page, limit int) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Page(page, limit)}
 }
 
 // Batch sets the batch operation number for the model.
-func (d *FaBscTransferDao) Batch(batch int) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Batch(batch)}
+func (d *FaConfigDao) Batch(batch int) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Batch(batch)}
 }
 
 // Cache sets the cache feature for the model. It caches the result of the sql, which means
@@ -220,8 +232,8 @@ func (d *FaBscTransferDao) Batch(batch int) *FaBscTransferDao {
 // control the cache like changing the <duration> or clearing the cache with specified <name>.
 //
 // Note that, the cache feature is disabled if the model is operating on a transaction.
-func (d *FaBscTransferDao) Cache(duration time.Duration, name ...string) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Cache(duration, name...)}
+func (d *FaConfigDao) Cache(duration time.Duration, name ...string) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Cache(duration, name...)}
 }
 
 // Data sets the operation data for the model.
@@ -231,39 +243,39 @@ func (d *FaBscTransferDao) Cache(duration time.Duration, name ...string) *FaBscT
 // Data("uid", 10000)
 // Data(g.Map{"uid": 10000, "name":"john"})
 // Data(g.Slice{g.Map{"uid": 10000, "name":"john"}, g.Map{"uid": 20000, "name":"smith"})
-func (d *FaBscTransferDao) Data(data ...interface{}) *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Data(data...)}
+func (d *FaConfigDao) Data(data ...interface{}) *FaConfigDao {
+	return &FaConfigDao{M: d.M.Data(data...)}
 }
 
 // All does "SELECT FROM ..." statement for the model.
-// It retrieves the records from table and returns the result as []*model.FaBscTransfer.
+// It retrieves the records from table and returns the result as []*model.FaConfig.
 // It returns nil if there's no record retrieved with the given conditions from table.
 //
 // The optional parameter <where> is the same as the parameter of M.Where function,
 // see M.Where.
-func (d *FaBscTransferDao) All(where ...interface{}) ([]*model.FaBscTransfer, error) {
+func (d *FaConfigDao) All(where ...interface{}) ([]*model.FaConfig, error) {
 	all, err := d.M.All(where...)
 	if err != nil {
 		return nil, err
 	}
-	var entities []*model.FaBscTransfer
+	var entities []*model.FaConfig
 	if err = all.Structs(&entities); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
 	return entities, nil
 }
 
-// One retrieves one record from table and returns the result as *model.FaBscTransfer.
+// One retrieves one record from table and returns the result as *model.FaConfig.
 // It returns nil if there's no record retrieved with the given conditions from table.
 //
 // The optional parameter <where> is the same as the parameter of M.Where function,
 // see M.Where.
-func (d *FaBscTransferDao) One(where ...interface{}) (*model.FaBscTransfer, error) {
+func (d *FaConfigDao) One(where ...interface{}) (*model.FaConfig, error) {
 	one, err := d.M.One(where...)
 	if err != nil {
 		return nil, err
 	}
-	var entity *model.FaBscTransfer
+	var entity *model.FaConfig
 	if err = one.Struct(&entity); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -272,12 +284,12 @@ func (d *FaBscTransferDao) One(where ...interface{}) (*model.FaBscTransfer, erro
 
 // FindOne retrieves and returns a single Record by M.WherePri and M.One.
 // Also see M.WherePri and M.One.
-func (d *FaBscTransferDao) FindOne(where ...interface{}) (*model.FaBscTransfer, error) {
+func (d *FaConfigDao) FindOne(where ...interface{}) (*model.FaConfig, error) {
 	one, err := d.M.FindOne(where...)
 	if err != nil {
 		return nil, err
 	}
-	var entity *model.FaBscTransfer
+	var entity *model.FaConfig
 	if err = one.Struct(&entity); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -286,12 +298,12 @@ func (d *FaBscTransferDao) FindOne(where ...interface{}) (*model.FaBscTransfer, 
 
 // FindAll retrieves and returns Result by by M.WherePri and M.All.
 // Also see M.WherePri and M.All.
-func (d *FaBscTransferDao) FindAll(where ...interface{}) ([]*model.FaBscTransfer, error) {
+func (d *FaConfigDao) FindAll(where ...interface{}) ([]*model.FaConfig, error) {
 	all, err := d.M.FindAll(where...)
 	if err != nil {
 		return nil, err
 	}
-	var entities []*model.FaBscTransfer
+	var entities []*model.FaConfig
 	if err = all.Structs(&entities); err != nil && err != sql.ErrNoRows {
 		return nil, err
 	}
@@ -314,7 +326,7 @@ func (d *FaBscTransferDao) FindAll(where ...interface{}) ([]*model.FaBscTransfer
 //
 // user := (*User)(nil)
 // err  := dao.User.Where("id", 1).Struct(&user)
-func (d *FaBscTransferDao) Struct(pointer interface{}, where ...interface{}) error {
+func (d *FaConfigDao) Struct(pointer interface{}, where ...interface{}) error {
 	return d.M.Struct(pointer, where...)
 }
 
@@ -334,7 +346,7 @@ func (d *FaBscTransferDao) Struct(pointer interface{}, where ...interface{}) err
 //
 // users := ([]*User)(nil)
 // err   := dao.User.Structs(&users)
-func (d *FaBscTransferDao) Structs(pointer interface{}, where ...interface{}) error {
+func (d *FaConfigDao) Structs(pointer interface{}, where ...interface{}) error {
 	return d.M.Structs(pointer, where...)
 }
 
@@ -359,14 +371,14 @@ func (d *FaBscTransferDao) Structs(pointer interface{}, where ...interface{}) er
 //
 // users := ([]*User)(nil)
 // err   := dao.User.Scan(&users)
-func (d *FaBscTransferDao) Scan(pointer interface{}, where ...interface{}) error {
+func (d *FaConfigDao) Scan(pointer interface{}, where ...interface{}) error {
 	return d.M.Scan(pointer, where...)
 }
 
 // Chunk iterates the table with given size and callback function.
-func (d *FaBscTransferDao) Chunk(limit int, callback func(entities []*model.FaBscTransfer, err error) bool) {
+func (d *FaConfigDao) Chunk(limit int, callback func(entities []*model.FaConfig, err error) bool) {
 	d.M.Chunk(limit, func(result gdb.Result, err error) bool {
-		var entities []*model.FaBscTransfer
+		var entities []*model.FaConfig
 		err = result.Structs(&entities)
 		if err == sql.ErrNoRows {
 			return false
@@ -376,16 +388,16 @@ func (d *FaBscTransferDao) Chunk(limit int, callback func(entities []*model.FaBs
 }
 
 // LockUpdate sets the lock for update for current operation.
-func (d *FaBscTransferDao) LockUpdate() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.LockUpdate()}
+func (d *FaConfigDao) LockUpdate() *FaConfigDao {
+	return &FaConfigDao{M: d.M.LockUpdate()}
 }
 
 // LockShared sets the lock in share mode for current operation.
-func (d *FaBscTransferDao) LockShared() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.LockShared()}
+func (d *FaConfigDao) LockShared() *FaConfigDao {
+	return &FaConfigDao{M: d.M.LockShared()}
 }
 
 // Unscoped enables/disables the soft deleting feature.
-func (d *FaBscTransferDao) Unscoped() *FaBscTransferDao {
-	return &FaBscTransferDao{M: d.M.Unscoped()}
+func (d *FaConfigDao) Unscoped() *FaConfigDao {
+	return &FaConfigDao{M: d.M.Unscoped()}
 }

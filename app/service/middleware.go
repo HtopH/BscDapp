@@ -15,6 +15,9 @@ type middleware struct{}
 func (s *middleware) Auth(r *ghttp.Request) {
 	addr := r.Header.Get("address")
 	if addr == "" {
+		addr = r.GetString("address")
+	}
+	if addr == "" {
 		_ = r.Response.WriteJsonExit(g.Map{"code": http.StatusUnauthorized, "data": nil, "message": "请注册"})
 	}
 	userInfo, err := dao.FaBscUser.Where("address=?", addr).One()

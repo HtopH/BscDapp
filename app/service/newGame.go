@@ -87,18 +87,18 @@ func (s *newGame) SetRound() (string, error) {
 }
 
 //会员出局
-func (s *newGame) UserOut(param *model.TaskUserOut) (string, error) {
-	auth, err := s.GetTransactOpts()
-	if err != nil {
-		return "", err
-	}
-	res, err := s.Conn.UserOut(auth, param.UserId, param.Round)
-	if err != nil {
-		g.Log().Debug("Service NewGame UserOut Err :", err)
-		return "", err
-	}
-	return res.Hash().String(), nil
-}
+//func (s *newGame) UserOut(param *model.TaskUserOut) (string, error) {
+//	auth, err := s.GetTransactOpts()
+//	if err != nil {
+//		return "", err
+//	}
+//	res, err := s.Conn.UserOut(auth, param.UserId, param.Round)
+//	if err != nil {
+//		g.Log().Debug("Service NewGame UserOut Err :", err)
+//		return "", err
+//	}
+//	return res.Hash().String(), nil
+//}
 
 //获取兑换比例
 func (s *newGame) GetPercent() (uint32, error) {

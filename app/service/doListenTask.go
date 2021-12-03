@@ -375,10 +375,10 @@ func (s *listenTask) DealUserWithdraw(c context.Context, param *chainService.Bsc
 func (s *listenTask) DealTransfer(c context.Context, param *chainService.BscGameTransferLog) error {
 	return dao.FaBscTransfer.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
 		data := &model.FaBscTransfer{
-			From:    param.FromAddr.String(),
-			To:      param.ToAddr.String(),
-			Amount:  BigIntToF(param.Value, model.TokenDecimals),
-			Created: int(time.Now().Unix()),
+			FromAddr: param.FromAddr.String(),
+			ToAddr:   param.ToAddr.String(),
+			Amount:   BigIntToF(param.Value, model.TokenDecimals),
+			Created:  int(time.Now().Unix()),
 		}
 		_, err := dao.FaBscTransfer.Ctx(ctx).OmitEmpty().Save(data)
 		if err != nil {

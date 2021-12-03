@@ -2,6 +2,19 @@ package model
 
 import "github.com/ethereum/go-ethereum/common"
 
+//列表输出字段
+type ListOutPut struct {
+	Page  int
+	Size  int
+	Total int
+}
+
+//页码
+type PageReq struct {
+	Page int `d:"1"`  //页码
+	Size int `d:"10"` //每页条数
+}
+
 var (
 	//合约地址
 	ContractAddr = common.HexToAddress("0x6b2FAA2733746a735363bfD426C38B1AC3cfAB3c")

@@ -42,8 +42,140 @@
                 }
             }
         },
-        "/api/user/get-user-info": {
+        "/api/index/get-reward-top": {
             "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统信息"
+                ],
+                "summary": "收益排行",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserRewardTop"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/get-first-team": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会员模块"
+                ],
+                "summary": "一代直推会员",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserTickerList"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/get-ticket-list": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会员模块"
+                ],
+                "summary": "兑换记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserTickerList"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/get-transfer-list": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会员模块"
+                ],
+                "summary": "转账记录",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "页码",
+                        "name": "page",
+                        "in": "formData"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "每页数量",
+                        "name": "size",
+                        "in": "formData"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserTransferList"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/get-user-info": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -55,7 +187,7 @@
                     "200": {
                         "description": "执行结果",
                         "schema": {
-                            "$ref": "#/definitions/model.FaBscUser"
+                            "$ref": "#/definitions/model.UserInfo"
                         }
                     }
                 }
@@ -204,57 +336,29 @@
                 }
             }
         },
-        "model.FaBscUser": {
+        "model.FaBscUserTicket": {
             "type": "object",
             "properties": {
-                "address": {
-                    "description": "用户地址",
-                    "type": "string"
-                },
                 "created": {
-                    "description": "注册时间",
                     "type": "integer"
-                },
-                "credit": {
-                    "description": "回报奖励",
-                    "type": "number"
                 },
                 "id": {
                     "type": "integer"
                 },
-                "investNum": {
-                    "description": "投资金额",
+                "payNum": {
+                    "description": "支付数量",
                     "type": "number"
                 },
-                "poolCredit": {
-                    "description": "奖池奖励",
+                "percent": {
+                    "description": "兑换比例",
                     "type": "number"
-                },
-                "refId": {
-                    "description": "推荐人ID",
-                    "type": "integer"
-                },
-                "refNum": {
-                    "description": "直推人数",
-                    "type": "integer"
-                },
-                "refStr": {
-                    "description": "推荐路径",
-                    "type": "string"
-                },
-                "teamNum": {
-                    "description": "团队人数",
-                    "type": "integer"
                 },
                 "ticketNum": {
-                    "description": "兑换的门票数",
+                    "description": "门票数量",
                     "type": "number"
                 },
-                "totalCredit": {
-                    "description": "累计奖励",
-                    "type": "number"
-                },
-                "updated": {
+                "uid": {
+                    "description": "会员ID",
                     "type": "integer"
                 }
             }
@@ -293,6 +397,169 @@
                     "type": "number"
                 },
                 "updated": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.TransferInfo": {
+            "type": "object",
+            "properties": {
+                "amount": {
+                    "description": "数量",
+                    "type": "number"
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "fromAddr": {
+                    "description": "转账地址",
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "toAddr": {
+                    "description": "接收地址",
+                    "type": "string"
+                },
+                "transferType": {
+                    "description": "转账类型:1-入,2-出",
+                    "type": "integer"
+                }
+            }
+        },
+        "model.UserInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "用户地址",
+                    "type": "string"
+                },
+                "created": {
+                    "description": "注册时间",
+                    "type": "integer"
+                },
+                "credit": {
+                    "description": "回报奖励",
+                    "type": "number"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "investNum": {
+                    "description": "投资金额",
+                    "type": "number"
+                },
+                "poolCredit": {
+                    "description": "奖池奖励",
+                    "type": "number"
+                },
+                "refId": {
+                    "description": "推荐人ID",
+                    "type": "integer"
+                },
+                "refNum": {
+                    "description": "直推人数",
+                    "type": "integer"
+                },
+                "refStr": {
+                    "description": "推荐路径",
+                    "type": "string"
+                },
+                "referReward": {
+                    "description": "推荐奖励",
+                    "type": "number"
+                },
+                "teamNum": {
+                    "description": "团队人数",
+                    "type": "integer"
+                },
+                "ticketNum": {
+                    "description": "兑换的门票数",
+                    "type": "number"
+                },
+                "totalCredit": {
+                    "description": "累计奖励",
+                    "type": "number"
+                },
+                "updated": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.UserReward": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "用户地址",
+                    "type": "string"
+                },
+                "rank": {
+                    "description": "排名",
+                    "type": "integer"
+                },
+                "totalCredit": {
+                    "description": "累计奖励",
+                    "type": "number"
+                }
+            }
+        },
+        "model.UserRewardTop": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.UserReward"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.UserTickerList": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.FaBscUserTicket"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.UserTransferList": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.TransferInfo"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "total": {
                     "type": "integer"
                 }
             }
