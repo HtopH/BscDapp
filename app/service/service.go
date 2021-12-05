@@ -22,6 +22,16 @@ type JsonResponse struct {
 	Message string      `json:"message"` // 提示信息
 }
 
+func GetConfig(key string) interface{} {
+	res, err := dao.FaConfig.Where(dao.FaConfig.Columns.Name, key).Value(dao.FaConfig.Columns.Value)
+	if err != nil {
+		g.Log().Debug("Service GetConfig Err:", err)
+		return ""
+	}
+	return res
+
+}
+
 func GetGameEndTime(gameInfo *model.FaBscGameInfo, nowSeed float64) int {
 	var (
 		newEnd int

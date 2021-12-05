@@ -2,7 +2,6 @@ package api
 
 import (
 	"BscDapp/app/common"
-	"BscDapp/app/dao"
 	"BscDapp/app/model"
 	"BscDapp/app/service"
 	"github.com/gogf/gf/net/ghttp"
@@ -112,9 +111,6 @@ func (a *indexApi) Login(r *ghttp.Request) {
 // @router  /api/index/notice  [GET]
 // @success 200 {object} service.JsonResponse "执行结果"
 func (a *indexApi) Notice(r *ghttp.Request) {
-	res, err := dao.FaConfig.Where("name=?", "notice").Value(dao.FaConfig.Columns.Value)
-	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
-	}
+	res := service.GetConfig("notice")
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }

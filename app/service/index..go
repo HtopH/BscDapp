@@ -38,18 +38,23 @@ func (s *indexService) GetGameBaseInfo() (*model.GameIndexInfo, error) {
 		g.Log().Debug("Api Index GameInfo GameInfo One Err:", err)
 		return nil, err
 	}
+
 	data.FaBscGameInfo = res
+	data.FaBscGameInfo.SeedPool += gconv.Float64(GetConfig("add_seed"))
+	data.FaBscGameInfo.JackPool += gconv.Float64(GetConfig("add_reward"))
+
 	data.TotalInvest, err = dao.FaBscUserGame.Where("status=1").Sum(dao.FaBscUserGame.Columns.InvestNum)
 	if err != nil {
 		g.Log().Debug("Api Index GameInfo UserGame TotalInvest Err:", err)
 		return nil, err
-
 	}
+	data.TotalInvest += gconv.Float64(GetConfig("add_invest"))
+
 	data.TotalReward, err = dao.FaBscUserGame.Where("status>1").Sum(dao.FaBscUserGame.Columns.InvestNum)
 	if err != nil {
 		g.Log().Debug("Api Index GameInfo UserGame TotalReward Err:", err)
 		return nil, err
-
 	}
+	data.TotalReward += gconv.Float64(GetConfig("add_credit"))
 	return data, nil
 }
