@@ -35,6 +35,7 @@ type faBscUserColumns struct {
 	TicketNum   string // 兑换的门票数
 	InvestNum   string // 投资金额
 	PoolCredit  string // 奖池奖励
+	RefCredit   string // 推荐奖励
 	Credit      string // 回报奖励
 	TotalCredit string // 累计奖励
 	Created     string // 注册时间
@@ -57,6 +58,7 @@ var (
 			TicketNum:   "ticket_num",
 			InvestNum:   "invest_num",
 			PoolCredit:  "pool_credit",
+			RefCredit:   "ref_credit",
 			Credit:      "credit",
 			TotalCredit: "total_credit",
 			Created:     "created",

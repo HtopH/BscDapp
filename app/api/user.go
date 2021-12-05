@@ -78,7 +78,7 @@ func (a *user) GetTicketList(r *ghttp.Request) {
 // @param   page formData int false "页码"
 // @param   size formData int false "每页数量"
 // @router  /api/user/get-first-team  [POST]
-// @success 200 {object} model.UserTickerList "执行结果"
+// @success 200 {object} model.TeamUserList "执行结果"
 func (a *user) GetFirstTeam(r *ghttp.Request) {
 	var (
 		req *model.UserInfoRep
@@ -102,9 +102,38 @@ func (a *user) GetFirstTeam(r *ghttp.Request) {
 // @success 200 {object} service.JsonResponse "执行结果"
 func (a *user) CheckUserJoin(r *ghttp.Request) {
 	userInfo := service.User.GetUser(r)
-	count, err := dao.FaBscUserGame.Where("uid=? and status=1", userInfo.Id).Count()
-	if err != nil || count > 0 {
+	gameInfo, err := dao.FaBscUserGame.Where("uid=? and status<3", userInfo.Id).One()
+	if err != nil || gameInfo != nil {
 		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: common.Failure})
 	}
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+}
+
+// @summary 会员活动信息
+// @tags    会员模块
+// @produce json
+// @router  /api/user/user-game-info  [GET]
+// @success 200 {object} model.UserGameInfo "执行结果"
+func (a *user) UserGameInfo(r *ghttp.Request) {
+	userInfo := service.User.GetUser(r)
+	data, err := service.User.GetUserGameInfo(r.Context(), userInfo.Id)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+}
+
+// @summary 获得投资收益(转卖)
+// @tags    会员模块
+// @produce json
+// @router  /api/user/get-game-reward  [GET]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *user) GetGameReward(r *ghttp.Request) {
+	userInfo := service.User.GetUser(r)
+	err := service.User.GameReward(r.Context(), userInfo.Id)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+
 }

@@ -29,3 +29,27 @@ func (s *indexService) GetBaseInfo() (*model.BscBaseInfo, error) {
 	data.SpendNum = GetNo() - 1
 	return data, err
 }
+
+//首页投资详情
+func (s *indexService) GetGameBaseInfo() (*model.GameIndexInfo, error) {
+	data := &model.GameIndexInfo{}
+	res, err := dao.FaBscGameInfo.Where("status=1").Order("round desc").One()
+	if err != nil {
+		g.Log().Debug("Api Index GameInfo GameInfo One Err:", err)
+		return nil, err
+	}
+	data.FaBscGameInfo = res
+	data.TotalInvest, err = dao.FaBscUserGame.Where("status=1").Sum(dao.FaBscUserGame.Columns.InvestNum)
+	if err != nil {
+		g.Log().Debug("Api Index GameInfo UserGame TotalInvest Err:", err)
+		return nil, err
+
+	}
+	data.TotalReward, err = dao.FaBscUserGame.Where("status>1").Sum(dao.FaBscUserGame.Columns.InvestNum)
+	if err != nil {
+		g.Log().Debug("Api Index GameInfo UserGame TotalReward Err:", err)
+		return nil, err
+
+	}
+	return data, nil
+}

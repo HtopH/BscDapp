@@ -14,7 +14,7 @@ type FaBscUser internal.FaBscUser
 // Fill with you ideas below.
 type UserInfo struct {
 	*FaBscUser
-	ReferReward float64 //推荐奖励
+	ReferReward float64 //累计推荐奖励
 }
 
 //会员收益排行
@@ -60,11 +60,17 @@ type TeamUserInfo struct {
 	Id      int     `orm:"id,primary"   json:"id"`
 	Address string  `orm:"address"      json:"address"` // 用户地址
 	Created int     `orm:"created"      json:"created"` // 注册时间
-	Num     float64 //消耗数
+	Num     float64 //兑换粮草消耗USDT
 }
 
 //团队会员信息列表
 type TeamUserList struct {
 	List []*TeamUserInfo
 	ListOutPut
+}
+
+type UserGameInfo struct {
+	*FaBscUserGame
+	Percent     int     //回报进度
+	TotalReward float64 //累计收益
 }

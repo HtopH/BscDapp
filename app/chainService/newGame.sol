@@ -25,6 +25,7 @@ contract NewGame {
 
     address constant private ADMIN_ADDR = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     address private op_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
+    address private pay_addr = 0x125a0daEE26BD73B37A3c2a86c84426c68743750;
 
     uint128 public  spendTickets;
     uint128 public  joinBase = 10000000000000000000;
@@ -114,7 +115,7 @@ contract NewGame {
 
         uint32 percent=getPercent();
         uint128 ticketNum= _value.mul(percent).div(percentWei);
-        Ticket_TOKEN.transfer(msg.sender,ticketNum);
+        Ticket_TOKEN.transferFrom(pay_addr,msg.sender,ticketNum);
         players[playerId].getTickets=this_player.getTickets+ticketNum;
 
         spendTickets+=ticketNum;
@@ -144,7 +145,7 @@ contract NewGame {
     }
 
     function userWithdraw(uint8 _type,uint128 _value) external {
-        require(_type>0 && _type<3,"type is wrong!");
+        require(_type>0 && _type<4,"type is wrong!");
         require(addrToId[msg.sender]!=0,"user is not exist!");
         require(_value <= USD_TOKEN.balanceOf(address(this)), "Contract have not enough balance!");
         emit userGetLog(4,_type,addrToId[msg.sender],_value);

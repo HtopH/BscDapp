@@ -92,14 +92,14 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 				return err
 			}
 
-			//发放奖励给最后20人
-			userGames, err := dao.FaBscUserGame.Ctx(ctx).Where("game_round=?", gameInfo.Round).Limit(20).Order("created desc").All()
+			//发放奖励给最后20人(未出局)
+			userGames, err := dao.FaBscUserGame.Ctx(ctx).Where("game_round=? and status=1", gameInfo.Round).Limit(20).Order("created desc").All()
 			if err != nil {
 				g.Log().Debug("Service Task DealGameStatus UserGame All Err:", err)
 				return err
 			}
 			//投资金额权重平分
-			totalNum, err := dao.FaBscUserGame.Ctx(ctx).Where("game_round=?", gameInfo.Round).Limit(20).Order("created desc").Sum("invest_num")
+			totalNum, err := dao.FaBscUserGame.Ctx(ctx).Where("game_round=? and status=1", gameInfo.Round).Limit(20).Order("created desc").Sum("invest_num")
 			if err != nil {
 				g.Log().Debug("Service Task DealGameStatus totalNum Find Err:", err)
 				return err
@@ -148,7 +148,11 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 
 		}
 		//将上场活动没结束的会员更新到最新活动
-		_, err = dao.FaBscUserGame.Ctx(ctx).Where("status=1 and game_round=?", gameInfo.Round).Update(g.Map{"gameInfo.Round": gameInfo.Round + 1})
+		_, err = dao.FaBscUserGame.Ctx(ctx).Where("status=1 and game_round=?", gameInfo.Round).Update(g.Map{"game_round": gameInfo.Round + 1})
+		if err != nil {
+			g.Log().Debug("Service Task DealGameStatus New UserGame Update Err:", err)
+
+		}
 		return err
 	})
 }
@@ -238,6 +242,13 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 			g.Log().Debug("Service DoListenTask DealUserJoinGame UserInfo Find Err:", err)
 			return gerror.New("获取会员信息失败：" + err.Error())
 		}
+
+		JoinInfo, err := dao.FaBscUserGame.Ctx(ctx).Where("uid=? and (status=1 or status=2)", userInfo.Id).One()
+		if err != nil || JoinInfo != nil {
+			g.Log().Debug("Service DoListenTask DealUserJoinGame UserGame UserGame Err:", err)
+			return gerror.New("会员已存在活动：" + gconv.String(JoinInfo))
+		}
+
 		num := BigIntToF(param.Value, model.TokenDecimals)
 		ticket := num * model.PercentJoinTicket / model.PercentBase
 		gameInfo, err := dao.FaBscGameInfo.Ctx(ctx).Where("status=1 and round=?", param.Round).One()
@@ -305,10 +316,9 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 			} else {
 				canGet = userGame.ReturnNum
 				reward = reward - userGame.ReturnNum
-				//满足出局条件
+				//满足出局条件,回报须手动提现
 				updateUserGame["status"] = 2
-				//发放到账户
-				err = User.ChangeCredit(ctx, userGame.Uid, userGame.WillNum, model.CreditReward)
+
 				////添加任务通知合约会员出局
 				//taskInfo := model.FaBscTask{
 				//	Type:     model.SendUserOut,
@@ -357,11 +367,19 @@ func (s *listenTask) DealUserWithdraw(c context.Context, param *chainService.Bsc
 				return gerror.New("会员余额不足")
 			}
 			err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.Credit, model.CreditWithdraw)
+
 		case model.WithdrawPoolType:
 			if userInfo.PoolCredit <= 0 {
 				return gerror.New("会员余额不足")
 			}
-			err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.Credit, model.CreditPoolWithdraw)
+			err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.PoolCredit, model.CreditPoolWithdraw)
+
+		case model.WithdrawRefType:
+			if userInfo.RefCredit <= 0 {
+				return gerror.New("会员余额不足")
+			}
+			err = User.ChangeCredit(ctx, userInfo.Id, -userInfo.RefCredit, model.CreditRefWithdraw)
+
 		default:
 			return gerror.New("提现类型错误:" + gconv.String(param.RewardType))
 		}

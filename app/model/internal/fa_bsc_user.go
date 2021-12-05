@@ -15,6 +15,7 @@ type FaBscUser struct {
 	TicketNum   float64 `orm:"ticket_num"   json:"ticketNum"`   // 兑换的门票数
 	InvestNum   float64 `orm:"invest_num"   json:"investNum"`   // 投资金额
 	PoolCredit  float64 `orm:"pool_credit"  json:"poolCredit"`  // 奖池奖励
+	RefCredit   float64 `orm:"ref_credit"   json:"refCredit"`   // 推荐奖励
 	Credit      float64 `orm:"credit"       json:"credit"`      // 回报奖励
 	TotalCredit float64 `orm:"total_credit" json:"totalCredit"` // 累计奖励
 	Created     int     `orm:"created"      json:"created"`     // 注册时间

@@ -17,7 +17,7 @@ type PageReq struct {
 
 var (
 	//合约地址
-	ContractAddr = common.HexToAddress("0x6b2FAA2733746a735363bfD426C38B1AC3cfAB3c")
+	ContractAddr = common.HexToAddress("0x5625Cf2D8e8E0492A5B190B897973ebC8e57a7c1")
 	//操作员地址
 	FromAddr = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")
 )
@@ -62,15 +62,18 @@ const (
 	CreditBuyTicket    = "buyTicket"      //兑换门票
 	CreditWithdraw     = "withdraw"       //提现投资回报
 	CreditPoolWithdraw = "poolWithdraw"   //提现奖池奖励
+	CreditRefWithdraw  = "refWithdraw"    //提现奖池奖励
 
 	//提现类型
+	WithdrawRefType    = 3 //推荐奖提现
 	WithdrawPoolType   = 2 //奖池提现
-	WithdrawCreditType = 1 //投资回报和推荐奖提现
+	WithdrawCreditType = 1 //投资回报提现
 
 	//余额字段类型
-	UserCreditOne   = "credit" //投资回报
-	UserCreditTwo   = "ticket" //门票
-	UserCreditThree = "pool"   //奖池奖励
+	UserCreditOne   = "credit"    //投资回报
+	UserCreditTwo   = "ticket"    //门票
+	UserCreditThree = "pool"      //奖池奖励
+	UserCreditFour  = "refCredit" //推荐奖
 
 	//数值比例设置
 	PercentBase       = 100 //基础数值

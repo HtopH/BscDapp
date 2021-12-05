@@ -14,5 +14,6 @@ type FaBscGameInfo internal.FaBscGameInfo
 // Fill with you ideas below.
 type GameIndexInfo struct {
 	*FaBscGameInfo
-	TotalInvest float64 //总投资
+	TotalInvest float64 //当前总投资
+	TotalReward float64 //当前获利转让
 }

@@ -14,6 +14,6 @@ type FaBscUserGame struct {
 	AwardNum  float64 `orm:"award_num"  json:"awardNum"`  // 奖励金额(奖池)
 	ReturnNum float64 `orm:"return_num" json:"returnNum"` // 剩余回报金额(投资)
 	WillNum   float64 `orm:"will_num"   json:"willNum"`   // 可获得回报
-	Status    int     `orm:"status"     json:"status"`    // 1:进行中,2:已出局
+	Status    int     `orm:"status"     json:"status"`    // 1:进行中,2:已出局,3已奖励
 	Created   int     `orm:"created"    json:"created"`   //
 }

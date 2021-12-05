@@ -15,7 +15,7 @@ type middleware struct{}
 func (s *middleware) Auth(r *ghttp.Request) {
 	addr := r.Header.Get("address")
 	if addr == "" {
-		addr = r.GetString("address")
+		addr = r.Cookie.Get("address")
 	}
 	if addr == "" {
 		_ = r.Response.WriteJsonExit(g.Map{"code": http.StatusUnauthorized, "data": nil, "message": "请注册"})

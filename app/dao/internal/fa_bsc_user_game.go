@@ -34,7 +34,7 @@ type faBscUserGameColumns struct {
 	AwardNum  string // 奖励金额(奖池)
 	ReturnNum string // 剩余回报金额(投资)
 	WillNum   string // 可获得回报
-	Status    string // 1:进行中,2:已出局
+	Status    string // 1:进行中,2:已出局,3已奖励
 	Created   string //
 }
 

@@ -43,7 +43,7 @@
             }
         },
         "/api/index/get-reward-top": {
-            "get": {
+            "post": {
                 "produces": [
                     "application/json"
                 ],
@@ -70,6 +70,53 @@
                         "description": "执行结果",
                         "schema": {
                             "$ref": "#/definitions/model.UserRewardTop"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/index/login": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统信息"
+                ],
+                "summary": "登录",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "钱包地址",
+                        "name": "address",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserRewardTop"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/check-user-join": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会员模块"
+                ],
+                "summary": "校验参与活动资格(调用合约Join前调用校验)",
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
                         }
                     }
                 }
@@ -102,7 +149,26 @@
                     "200": {
                         "description": "执行结果",
                         "schema": {
-                            "$ref": "#/definitions/model.UserTickerList"
+                            "$ref": "#/definitions/model.TeamUserList"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/user/get-game-reward": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会员模块"
+                ],
+                "summary": "获得投资收益(转卖)",
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
                         }
                     }
                 }
@@ -193,6 +259,25 @@
                 }
             }
         },
+        "/api/user/user-game-info": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "会员模块"
+                ],
+                "summary": "会员活动信息",
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/model.UserGameInfo"
+                        }
+                    }
+                }
+            }
+        },
         "/joinGame": {
             "post": {
                 "produces": [
@@ -201,7 +286,7 @@
                 "tags": [
                     "合约接口"
                 ],
-                "summary": "投资",
+                "summary": "投资（先调中心化接口校验投资资格）(支付USDT和粮草)",
                 "parameters": [
                     {
                         "type": "integer",
@@ -229,7 +314,7 @@
                 "tags": [
                     "合约接口"
                 ],
-                "summary": "购买门票",
+                "summary": "购买门票(支付USDT)",
                 "parameters": [
                     {
                         "type": "integer",
@@ -257,12 +342,47 @@
                 "tags": [
                     "合约接口"
                 ],
-                "summary": "注册",
+                "summary": "注册（先调中心化接口校验会员是否存在）",
                 "parameters": [
                     {
                         "type": "string",
-                        "description": "推荐人地址,无则传空字符串 ",
+                        "description": "推荐人地址,无则传系统根节点地址",
                         "name": "ref_addr",
+                        "in": "formData",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/transferToUser": {
+            "post": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "合约接口"
+                ],
+                "summary": "会员粮草转账(支付粮草)",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "接收人钱包地址",
+                        "name": "_addr",
+                        "in": "formData",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "转账金额,big.int,需乘精度",
+                        "name": "_value",
                         "in": "formData",
                         "required": true
                     }
@@ -285,7 +405,7 @@
                 "tags": [
                     "合约接口"
                 ],
-                "summary": "会员提现",
+                "summary": "会员提现（先调中心化会员数据接口校验提现额度）",
                 "parameters": [
                     {
                         "type": "integer",
@@ -393,10 +513,54 @@
                     "type": "integer"
                 },
                 "totalInvest": {
-                    "description": "总投资",
+                    "description": "当前总投资",
+                    "type": "number"
+                },
+                "totalReward": {
+                    "description": "当前获利转让",
                     "type": "number"
                 },
                 "updated": {
+                    "type": "integer"
+                }
+            }
+        },
+        "model.TeamUserInfo": {
+            "type": "object",
+            "properties": {
+                "address": {
+                    "description": "用户地址",
+                    "type": "string"
+                },
+                "created": {
+                    "description": "注册时间",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "num": {
+                    "description": "兑换粮草消耗USDT",
+                    "type": "number"
+                }
+            }
+        },
+        "model.TeamUserList": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.TeamUserInfo"
+                    }
+                },
+                "page": {
+                    "type": "integer"
+                },
+                "size": {
+                    "type": "integer"
+                },
+                "total": {
                     "type": "integer"
                 }
             }
@@ -428,6 +592,57 @@
                 }
             }
         },
+        "model.UserGameInfo": {
+            "type": "object",
+            "properties": {
+                "awardNum": {
+                    "description": "奖励金额(奖池)",
+                    "type": "number"
+                },
+                "created": {
+                    "type": "integer"
+                },
+                "gameRound": {
+                    "description": "场次Round",
+                    "type": "integer"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "investNum": {
+                    "description": "投资金额",
+                    "type": "number"
+                },
+                "percent": {
+                    "description": "回报进度",
+                    "type": "integer"
+                },
+                "returnNum": {
+                    "description": "剩余回报金额(投资)",
+                    "type": "number"
+                },
+                "status": {
+                    "description": "1:进行中,2:已出局,3已奖励",
+                    "type": "integer"
+                },
+                "ticketNum": {
+                    "description": "门票金额",
+                    "type": "number"
+                },
+                "totalReward": {
+                    "description": "累计收益",
+                    "type": "number"
+                },
+                "uid": {
+                    "description": "会员ID",
+                    "type": "integer"
+                },
+                "willNum": {
+                    "description": "可获得回报",
+                    "type": "number"
+                }
+            }
+        },
         "model.UserInfo": {
             "type": "object",
             "properties": {
@@ -454,6 +669,10 @@
                     "description": "奖池奖励",
                     "type": "number"
                 },
+                "refCredit": {
+                    "description": "推荐奖励",
+                    "type": "number"
+                },
                 "refId": {
                     "description": "推荐人ID",
                     "type": "integer"
@@ -467,7 +686,7 @@
                     "type": "string"
                 },
                 "referReward": {
-                    "description": "推荐奖励",
+                    "description": "累计推荐奖励",
                     "type": "number"
                 },
                 "teamNum": {
@@ -572,8 +791,7 @@
                     "type": "integer"
                 },
                 "data": {
-                    "description": "返回数据",
-                    "type": "object"
+                    "description": "返回数据"
                 },
                 "message": {
                     "description": "提示信息",

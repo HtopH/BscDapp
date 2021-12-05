@@ -27,6 +27,25 @@ func (s *user) GetUser(r *ghttp.Request) *model.FaBscUser {
 	return user
 }
 
+//会员最新活动信息
+func (s *user) GetUserGameInfo(ctx context.Context, uid int) (*model.UserGameInfo, error) {
+	data := &model.UserGameInfo{}
+	userGame, err := dao.FaBscUserGame.Ctx(ctx).Where("uid=?", uid).Order("id desc").One()
+	if err != nil || userGame == nil {
+		g.Log().Debug("Service User GetUserGameInfo UserGame Find Err:", err)
+		return nil, err
+	}
+	data.FaBscUserGame = userGame
+	data.Percent = int((userGame.WillNum - userGame.ReturnNum) * 100 / userGame.WillNum)
+	data.TotalReward, err = dao.FaBscUserGame.Ctx(ctx).Where("uid=? and status>2", uid).Sum(dao.FaBscUserGame.Columns.WillNum)
+	if err != nil {
+		g.Log().Debug("Service User GetUserGameInfo UserGame Sum Total Err:", err)
+		return nil, err
+	}
+	return data, nil
+
+}
+
 //修改会员余额
 func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType string) error {
 	var (
@@ -51,8 +70,8 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 		filename = model.UserCreditThree
 	case model.CreditRefReward: //推荐奖励
 		update = g.Map{
-			"credit": &gdb.Counter{
-				Field: "credit",
+			"ref_credit": &gdb.Counter{
+				Field: "ref_credit",
 				Value: amount,
 			},
 			"total_credit": &gdb.Counter{
@@ -61,6 +80,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			},
 			"updated": time.Now().Unix(),
 		}
+		filename = model.UserCreditFour
 	case model.CreditReward: //投资回报
 		update = g.Map{
 			"credit": &gdb.Counter{
@@ -94,6 +114,27 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			return err
 		}
 		filename = model.UserCreditThree
+	case model.CreditRefWithdraw: //推荐奖提现
+		update = g.Map{
+			"ref_credit": &gdb.Counter{
+				Field: "ref_credit",
+				Value: amount,
+			},
+			"updated": time.Now().Unix(),
+		}
+		//添加任务发放到合约
+		taskInfo := model.FaBscTask{
+			Type:     model.SendPay,
+			Task:     gconv.String(model.TaskAddUserBalance{UserId: uint64(uid), Value: -amount}),
+			Created:  int(time.Now().Unix()),
+			TaskTime: int(time.Now().Unix()),
+		}
+		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		if err != nil {
+			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
+			return err
+		}
+		filename = model.UserCreditFour
 	case model.CreditWithdraw: //投资回报提现
 		update = g.Map{
 			"credit": &gdb.Counter{
@@ -254,4 +295,23 @@ func (s *user) FirstLevelTeam(ctx context.Context, req *model.UserInfoRep) (*mod
 		}
 	}
 	return data, err
+}
+
+//会员获取投资回报
+func (s *user) GameReward(c context.Context, Uid int) error {
+	return dao.FaBscUserGame.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
+		userGameInfo, err := dao.FaBscUserGame.Ctx(ctx).Where("uid=? and status=2", Uid).One()
+		if err != nil || userGameInfo == nil {
+			g.Log().Debug("Api User GetGameReward userGameInfo Find Err:", err)
+			return gerror.New("信息不存在")
+		}
+		_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", userGameInfo.Id).Update(g.Map{"status": 3, "updated": time.Now().Unix()})
+		if err != nil {
+			g.Log().Debug("Api User GetGameReward userGameInfo Update Err:", err)
+			return err
+		}
+		//发放到账户
+		err = s.ChangeCredit(ctx, userGameInfo.Uid, userGameInfo.WillNum, model.CreditReward)
+		return err
+	})
 }

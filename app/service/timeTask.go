@@ -36,14 +36,14 @@ func (s *timeTask) ListenTask() {
 		NewGame.Init()
 	}, "bscListen")
 	//定时检测活动状态
-	_, _ = gcron.AddSingleton("1 */10 * * * *", func() {
+	_, _ = gcron.AddSingleton("29 * * * * *", func() {
 		g.Log().Debug("Task CheckGame Begin")
 		_ = ListenTask.DealGameStatus(context.Background())
 		g.Log().Debug("Task CheckGame End")
 	}, "checkGame")
 
 	//定时消费任务
-	_, _ = gcron.AddSingleton("1 */11 * * * *", func() {
+	_, _ = gcron.AddSingleton("30 * * * * *", func() {
 		g.Log().Debug("Task BscTask Begin")
 		s.FinishBscTask()
 		g.Log().Debug("Task BscTask End")
