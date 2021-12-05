@@ -103,6 +103,25 @@
                 }
             }
         },
+        "/api/index/notice": {
+            "get": {
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "系统信息"
+                ],
+                "summary": "公告",
+                "responses": {
+                    "200": {
+                        "description": "执行结果",
+                        "schema": {
+                            "$ref": "#/definitions/service.JsonResponse"
+                        }
+                    }
+                }
+            }
+        },
         "/api/user/check-user-join": {
             "get": {
                 "produces": [

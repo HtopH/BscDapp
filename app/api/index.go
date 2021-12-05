@@ -2,6 +2,7 @@ package api
 
 import (
 	"BscDapp/app/common"
+	"BscDapp/app/dao"
 	"BscDapp/app/model"
 	"BscDapp/app/service"
 	"github.com/gogf/gf/net/ghttp"
@@ -77,6 +78,7 @@ func (a *indexApi) GetRewardTop(r *ghttp.Request) {
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
 }
 
+//初始化合约数据表
 //func (a *indexApi) SystemInit(r *ghttp.Request) {
 //	dao.FaBscCredit.Where("id>0").Delete()
 //	dao.FaBscGameInfo.Where("id>0").Delete()
@@ -102,4 +104,17 @@ func (a *indexApi) Login(r *ghttp.Request) {
 	address := r.GetString("address")
 	r.Cookie.Set("address", address)
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+}
+
+// @summary 公告
+// @tags    系统信息
+// @produce json
+// @router  /api/index/notice  [GET]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) Notice(r *ghttp.Request) {
+	res, err := dao.FaConfig.Where("name=?", "notice").Value(dao.FaConfig.Columns.Value)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
