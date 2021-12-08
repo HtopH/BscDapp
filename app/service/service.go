@@ -50,8 +50,8 @@ func GetGameEndTime(gameInfo *model.FaBscGameInfo, nowSeed float64) int {
 }
 
 func GetBigInt(num float64, decimals string) *big.Int {
-	dec, _ := strconv.Atoi(decimals) // 兑换比例精度
-	temp := num * float64(dec)
+	dec := gconv.Float64(decimals) // 兑换比例精度
+	temp, _ := decimal.NewFromFloat(num).Mul(decimal.NewFromFloat(dec)).Float64()
 	float := strconv.FormatFloat(temp, 'f', -1, 64)
 	res, _ := new(big.Int).SetString(float, 10)
 	return res

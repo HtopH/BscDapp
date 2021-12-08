@@ -118,6 +118,20 @@ func (s *newGame) IdToAddr(id uint64) common.Address {
 	return res
 }
 
+//设置粮草消耗值
+func (s *newGame) SetSpend(num float64) (string, error) {
+	auth, err := s.GetTransactOpts()
+	if err != nil {
+		return "", err
+	}
+	res, err := s.Conn.SetSpend(auth, GetBigInt(num, model.TokenDecimals))
+	if err != nil {
+		g.Log().Debug("Service NewGame SetSpend Err :", err)
+		return "", err
+	}
+	return res.Hash().String(), nil
+}
+
 //监听合约事件
 func (s *newGame) ListenNewGame() {
 	//注册

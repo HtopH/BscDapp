@@ -2,10 +2,13 @@ package api
 
 import (
 	"BscDapp/app/common"
+	"BscDapp/app/dao"
 	"BscDapp/app/model"
 	"BscDapp/app/service"
+	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
 	"net/http"
+	"time"
 )
 
 var Index = indexApi{}
@@ -112,5 +115,25 @@ func (a *indexApi) Login(r *ghttp.Request) {
 // @success 200 {object} service.JsonResponse "执行结果"
 func (a *indexApi) Notice(r *ghttp.Request) {
 	res := service.GetConfig("notice")
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+}
+
+// @summary 修改粮草消耗
+// @tags    系统信息
+// @produce json
+// @param   spend formData float64 true "数量"
+// @router  /api/index/set-spend  [POST]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) SetSpend(r *ghttp.Request) {
+	spend := r.GetFloat64("spend")
+	if spend <= 0 {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: common.Failure})
+	}
+	res, err := service.NewGame.SetSpend(spend)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	dao.FaBscBaseInfo.Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": spend, "updated": time.Now().Unix()})
+
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
