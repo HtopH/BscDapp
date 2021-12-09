@@ -105,15 +105,16 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 				return err
 			}
 			if len(userGames) > 0 && totalNum > 0 {
+				var reward float64
 				for _, v := range userGames {
 					//奖励会员并插入记录
-					reward := gameInfo.JackPool * v.InvestNum / totalNum
+					reward = gameInfo.JackPool * v.InvestNum / totalNum
 					err = User.ChangeCredit(ctx, v.Uid, reward, model.CreditPool)
 					if err != nil {
 						return err
 					}
 					//更新奖励金额
-					_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", v.Id).Update(g.Map{"award_num": reward})
+					_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", v.Id).Update(dao.FaBscUserGame.Columns.AwardNum, reward)
 					if err != nil {
 						g.Log().Debug("Service Task DealGameStatus UserGame Update Err:", err)
 					}
