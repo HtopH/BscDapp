@@ -5,7 +5,7 @@ import (
 	"BscDapp/app/model"
 	"context"
 	"github.com/gogf/gf/frame/g"
-	"github.com/gogf/gf/os/gcron"
+	"github.com/gogf/gf/os/gtimer"
 	"github.com/gogf/gf/util/gconv"
 	"strconv"
 	"time"
@@ -17,8 +17,8 @@ type timeTask struct{}
 
 //定时任务
 func (s *timeTask) ListenTask() {
-	//循环监听BSC日志
-	_, _ = gcron.AddSingleton("1 */1 * * * *", func() {
+
+	gtimer.AddSingleton(5*time.Second, func() {
 		//监听之前先补全为监听到的日志
 		baseInfo, _ := dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).One()
 		num, err := strconv.Atoi(baseInfo.TheValue)
@@ -34,20 +34,14 @@ func (s *timeTask) ListenTask() {
 		NewGame.WsClient.Close()
 		NewGame.Client.Close()
 		NewGame.Init()
-	}, "bscListen")
-	//定时检测活动状态
-	_, _ = gcron.AddSingleton("29 * * * * *", func() {
+	})
+
+	gtimer.AddSingleton(9*time.Second, func() {
 		g.Log().Debug("Task CheckGame Begin")
 		_ = ListenTask.DealGameStatus(context.Background())
 		g.Log().Debug("Task CheckGame End")
-	}, "checkGame")
+	})
 
-	//定时消费任务
-	_, _ = gcron.AddSingleton("30 * * * * *", func() {
-		g.Log().Debug("Task BscTask Begin")
-		s.FinishBscTask()
-		g.Log().Debug("Task BscTask End")
-	}, "bscTask")
 }
 
 //读取队列任务
@@ -101,6 +95,28 @@ func (s *timeTask) FinishBscTask() {
 		task, err = dao.FaBscTask.Ctx(ctx).Where("status=0 and task_time<?", time.Now().Unix()).Order("task_time asc").One()
 		if err != nil {
 			g.Log().Debug("Service TimeTask FinishBscTask Task Find Err:", err)
+		}
+	}
+}
+
+//redis订阅任务触发
+func (s *timeTask) TaskSubscribe() {
+	conn := g.Redis().Conn()
+	_, err := conn.DoVar("SUBSCRIBE", "bsc:task")
+	if err != nil {
+		g.Log().Debug("SUBSCRIBE", "err", err)
+	}
+	for {
+		reply, err := conn.ReceiveVar()
+		if err != nil {
+			g.Log().Debug("SUBSCRIBE", "reply err", err)
+		}
+
+		if len(reply.Slice()) > 2 && gconv.Map(reply.Slice()[2])["doType"] != nil {
+			time.Sleep(time.Second)
+			g.Log().Debug("Task BscTask Begin")
+			s.FinishBscTask()
+			g.Log().Debug("Task BscTask End")
 		}
 	}
 }

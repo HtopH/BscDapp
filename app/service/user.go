@@ -108,7 +108,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			Created:  int(time.Now().Unix()),
 			TaskTime: int(time.Now().Unix()),
 		}
-		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		err = User.AddTask(ctx, &taskInfo)
 		if err != nil {
 			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
 			return err
@@ -129,7 +129,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			Created:  int(time.Now().Unix()),
 			TaskTime: int(time.Now().Unix()),
 		}
-		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		err = User.AddTask(ctx, &taskInfo)
 		if err != nil {
 			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
 			return err
@@ -150,7 +150,7 @@ func (s *user) ChangeCredit(ctx context.Context, uid int, amount float64, doType
 			Created:  int(time.Now().Unix()),
 			TaskTime: int(time.Now().Unix()),
 		}
-		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		err = User.AddTask(ctx, &taskInfo)
 		if err != nil {
 			g.Log().Debug("Service User ChangeCredit Task Save Err:", err)
 			return err
@@ -314,4 +314,18 @@ func (s *user) GameReward(c context.Context, Uid int) error {
 		err = s.ChangeCredit(ctx, userGameInfo.Uid, userGameInfo.WillNum, model.CreditReward)
 		return err
 	})
+}
+
+//发布Bsc任务
+func (s *user) AddTask(ctx context.Context, data *model.FaBscTask) error {
+	_, err := dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(data)
+	if err != nil {
+		g.Log().Debug("Service User AddTask Save Err:", err)
+		return err
+	}
+	_, err = g.Redis().DoVar("PUBLISH", "bsc:task", g.Map{"doType": 1})
+	if err != nil {
+		g.Log().Debug("Service User AddTask Redis Err:", err)
+	}
+	return err
 }

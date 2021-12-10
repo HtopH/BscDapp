@@ -30,6 +30,8 @@ func (a *indexApi) Test(r *ghttp.Request) {
 	//n3 := service.GetBase(n2)
 	//n1 := service.GetPercent()
 	//g.Log().Debug(n2, n3, n1)
+
+	g.Redis().DoVar("PUBLISH", "bsc:task", g.Map{"doType": 1})
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
 }
 

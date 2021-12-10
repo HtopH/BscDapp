@@ -5,6 +5,7 @@ import (
 	"BscDapp/app/service"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/os/grpool"
 	"github.com/gogf/swagger"
 	"net/http"
 )
@@ -18,7 +19,14 @@ func init() {
 	service.TimeTask.ListenTask()
 	//静态资源路由
 	s.AddStaticPath("/public", "/public")
-	s.AddStaticPath("/swagger", "/swagger")
+
+	//redis任务订阅
+	err := grpool.Add(func() {
+		service.TimeTask.TaskSubscribe()
+	})
+	if err != nil {
+		g.Log().Debug("Router grPool Err:", err)
+	}
 	//动态路由
 	s.Group("/api", func(group *ghttp.RouterGroup) {
 		group.Middleware(service.Middleware.SetCORS)

@@ -142,7 +142,7 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 			Created:  int(time.Now().Unix()),
 			TaskTime: int(time.Now().Unix()),
 		}
-		_, err = dao.FaBscTask.Ctx(ctx).OmitEmpty().Save(taskInfo)
+		err = User.AddTask(ctx, &taskInfo)
 		if err != nil {
 			g.Log().Debug("Service Task DealGameStatus Task Save Err:", err)
 			return err
