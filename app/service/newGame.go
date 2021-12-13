@@ -273,20 +273,21 @@ func (s *newGame) ListenNewGame() {
 			run = false
 			break
 		}
-		data.Created = int(time.Now().Unix())
-		_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
-		if err != nil {
-			g.Log().Debug("ListenNewGame ListenLog Save Err:", err)
-		}
-		//更新系统区块高度
-		nowBlock, _ := dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Value("theValue")
-		if nowBlock.Int64() < data.Block {
-			_, err = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": data.Block + 1})
+		if data.Data != "" {
+			data.Created = int(time.Now().Unix())
+			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
+			if err != nil {
+				g.Log().Debug("ListenNewGame ListenLog Save Err:", err)
+			}
+			//更新系统区块高度
+			if data.Block > 0 {
+				_, err = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": data.Block + 1})
+			}
+			if err != nil {
+				g.Log().Debug("ListenNewGame BaseInfo Update Err:", err)
+			}
 		}
 
-		if err != nil {
-			g.Log().Debug("ListenNewGame BaseInfo Update Err:", err)
-		}
 	}
 }
 
