@@ -166,10 +166,14 @@ func (s *newGame) ListenNewGame() {
 	//门票转账
 	transferCh := make(chan *chainService.BscGameTransferLog)
 	transferSub, err := s.WsConn.WatchTransferLog(&bind.WatchOpts{}, transferCh)
+	if err != nil {
+		g.Log().Debug("WatchTransferLog监听合约特定事件失败", err)
+		return
+	}
+
 	g.Log().Debug("监听事件堵塞等待：")
 	run := true
 	for run {
-		//监听前先消费任务
 		data := model.FaBscListenLog{}
 		select {
 		case res := <-registerCh:
@@ -187,12 +191,7 @@ func (s *newGame) ListenNewGame() {
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
 			data.Data = gconv.String(res)
-			data.Created = int(time.Now().Unix())
 
-			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
-			if err != nil {
-				g.Log().Debug("ListenNewGame registerCh ListenLog Save Err:", err)
-			}
 		case err = <-registerSub.Err():
 			g.Log().Debug("joinSub监听事件结果错误", err)
 			run = false
@@ -212,11 +211,7 @@ func (s *newGame) ListenNewGame() {
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
-			data.Created = int(time.Now().Unix())
-			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
-			if err != nil {
-				g.Log().Debug("ListenNewGame buyTicketCh ListenLog Save Err:", err)
-			}
+
 		case err = <-buyTicketSub.Err():
 			g.Log().Debug("buyTicketSub监听事件结果错误", err)
 			run = false
@@ -236,11 +231,7 @@ func (s *newGame) ListenNewGame() {
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
-			data.Created = int(time.Now().Unix())
-			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
-			if err != nil {
-				g.Log().Debug("ListenNewGame joinCh ListenLog Save Err:", err)
-			}
+
 		case err = <-joinSub.Err():
 			g.Log().Debug("joinSub监听事件结果错误", err)
 			run = false
@@ -259,11 +250,7 @@ func (s *newGame) ListenNewGame() {
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
-			data.Created = int(time.Now().Unix())
-			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
-			if err != nil {
-				g.Log().Debug("ListenNewGame userGetCh ListenLog Save Err:", err)
-			}
+
 		case err = <-userGetSub.Err():
 			g.Log().Debug("userGetSub监听事件结果错误", err)
 			run = false
@@ -281,18 +268,22 @@ func (s *newGame) ListenNewGame() {
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
-			data.Created = int(time.Now().Unix())
-			_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
-			if err != nil {
-				g.Log().Debug("ListenNewGame transferCh ListenLog Save Err:", err)
-			}
+
 		case err = <-transferSub.Err():
 			g.Log().Debug("transferSub监听事件结果错误", err)
 			run = false
 			break
-
 		}
-
+		data.Created = int(time.Now().Unix())
+		_, err = dao.FaBscListenLog.OmitEmpty().Save(data)
+		if err != nil {
+			g.Log().Debug("ListenNewGame ListenLog Save Err:", err)
+		}
+		//更新系统区块高度
+		_, err = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": data.Block + 1})
+		if err != nil {
+			g.Log().Debug("ListenNewGame BaseInfo Update Err:", err)
+		}
 	}
 }
 
@@ -338,152 +329,159 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			Created: int(time.Now().Unix()),
 			Status:  0,
 		}
-
-		//TODO 尝试解析注册事件
-		regEvent := struct {
+		doType := struct {
 			DoType uint8
-			Id     uint64
-			Addr   common.Address
-			RefId  uint64
 		}{}
-		err = contractAbi.UnpackIntoInterface(&regEvent, "registerLog", vLog.Data)
-		g.Log().Debug("registerLog 解析日志:", regEvent)
-		//不报错说明是注册事件
-		if err == nil && regEvent.DoType == 1 {
-			//日志解析不到地址,直接通过ID读取会员地址
-			regEvent.Addr = s.IdToAddr(regEvent.Id)
-			regData := &chainService.BscGameRegisterLog{
-				DoType: regEvent.DoType,
-				Id:     regEvent.Id,
-				Addr:   regEvent.Addr,
-				RefId:  regEvent.RefId,
-			}
+		err = contractAbi.UnpackIntoInterface(&doType, "registerLog", vLog.Data)
+		g.Log().Debug("doType:", doType)
+		switch doType.DoType {
+		case model.DoTypeRegister:
+			//TODO 尝试解析注册事件
+			regEvent := struct {
+				DoType uint8
+				Id     uint64
+				Addr   common.Address
+				RefId  uint64
+			}{}
+			err = contractAbi.UnpackIntoInterface(&regEvent, "registerLog", vLog.Data)
+			g.Log().Debug("registerLog 解析日志:", regEvent)
+			//不报错说明是注册事件
+			if err == nil && regEvent.DoType == 1 {
+				//日志解析不到地址,直接通过ID读取会员地址
+				regEvent.Addr = s.IdToAddr(regEvent.Id)
+				regData := &chainService.BscGameRegisterLog{
+					DoType: regEvent.DoType,
+					Id:     regEvent.Id,
+					Addr:   regEvent.Addr,
+					RefId:  regEvent.RefId,
+				}
 
-			err = ListenTask.DealRegister(context.Background(), regData)
-			if err != nil {
-				logData.Status = 2
-				logData.Remark = err.Error()
-			} else {
-				logData.Status = 1
+				err = ListenTask.DealRegister(context.Background(), regData)
+				if err != nil {
+					logData.Status = 2
+					logData.Remark = err.Error()
+				} else {
+					logData.Status = 1
+				}
+				logData.Uid = int(regEvent.Id)
+				logData.Data = gconv.String(regData)
+				logData.Type = model.ListenRegister
 			}
-			logData.Uid = int(regEvent.Id)
-			logData.Data = gconv.String(regData)
-			logData.Type = model.ListenRegister
-		}
+		case model.DoTypeBuy:
+			//TODO 尝试解析购买门票事件
+			buyEvent := struct {
+				DoType    uint8
+				Id        uint64
+				Value     *big.Int
+				GetTicket *big.Int
+				Percent   uint32
+			}{}
+			err = contractAbi.UnpackIntoInterface(&buyEvent, "buyTicketLog", vLog.Data)
+			g.Log().Debug("buyTicketLog 解析日志:", buyEvent)
+			//不报错说明是购买门票事件
+			if err == nil && buyEvent.DoType == 2 {
+				buyData := &chainService.BscGameBuyTicketLog{
+					DoType:    buyEvent.DoType,
+					Id:        buyEvent.Id,
+					Value:     buyEvent.Value,
+					GetTicket: buyEvent.GetTicket,
+					Percent:   buyEvent.Percent,
+				}
+				logData.Data = gconv.String(buyData)
+				err = ListenTask.DealBuyTicket(context.Background(), buyData)
+				if err != nil {
+					logData.Status = 2
+					logData.Remark = err.Error()
+				} else {
+					logData.Status = 1
+				}
+				logData.Uid = int(buyEvent.Id)
+				logData.Type = model.ListenBuy
 
-		//TODO 尝试解析购买门票事件
-		buyEvent := struct {
-			DoType    uint8
-			Id        uint64
-			Value     *big.Int
-			GetTicket *big.Int
-			Percent   uint32
-		}{}
-		err = contractAbi.UnpackIntoInterface(&buyEvent, "buyTicketLog", vLog.Data)
-		g.Log().Debug("buyTicketLog 解析日志:", buyEvent)
-		//不报错说明是购买门票事件
-		if err == nil && buyEvent.DoType == 2 {
-			buyData := &chainService.BscGameBuyTicketLog{
-				DoType:    buyEvent.DoType,
-				Id:        buyEvent.Id,
-				Value:     buyEvent.Value,
-				GetTicket: buyEvent.GetTicket,
-				Percent:   buyEvent.Percent,
 			}
-			logData.Data = gconv.String(buyData)
-			err = ListenTask.DealBuyTicket(context.Background(), buyData)
-			if err != nil {
-				logData.Status = 2
-				logData.Remark = err.Error()
-			} else {
-				logData.Status = 1
+		case model.DoTypeJoin:
+			//TODO 尝试解析参与活动事件
+			joinEvent := struct {
+				DoType uint8
+				Id     uint64
+				Value  *big.Int
+				Round  uint32
+			}{}
+			err = contractAbi.UnpackIntoInterface(&joinEvent, "joinLog", vLog.Data)
+			g.Log().Debug("joinLog 解析日志:", joinEvent)
+			if err == nil && joinEvent.DoType == 3 {
+				joinData := &chainService.BscGameJoinLog{
+					DoType: joinEvent.DoType,
+					Id:     joinEvent.Id,
+					Value:  joinEvent.Value,
+					Round:  joinEvent.Round,
+				}
+				logData.Data = gconv.String(joinData)
+				err = ListenTask.DealUserJoinGame(context.Background(), joinData)
+				if err != nil {
+					logData.Status = 2
+					logData.Remark = err.Error()
+				} else {
+					logData.Status = 1
+				}
+				logData.Uid = int(joinEvent.Id)
+				logData.Type = model.ListenJoin
 			}
-			logData.Uid = int(buyEvent.Id)
-			logData.Type = model.ListenBuy
-
-		}
-
-		//TODO 尝试解析参与活动事件
-		joinEvent := struct {
-			DoType uint8
-			Id     uint64
-			Value  *big.Int
-			Round  uint32
-		}{}
-		err = contractAbi.UnpackIntoInterface(&joinEvent, "joinLog", vLog.Data)
-		g.Log().Debug("joinLog 解析日志:", joinEvent)
-		if err == nil && joinEvent.DoType == 3 {
-			joinData := &chainService.BscGameJoinLog{
-				DoType: joinEvent.DoType,
-				Id:     joinEvent.Id,
-				Value:  joinEvent.Value,
-				Round:  joinEvent.Round,
+		case model.DoTypeWithdrawal:
+			//TODO 尝试解析提现请求
+			getEvent := struct {
+				DoType     uint8
+				RewardType uint8
+				Id         uint64
+				Value      *big.Int
+			}{}
+			err = contractAbi.UnpackIntoInterface(&getEvent, "userGetLog", vLog.Data)
+			g.Log().Debug("userGetLog 解析日志:", getEvent)
+			if err == nil && getEvent.DoType == 4 {
+				getData := &chainService.BscGameUserGetLog{
+					DoType:     getEvent.DoType,
+					RewardType: getEvent.RewardType,
+					Id:         getEvent.Id,
+					Value:      getEvent.Value,
+				}
+				logData.Data = gconv.String(getData)
+				err = ListenTask.DealUserWithdraw(context.Background(), getData)
+				if err != nil {
+					logData.Status = 2
+					logData.Remark = err.Error()
+				} else {
+					logData.Status = 1
+				}
+				logData.Uid = int(getEvent.Id)
+				logData.Type = model.ListenWithdrawal
 			}
-			logData.Data = gconv.String(joinData)
-			err = ListenTask.DealUserJoinGame(context.Background(), joinData)
-			if err != nil {
-				logData.Status = 2
-				logData.Remark = err.Error()
-			} else {
-				logData.Status = 1
+		case model.DoTypeTransfer:
+			//TODO 尝试解析转账请求
+			transferEvent := struct {
+				DoType   uint8
+				FromAddr common.Address
+				ToAddr   common.Address
+				Value    *big.Int
+			}{}
+			err = contractAbi.UnpackIntoInterface(&transferEvent, "transferLog", vLog.Data)
+			g.Log().Debug("transferLog 解析日志:", transferEvent)
+			if err == nil && transferEvent.DoType == 5 {
+				getData := &chainService.BscGameTransferLog{
+					DoType:   transferEvent.DoType,
+					FromAddr: transferEvent.FromAddr,
+					ToAddr:   transferEvent.ToAddr,
+					Value:    transferEvent.Value,
+				}
+				logData.Data = gconv.String(getData)
+				err = ListenTask.DealTransfer(context.Background(), getData)
+				if err != nil {
+					logData.Status = 2
+					logData.Remark = err.Error()
+				} else {
+					logData.Status = 1
+				}
+				logData.Type = model.ListenTransfer
 			}
-			logData.Uid = int(joinEvent.Id)
-			logData.Type = model.ListenJoin
-		}
-
-		//TODO 尝试解析提现请求
-		getEvent := struct {
-			DoType     uint8
-			RewardType uint8
-			Id         uint64
-			Value      *big.Int
-		}{}
-		err = contractAbi.UnpackIntoInterface(&getEvent, "userGetLog", vLog.Data)
-		g.Log().Debug("userGetLog 解析日志:", getEvent)
-		if err == nil && getEvent.DoType == 4 {
-			getData := &chainService.BscGameUserGetLog{
-				DoType:     getEvent.DoType,
-				RewardType: getEvent.RewardType,
-				Id:         getEvent.Id,
-				Value:      getEvent.Value,
-			}
-			logData.Data = gconv.String(getData)
-			err = ListenTask.DealUserWithdraw(context.Background(), getData)
-			if err != nil {
-				logData.Status = 2
-				logData.Remark = err.Error()
-			} else {
-				logData.Status = 1
-			}
-			logData.Uid = int(getEvent.Id)
-			logData.Type = model.ListenWithdrawal
-		}
-
-		//TODO 尝试解析转账请求
-		transferEvent := struct {
-			DoType   uint8
-			FromAddr common.Address
-			ToAddr   common.Address
-			Value    *big.Int
-		}{}
-		err = contractAbi.UnpackIntoInterface(&transferEvent, "transferLog", vLog.Data)
-		g.Log().Debug("transferLog 解析日志:", transferEvent)
-		if err == nil && transferEvent.DoType == 5 {
-			getData := &chainService.BscGameTransferLog{
-				DoType:   transferEvent.DoType,
-				FromAddr: transferEvent.FromAddr,
-				ToAddr:   transferEvent.ToAddr,
-				Value:    transferEvent.Value,
-			}
-			logData.Data = gconv.String(getData)
-			err = ListenTask.DealTransfer(context.Background(), getData)
-			if err != nil {
-				logData.Status = 2
-				logData.Remark = err.Error()
-			} else {
-				logData.Status = 1
-			}
-			logData.Type = model.ListenTransfer
 		}
 
 		//将获取到的交易日志存储起来

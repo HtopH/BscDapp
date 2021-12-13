@@ -21,3 +21,9 @@ type BscBaseInfo struct {
 	SpendNum      int     //缩减次数
 	JoinPercent   float64 //参与活动金额与门票比例-100:JoinPercent
 }
+
+//马匹信息
+type HorseInfo struct {
+	Path  string //图片路径
+	Price string //数据
+}

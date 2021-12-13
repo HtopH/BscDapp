@@ -252,7 +252,7 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 
 		num := BigIntToF(param.Value, model.TokenDecimals)
 		ticket := num * model.PercentJoinTicket / model.PercentBase
-		gameInfo, err := dao.FaBscGameInfo.Ctx(ctx).Where("status=1 and round=?", param.Round).One()
+		gameInfo, err := dao.FaBscGameInfo.Ctx(ctx).Where("status=1").One()
 		if err != nil || gameInfo == nil {
 			g.Log().Debug("Service DoListenTask DealUserJoinGame gameInfo Find Err:", err)
 			return gerror.New("查询活动信息失败:" + err.Error())
@@ -282,18 +282,24 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 		}
 
 		//会员参与活动,更新活动信息
-		nowJack := gameInfo.JackPool + num*model.PercentJoinToJack/model.PercentBase
-		nowSeed := gameInfo.JackPool + num*model.PercentJoinToSeed/model.PercentBase
-		endTime := GetGameEndTime(gameInfo, nowJack)
+		jackNum := num * model.PercentJoinToJack / model.PercentBase
+
+		endTime := GetGameEndTime(gameInfo, gameInfo.JackPool+jackNum)
 		if endTime == 0 {
 			//结束时间加10分钟
 			endTime = gameInfo.EndTime + model.GameBaseTime
 		}
 		updateGame := g.Map{
-			"jack_pool": nowJack,
-			"seed_pool": nowSeed,
-			"end_time":  endTime,
-			"updated":   now.Unix(),
+			"seed_pool": &gdb.Counter{
+				Field: "seed_pool",
+				Value: num * model.PercentJoinToSeed / model.PercentBase,
+			},
+			"jack_pool": &gdb.Counter{
+				Field: "jack_pool",
+				Value: jackNum,
+			},
+			"end_time": endTime,
+			"updated":  now.Unix(),
 		}
 		_, err = dao.FaBscGameInfo.Ctx(ctx).Where("id=?", gameInfo.Id).Update(updateGame)
 		if err != nil || gameInfo == nil {
@@ -333,7 +339,10 @@ func (s *listenTask) DealUserJoinGame(c context.Context, param *chainService.Bsc
 				//	return err
 				//}
 			}
-			updateUserGame["return_num"] = userGame.ReturnNum - canGet
+			updateUserGame["return_num"] = &gdb.Counter{
+				Field: "return_num",
+				Value: -canGet,
+			}
 			_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", userGame.Id).Update(updateUserGame)
 			if err != nil {
 				g.Log().Debug("Service DoListenTask DealUserJoinGame userGame Update Err:", err)

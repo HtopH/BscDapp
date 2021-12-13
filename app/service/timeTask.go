@@ -102,6 +102,7 @@ func (s *timeTask) FinishBscTask() {
 //redis订阅任务触发
 func (s *timeTask) TaskSubscribe() {
 	conn := g.Redis().Conn()
+	defer conn.Close()
 	_, err := conn.DoVar("SUBSCRIBE", "bsc:task")
 	if err != nil {
 		g.Log().Debug("SUBSCRIBE", "err", err)

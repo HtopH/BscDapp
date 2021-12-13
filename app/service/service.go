@@ -61,9 +61,8 @@ func BigIntToF(num *big.Int, decimals string) float64 {
 	return gconv.Float64(num.String()) / gconv.Float64(decimals)
 }
 
-func GetPercent() float64 {
-	var percent float64
-	tempN := GetNo()
+func GetPercent() (tempN int, percent float64, spend float64) {
+	tempN, spend = GetNo()
 	base := float64(GetBase(tempN))
 	n := float64(tempN)
 	//直接算浮点会丢失精度,需要用函数处理浮点和运算
@@ -82,7 +81,7 @@ func GetPercent() float64 {
 			//percent = 1 / base
 		}
 	}
-	return percent
+	return tempN, percent, spend
 }
 
 func GetBase(n int) int {
@@ -94,17 +93,17 @@ func GetBase(n int) int {
 	return int(base)
 }
 
-func GetNo() int {
+func GetNo() (int, float64) {
 	var n int
 	spendTickets, err := dao.FaBscBaseInfo.Where(dao.FaBscBaseInfo.Columns.TheKey, model.BaseSpendKey).Value(dao.FaBscBaseInfo.Columns.TheValue)
 	if err != nil {
 		g.Log().Debug("Service service GetNo BaseInfo Value Err:", err)
-		return n
+		return n, 0
 	}
 	if spendTickets.Float64() > 0 {
 		n = int(math.Ceil(spendTickets.Float64() / baseNum))
 	} else {
 		n = 1
 	}
-	return n
+	return n, spendTickets.Float64()
 }

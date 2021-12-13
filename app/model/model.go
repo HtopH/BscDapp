@@ -42,6 +42,12 @@ const (
 	ListenWithdrawal = "withdrawal"
 	ListenTransfer   = "transfer"
 
+	DoTypeRegister   = 1
+	DoTypeBuy        = 2
+	DoTypeJoin       = 3
+	DoTypeWithdrawal = 4
+	DoTypeTransfer   = 5
+
 	//系统基础信息key
 	BaseReadKey  = "readBlock"
 	BaseSpendKey = "spendTicket"

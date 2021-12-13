@@ -7,6 +7,7 @@ import (
 	"BscDapp/app/service"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
+	"github.com/gogf/gf/util/gconv"
 	"net/http"
 	"time"
 )
@@ -41,10 +42,7 @@ func (a *indexApi) Test(r *ghttp.Request) {
 // @router  /api/index/base-info   [GET]
 // @success 200 {object} model.BscBaseInfo "执行结果"
 func (a *indexApi) BaseInfo(r *ghttp.Request) {
-	res, err := service.Index.GetBaseInfo()
-	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
-	}
+	res := service.Index.GetBaseInfo()
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
 
@@ -81,22 +79,6 @@ func (a *indexApi) GetRewardTop(r *ghttp.Request) {
 	}
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
 }
-
-//初始化合约数据表
-//func (a *indexApi) SystemInit(r *ghttp.Request) {
-//	dao.FaBscCredit.Where("id>0").Delete()
-//	dao.FaBscGameInfo.Where("id>0").Delete()
-//	dao.FaBscListenLog.Where("id>0").Delete()
-//	dao.FaBscTask.Where("id>0").Delete()
-//	dao.FaBscTransfer.Where("id>0").Delete()
-//	dao.FaBscUserGame.Where("id>0").Delete()
-//	dao.FaBscUserTicket.Where("id>0").Delete()
-//
-//	dao.FaBscUser.Where("id>0").Delete()
-//	dao.FaBscUser.OmitEmpty().Save(g.Map{"id": 1, "address": model.OwnAddr, "ref_id": 0})
-//	dao.FaBscBaseInfo.Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": 0})
-//
-//}
 
 // @summary 登录
 // @tags    系统信息
@@ -139,3 +121,42 @@ func (a *indexApi) SetSpend(r *ghttp.Request) {
 
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
+
+// @summary 马匹信息
+// @tags    系统信息
+// @produce json
+// @router  /api/index/get-horse  [GET]
+// @success 200 {object} model.HorseInfo "执行结果"
+func (a *indexApi) GetHorse(r *ghttp.Request) {
+	data := make([]*model.HorseInfo, 0)
+	res := service.GetConfig("horse_info")
+	if res != nil {
+		info := gconv.Map(res)
+		if len(info) > 0 {
+			for k, v := range info {
+				temp := model.HorseInfo{
+					Path:  k,
+					Price: v.(string),
+				}
+				data = append(data, &temp)
+			}
+		}
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+}
+
+//初始化合约数据表
+//func (a *indexApi) SystemInit(r *ghttp.Request) {
+//	dao.FaBscCredit.Where("id>0").Delete()
+//	dao.FaBscGameInfo.Where("id>0").Delete()
+//	dao.FaBscListenLog.Where("id>0").Delete()
+//	dao.FaBscTask.Where("id>0").Delete()
+//	dao.FaBscTransfer.Where("id>0").Delete()
+//	dao.FaBscUserGame.Where("id>0").Delete()
+//	dao.FaBscUserTicket.Where("id>0").Delete()
+//
+//	dao.FaBscUser.Where("id>0").Delete()
+//	dao.FaBscUser.OmitEmpty().Save(g.Map{"id": 1, "address": model.OwnAddr, "ref_id": 0})
+//	dao.FaBscBaseInfo.Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": 0})
+//
+//}

@@ -31,6 +31,7 @@ func (a *contractApi) JoinGame() {}
 // @summary 会员提现（先调中心化会员数据接口校验提现额度）
 // @tags   合约接口
 // @produce json
+// @param   _type formData int true "提现类型:1-投资回报,2-奖池奖励,3-推荐奖励"
 // @param   _value formData int true "提现金额,big.int,需乘精度,不需用户填,直接传会员余额"
 // @router  /userWithdraw [POST]
 // @success 200 {object} service.JsonResponse "执行结果"
