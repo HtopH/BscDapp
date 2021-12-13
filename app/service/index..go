@@ -34,22 +34,24 @@ func (s *indexService) GetGameBaseInfo() (*model.GameIndexInfo, error) {
 	//结束时间返回剩余时间
 	res.EndTime = res.EndTime - int(time.Now().Unix())
 
+	invented := gconv.Map(GetConfig("invented_num"))
+
 	data.FaBscGameInfo = res
-	data.FaBscGameInfo.SeedPool += gconv.Float64(GetConfig("add_seed"))
-	data.FaBscGameInfo.JackPool += gconv.Float64(GetConfig("add_reward"))
+	data.FaBscGameInfo.SeedPool += gconv.Float64(invented["add_seed"])
+	data.FaBscGameInfo.JackPool += gconv.Float64(invented["add_reward"])
 
 	data.TotalInvest, err = dao.FaBscUserGame.Where("status=1").Sum(dao.FaBscUserGame.Columns.InvestNum)
 	if err != nil {
 		g.Log().Debug("Api Index GameInfo UserGame TotalInvest Err:", err)
 		return nil, err
 	}
-	data.TotalInvest += gconv.Float64(GetConfig("add_invest"))
+	data.TotalInvest += gconv.Float64(invented["add_invest"])
 
 	data.TotalReward, err = dao.FaBscUserGame.Where("status>1").Sum(dao.FaBscUserGame.Columns.InvestNum)
 	if err != nil {
 		g.Log().Debug("Api Index GameInfo UserGame TotalReward Err:", err)
 		return nil, err
 	}
-	data.TotalReward += gconv.Float64(GetConfig("add_credit"))
+	data.TotalReward += gconv.Float64(invented["add_credit"])
 	return data, nil
 }

@@ -23,10 +23,11 @@ func (s *timeTask) ListenTask() {
 		baseInfo, _ := dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).One()
 		num, err := strconv.Atoi(baseInfo.TheValue)
 		if err != nil {
-			num = 1
 			g.Log().Debug("Service ListenTask strconv Err:", err)
+		} else {
+			NewGame.ReadBlockLog(int64(num))
 		}
-		NewGame.ReadBlockLog(int64(num))
+
 		//开始监听
 		NewGame.ListenNewGame()
 

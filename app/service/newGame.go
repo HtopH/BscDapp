@@ -268,7 +268,6 @@ func (s *newGame) ListenNewGame() {
 			data.Data = gconv.String(res)
 			data.Block = int64(res.Raw.BlockNumber)
 			data.TxHash = res.Raw.TxHash.String()
-
 		case err = <-transferSub.Err():
 			g.Log().Debug("transferSub监听事件结果错误", err)
 			run = false
@@ -280,7 +279,11 @@ func (s *newGame) ListenNewGame() {
 			g.Log().Debug("ListenNewGame ListenLog Save Err:", err)
 		}
 		//更新系统区块高度
-		_, err = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": data.Block + 1})
+		nowBlock, _ := dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Value("theValue")
+		if nowBlock.Int64() < data.Block {
+			_, err = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": data.Block + 1})
+		}
+
 		if err != nil {
 			g.Log().Debug("ListenNewGame BaseInfo Update Err:", err)
 		}
@@ -289,6 +292,7 @@ func (s *newGame) ListenNewGame() {
 
 //读取合约日志（在指定的区块高度范围）（日志即合约所触发的事件）
 func (s *newGame) ReadBlockLog(startBlock int64) {
+	g.Log().Debug("Start ReadBlockLog:", startBlock)
 	maxBlockNum, _ := s.Client.BlockNumber(s.Ctx)
 	if uint64(startBlock) > maxBlockNum {
 		return
@@ -494,6 +498,7 @@ func (s *newGame) ReadBlockLog(startBlock int64) {
 			g.Log().Debug("ReadBlockLog ListenLog Save err:", err)
 		}
 	}
+	g.Log().Debug("End ReadBlockLog:", endBlock)
 	//更新拉取区块高度起始点
 	_, _ = dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).Update(g.Map{"theValue": endBlock + 1, "updated": time.Now().Unix()})
 	//结束的区块还不是最新的，继续拉取
