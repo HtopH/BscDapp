@@ -36,7 +36,7 @@ func (s *user) GetUserGameInfo(ctx context.Context, uid int) (*model.UserGameInf
 		return nil, err
 	}
 	data.FaBscUserGame = userGame
-	data.Percent = int((userGame.WillNum - userGame.ReturnNum) * 100 / userGame.WillNum)
+	data.Percent = int((userGame.WillNum - userGame.ReturnNum) * 100 / userGame.InvestNum)
 	data.TotalReward, err = dao.FaBscUserGame.Ctx(ctx).Where("uid=? and status>2", uid).Sum(dao.FaBscUserGame.Columns.WillNum)
 	if err != nil {
 		g.Log().Debug("Service User GetUserGameInfo UserGame Sum Total Err:", err)
@@ -314,6 +314,17 @@ func (s *user) GameReward(c context.Context, Uid int) error {
 		err = s.ChangeCredit(ctx, userGameInfo.Uid, userGameInfo.WillNum, model.CreditReward)
 		return err
 	})
+}
+
+func UserRefReward() {
+	//统计前5个月数据
+	year, month, _ := time.Now().Date()
+	thisMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
+	startTime := thisMonth.AddDate(0, -11, 0).Unix()
+	endTime := thisMonth.AddDate(0, +1, 0).Add(-time.Second).Unix()
+	for i := 5 - 1; i >= 0; i-- {
+		year, month, _ = thisMonth.AddDate(0, -i, 0).Date()
+	}
 }
 
 //发布Bsc任务

@@ -114,7 +114,7 @@ func (s *listenTask) DealGameStatus(c context.Context) error {
 						return err
 					}
 					//更新奖励金额
-					_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", v.Id).Update(dao.FaBscUserGame.Columns.AwardNum, reward)
+					_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", v.Id).Increment(dao.FaBscUserGame.Columns.AwardNum, reward)
 					if err != nil {
 						g.Log().Debug("Service Task DealGameStatus UserGame Update Err:", err)
 					}

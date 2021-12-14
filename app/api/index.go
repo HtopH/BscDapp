@@ -102,6 +102,16 @@ func (a *indexApi) Notice(r *ghttp.Request) {
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
 
+// @summary 市场规则
+// @tags    系统信息
+// @produce json
+// @router  /api/index/market-rule  [GET]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) MarketRule(r *ghttp.Request) {
+	res := service.GetConfig("market_rule")
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+}
+
 // @summary 修改粮草消耗
 // @tags    系统信息
 // @produce json
