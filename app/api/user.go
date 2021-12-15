@@ -135,5 +135,18 @@ func (a *user) GetGameReward(r *ghttp.Request) {
 		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
 	}
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+}
 
+// @summary 获得推荐奖统计
+// @tags    会员模块
+// @produce json
+// @router  /api/user/get-ref-reward-info  [GET]
+// @success 200 {object} model.UserRefRewardInfo "执行结果"
+func (a *user) GetRefRewardInfo(r *ghttp.Request) {
+	userInfo := service.User.GetUser(r)
+	data, err := service.User.UserRefReward(userInfo.Id, 5)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
 }

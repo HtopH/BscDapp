@@ -316,15 +316,23 @@ func (s *user) GameReward(c context.Context, Uid int) error {
 	})
 }
 
-func UserRefReward() {
+//推荐奖统计
+func (s *user) UserRefReward(uid, monLen int) ([]*model.UserRefRewardInfo, error) {
+	var err error
 	//统计前5个月数据
 	year, month, _ := time.Now().Date()
 	thisMonth := time.Date(year, month, 1, 0, 0, 0, 0, time.Local)
-	startTime := thisMonth.AddDate(0, -11, 0).Unix()
-	endTime := thisMonth.AddDate(0, +1, 0).Add(-time.Second).Unix()
-	for i := 5 - 1; i >= 0; i-- {
-		year, month, _ = thisMonth.AddDate(0, -i, 0).Date()
+	data := make([]*model.UserRefRewardInfo, monLen)
+
+	for i := monLen - 1; i >= 0; i-- {
+		data[monLen-i-1] = &model.UserRefRewardInfo{}
+		startTime := thisMonth.AddDate(0, -i, 0).Unix()
+		endTime := thisMonth.AddDate(0, -i+1, 0).Add(-time.Second).Unix()
+		data[monLen-i-1].Month = thisMonth.AddDate(0, -i, 0).Format("01") + "月"
+		data[monLen-i-1].TotalReward, err = dao.FaBscCredit.Where("uid=? and type=? and created>=? and created<=?", uid, model.CreditRefReward, startTime, endTime).Sum("num")
 	}
+
+	return data, err
 }
 
 //发布Bsc任务

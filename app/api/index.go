@@ -102,6 +102,17 @@ func (a *indexApi) Notice(r *ghttp.Request) {
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
 
+// @summary 扇型图比例
+// @tags    系统信息
+// @produce json
+// @router  /api/index/token-allocation  [GET]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) TokenAllocation(r *ghttp.Request) {
+	res := gconv.Map(service.GetConfig("token_allocation"))
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+
+}
+
 // @summary 市场规则
 // @tags    系统信息
 // @produce json

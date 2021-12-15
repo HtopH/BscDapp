@@ -74,3 +74,15 @@ type UserGameInfo struct {
 	Percent     int     //回报进度
 	TotalReward float64 //累计收益
 }
+
+//会员推荐奖统计
+type UserRefRewardInfo struct {
+	Month       string  //月份
+	TotalReward float64 //推荐收益
+}
+
+//扇形图比例分布
+type TokenAllocationInfo struct {
+	Name    string  //名称
+	Percent float64 //比例
+}
