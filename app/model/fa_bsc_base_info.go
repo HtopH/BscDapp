@@ -14,16 +14,18 @@ type FaBscBaseInfo internal.FaBscBaseInfo
 // Fill with you ideas below.
 //系统基本信息
 type BscBaseInfo struct {
-	OwnAddr       string  //根节点地址
-	TokenDecimal  string  //代币精度
-	TicketPercent float64 //门票兑换比例- 1:TicketPercent
-	SpendTicket   float64 //已兑换门票
-	SpendNum      int     //缩减次数
-	JoinPercent   float64 //参与活动金额与门票比例-100:JoinPercent
+	OwnAddr       string                 //根节点地址
+	TokenDecimal  string                 //代币精度
+	TicketPercent float64                //门票兑换比例- 1:TicketPercent
+	SpendTicket   float64                //已兑换门票
+	SpendNum      int                    //缩减次数
+	JoinPercent   float64                //参与活动金额与门票比例-100:JoinPercent
+	ImgInfo       map[string]interface{} //系统图片信息
 }
 
 //马匹信息
 type HorseInfo struct {
+	Name  string //名称
 	Path  string //图片路径
 	Price string //数据
 }

@@ -149,21 +149,34 @@ func (a *indexApi) SetSpend(r *ghttp.Request) {
 // @router  /api/index/get-horse  [GET]
 // @success 200 {object} model.HorseInfo "执行结果"
 func (a *indexApi) GetHorse(r *ghttp.Request) {
-	data := make([]*model.HorseInfo, 0)
-	res := service.GetConfig("horse_info")
-	if res != nil {
-		info := gconv.Map(res)
-		if len(info) > 0 {
-			for k, v := range info {
-				temp := model.HorseInfo{
-					Path:  k,
-					Price: v.(string),
-				}
-				data = append(data, &temp)
-			}
+	data := service.Index.GetHorseInfo()
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+}
+
+// @summary 滚动消息
+// @tags    系统信息
+// @produce json
+// @router  /api/index/scroll-msg  [GET]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) ScrollMsg(r *ghttp.Request) {
+	userGames, err := dao.FaBscUserGame.Order("id desc").Limit(10).All()
+	if err != nil || userGames == nil {
+		g.Log().Debug("Api Index ScrollMsg")
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+	}
+	data := make([]string, len(userGames))
+	horse := service.Index.GetHorseInfo()
+	for k, v := range userGames {
+		res := service.Index.GetUserHorse(horse, v.InvestNum)
+		if v.Status == 3 {
+			data[k] = "ID" + gconv.String(v.Uid) + "转让" + res.Name + "获得" + gconv.String(v.WillNum) + "U收益"
+		} else {
+			data[k] = "ID" + gconv.String(v.Uid) + "领养价值" + gconv.String(v.InvestNum) + "U收益的" + res.Name
 		}
+
 	}
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+
 }
 
 //初始化合约数据表

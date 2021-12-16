@@ -51,7 +51,8 @@ type UserTransferList struct {
 
 //会员门票兑换记录
 type UserTickerList struct {
-	List []*FaBscUserTicket
+	List    []*FaBscUserTicket
+	TimeStr string //格式化时间
 	ListOutPut
 }
 
@@ -71,6 +72,7 @@ type TeamUserList struct {
 
 type UserGameInfo struct {
 	*FaBscUserGame
+	ImgPath     string  //马匹图片
 	Percent     int     //回报进度
 	TotalReward float64 //累计收益
 }

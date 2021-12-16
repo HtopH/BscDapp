@@ -5,6 +5,7 @@ import (
 	"BscDapp/app/model"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
+	"strings"
 	"time"
 )
 
@@ -20,6 +21,8 @@ func (s *indexService) GetBaseInfo() *model.BscBaseInfo {
 	data.JoinPercent = model.PercentBase / model.PercentJoinTicket
 	data.OwnAddr = model.OwnAddr
 	data.SpendNum, data.TicketPercent, data.SpendTicket = GetPercent()
+	imgs := GetConfig("imgPath")
+	data.ImgInfo = gconv.Map(imgs)
 	return data
 }
 
@@ -54,4 +57,42 @@ func (s *indexService) GetGameBaseInfo() (*model.GameIndexInfo, error) {
 	}
 	data.TotalReward += gconv.Float64(invented["add_credit"])
 	return data, nil
+}
+
+//获取所以马匹信息
+func (s *indexService) GetHorseInfo() []*model.HorseInfo {
+	data := make([]*model.HorseInfo, 0)
+	info := gconv.Map(GetConfig("horse_info"))
+	price := gconv.Map(GetConfig("horse_price"))
+	if len(info) > 0 {
+		for k, v := range info {
+			temp := model.HorseInfo{
+				Name:  k,
+				Path:  v.(string),
+				Price: price[k].(string),
+			}
+			data = append(data, &temp)
+		}
+
+	}
+	return data
+}
+
+//获取投资金额对应的马
+func (s *indexService) GetUserHorse(horse []*model.HorseInfo, investNum float64) *model.HorseInfo {
+
+	var data = &model.HorseInfo{}
+	if len(horse) > 0 {
+		for _, v := range horse {
+			prices := strings.Split(v.Price, "-")
+			if len(prices) == 2 {
+				if investNum >= gconv.Float64(prices[0]) && investNum <= gconv.Float64(prices[1]) {
+					data = v
+					break
+				}
+			}
+
+		}
+	}
+	return data
 }

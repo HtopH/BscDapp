@@ -42,6 +42,9 @@ func (s *user) GetUserGameInfo(ctx context.Context, uid int) (*model.UserGameInf
 		g.Log().Debug("Service User GetUserGameInfo UserGame Sum Total Err:", err)
 		return nil, err
 	}
+	horse := Index.GetHorseInfo()
+	res := Index.GetUserHorse(horse, data.InvestNum)
+	data.ImgPath = res.Path
 	return data, nil
 
 }
