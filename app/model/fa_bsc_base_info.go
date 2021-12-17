@@ -29,3 +29,10 @@ type HorseInfo struct {
 	Path  string //图片路径
 	Price string //数据
 }
+
+//合约地址信息
+type AddrInfo struct {
+	TicketAddr   string //粮草地址
+	UsdtAddr     string //usdt地址
+	ContractAddr string //合约地址
+}

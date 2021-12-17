@@ -10,6 +10,7 @@ import (
 	"github.com/gogf/gf/errors/gerror"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/util/gconv"
+	"github.com/shopspring/decimal"
 	"time"
 )
 
@@ -167,8 +168,8 @@ func (s *listenTask) DealBuyTicket(c context.Context, param *chainService.BscGam
 			return gerror.New("获取会员信息失败：" + err.Error())
 		}
 		num := BigIntToF(param.Value, model.TokenDecimals)
-		percent := float64(param.Percent) / gconv.Float64(model.PercentDecimals)
-		ticketNum := num * percent
+		percent, _ := decimal.NewFromFloat(float64(param.Percent)).Div(decimal.NewFromFloat(gconv.Float64(model.PercentDecimals))).Float64()
+		ticketNum, _ := decimal.NewFromFloat(num).Mul(decimal.NewFromFloat(percent)).Float64()
 		//插入购买记录
 		buyInfo := model.FaBscUserTicket{
 			Uid:       userInfo.Id,
@@ -187,9 +188,9 @@ func (s *listenTask) DealBuyTicket(c context.Context, param *chainService.BscGam
 			return err
 		}
 		//注入奖池
-		jackNum := num * 25 / 100
+		jackNum, _ := decimal.NewFromFloat(num).Mul(decimal.NewFromFloat(model.PercentBuyTicketToJack)).Div(decimal.NewFromFloat(model.PercentBase)).Float64()
 		//注入种子池
-		seedNum := num * 25 / 100
+		seedNum, _ := decimal.NewFromFloat(num).Mul(decimal.NewFromFloat(model.PercentBuyTicketToSeed)).Div(decimal.NewFromFloat(model.PercentBase)).Float64()
 		gameInfo, err := dao.FaBscGameInfo.Ctx(ctx).Where("status=1").One()
 		if err != nil || gameInfo == nil {
 			g.Log().Debug("Service DoListenTask DelBuyTicket GameInfo One Err:", err)
@@ -227,7 +228,7 @@ func (s *listenTask) DealBuyTicket(c context.Context, param *chainService.BscGam
 		//更新系统已兑换门票
 		spendInfo, _ := dao.FaBscBaseInfo.Ctx(ctx).Where("theKey=?", model.BaseSpendKey).One()
 		if spendInfo != nil {
-			spend := ticketNum + gconv.Float64(spendInfo.TheValue)
+			spend, _ := decimal.NewFromFloat(ticketNum).Add(decimal.NewFromFloat(gconv.Float64(spendInfo.TheValue))).Float64()
 			_, _ = dao.FaBscBaseInfo.Ctx(ctx).Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": spend, "updated": time.Now().Unix()})
 		}
 		return nil

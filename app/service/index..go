@@ -21,6 +21,7 @@ func (s *indexService) GetBaseInfo() *model.BscBaseInfo {
 	data.JoinPercent = model.PercentBase / model.PercentJoinTicket
 	data.OwnAddr = model.OwnAddr
 	data.SpendNum, data.TicketPercent, data.SpendTicket = GetPercent()
+	data.SpendNum -= 1
 	imgs := GetConfig("imgPath")
 	data.ImgInfo = gconv.Map(imgs)
 	return data

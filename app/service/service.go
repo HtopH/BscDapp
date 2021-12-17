@@ -58,7 +58,8 @@ func GetBigInt(num float64, decimals string) *big.Int {
 }
 
 func BigIntToF(num *big.Int, decimals string) float64 {
-	return gconv.Float64(num.String()) / gconv.Float64(decimals)
+	res, _ := decimal.NewFromFloat(gconv.Float64(num.String())).Div(decimal.NewFromFloat(gconv.Float64(decimals))).Float64()
+	return res
 }
 
 func GetPercent() (tempN int, percent float64, spend float64) {

@@ -46,6 +46,20 @@ func (a *indexApi) BaseInfo(r *ghttp.Request) {
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
 
+// @summary 地址信息
+// @tags    系统信息
+// @produce json
+// @router  /api/index/base-addr-info  [GET]
+// @success 200 {object} model.AddrInfo "执行结果"
+func (a *indexApi) BaseAddrInfo(r *ghttp.Request) {
+	res := model.AddrInfo{
+		TicketAddr:   model.TicketAddr,
+		UsdtAddr:     model.UsdtAddr,
+		ContractAddr: model.ContractAddr.String(),
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+}
+
 // @summary 场次信息
 // @tags    系统信息
 // @produce json

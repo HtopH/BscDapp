@@ -32,6 +32,10 @@ const (
 	RpcWsUrl = "wss://speedy-nodes-nyc.moralis.io/783b783a3e310fa8f97290a5/bsc/testnet/ws"
 	//钱包账户私钥
 	PrivateKey = "841da76418e1314614ed7d88ba3f29067f5d532304c70499f331fb3aab9b7fd8"
+	//粮草地址
+	TicketAddr = "0x843c95480D6BC6E23C33adb0ec5D2246CBA8E1E9"
+	//USDT地址
+	UsdtAddr = "0xD47636fb8bdBAF9AF3c90bc913800e3bf72E7cB4"
 )
 
 const (
@@ -82,12 +86,14 @@ const (
 	UserCreditFour  = "refCredit" //推荐奖
 
 	//数值比例设置
-	PercentBase       = 100 //基础数值
-	PercentJoinTicket = 10  //投资消耗门票比例
-	PercentJoinOut    = 70  //投资给出比例
-	PercentJoinReturn = 140 //投资回报比例
-	PercentJoinToJack = 15  //投资抽取到奖池比例
-	PercentJoinToSeed = 15  //投资抽取到种子池比例
+	PercentBase            float64 = 100 //基础数值
+	PercentJoinTicket      float64 = 10  //投资消耗门票比例
+	PercentJoinOut         float64 = 70  //投资给出比例
+	PercentJoinReturn      float64 = 140 //投资回报比例
+	PercentJoinToJack      float64 = 15  //投资抽取到奖池比例
+	PercentJoinToSeed      float64 = 15  //投资抽取到种子池比例
+	PercentBuyTicketToJack float64 = 25  //兑换粮草抽取到奖池比例
+	PercentBuyTicketToSeed float64 = 25  //兑换粮草到种子池比例
 
 	//奖池金额与对应的倒计时
 	GameLevelOneTime   = 60 * 60 * 24
