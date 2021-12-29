@@ -403,6 +403,11 @@
 		"inputs": [
 			{
 				"internalType": "address",
+				"name": "user_addr",
+				"type": "address"
+			},
+			{
+				"internalType": "address",
 				"name": "ref_addr",
 				"type": "address"
 			}

@@ -58,6 +58,20 @@ func (s *newGame) Init() {
 	}
 }
 
+//注册
+func (s *newGame) Register(param *model.UserRegisterReq) (string, error) {
+	auth, err := s.GetTransactOpts()
+	if err != nil {
+		return "", err
+	}
+	res, err := s.Conn.Register(auth, common.HexToAddress(param.UserAddr), common.HexToAddress(param.RefAddr))
+	if err != nil {
+		g.Log().Debug("Service NewGame Register Err :", err)
+		return "", err
+	}
+	return res.Hash().String(), nil
+}
+
 //系统支付给用户
 func (s *newGame) Pay(param *model.TaskAddUserBalance) (string, error) {
 	auth, err := s.GetTransactOpts()

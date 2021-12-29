@@ -16,6 +16,35 @@ var User = user{}
 
 type user struct{}
 
+//注册
+func (s *user) Register(c context.Context, param *model.UserRegisterReq) error {
+	return dao.FaBscUser.Transaction(c, func(ctx context.Context, tx *gdb.TX) error {
+		count, err := dao.FaBscUser.Where("address=?", param.UserAddr).LockUpdate().Count()
+		if err != nil {
+			g.Log().Debug("Service User Register User Count Err:", err)
+		}
+		if count != 0 {
+			return gerror.New("用户已注册")
+		}
+		if param.RefAddr != "" {
+			if count, _ = dao.FaBscUser.Where("address=?", param.RefAddr).Count(); count == 0 {
+				return gerror.New("推荐人不存在")
+			}
+		} else {
+			param.RefAddr = model.OwnAddr
+		}
+		//注册,添加交易任务
+		taskInfo := model.FaBscTask{
+			Type:     model.SendRegister,
+			Task:     gconv.String(param),
+			Created:  int(time.Now().Unix()),
+			TaskTime: int(time.Now().Unix()),
+		}
+
+		return User.AddTask(ctx, &taskInfo)
+	})
+}
+
 //获取登陆会员信息
 func (s *user) GetUser(r *ghttp.Request) *model.FaBscUser {
 	user := new(model.FaBscUser)

@@ -17,7 +17,7 @@ type PageReq struct {
 
 var (
 	//合约地址
-	ContractAddr = common.HexToAddress("0x5625Cf2D8e8E0492A5B190B897973ebC8e57a7c1")
+	ContractAddr = common.HexToAddress("0x59F569dBB52c014a388Ef9E262E3BC97fb533acD")
 	//操作员地址
 	FromAddr = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")
 )
@@ -64,6 +64,7 @@ const (
 	SendPay      = "pay"
 	SendSetRound = "setRound"
 	SendUserOut  = "userOut"
+	SendRegister = "register"
 
 	//余额变动事件
 	CreditReward       = "returnReward"   //投资回报

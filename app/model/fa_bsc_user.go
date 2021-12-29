@@ -12,6 +12,11 @@ import (
 type FaBscUser internal.FaBscUser
 
 // Fill with you ideas below.
+type UserRegisterReq struct {
+	UserAddr string `v:"required#请输入用户地址"`
+	RefAddr  string
+}
+
 type UserInfo struct {
 	*FaBscUser
 	ReferReward float64 //累计推荐奖励

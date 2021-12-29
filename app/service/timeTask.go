@@ -69,13 +69,20 @@ func (s *timeTask) FinishBscTask() {
 			res, err = NewGame.Pay(&param)
 		case model.SendSetRound:
 			res, err = NewGame.SetRound()
-			//case model.SendUserOut:
-			//	var param model.TaskUserOut
-			//	err = gconv.Struct(task.Task, &param)
-			//	if err != nil {
-			//		g.Log().Debug("Service TimeTask FinishBscTask SendAddBalance Struct Err:", err)
-			//	}
-			//	res, err = NewGame.UserOut(&param)
+		//case model.SendUserOut:
+		//	var param model.TaskUserOut
+		//	err = gconv.Struct(task.Task, &param)
+		//	if err != nil {
+		//		g.Log().Debug("Service TimeTask FinishBscTask SendAddBalance Struct Err:", err)
+		//	}
+		//	res, err = NewGame.UserOut(&param)
+		case model.SendRegister:
+			var param model.UserRegisterReq
+			err = gconv.Struct(task.Task, &param)
+			if err != nil {
+				g.Log().Debug("Service TimeTask FinishBscTask SendRegister Struct Err:", err)
+			}
+			res, err = NewGame.Register(&param)
 		}
 
 		if err != nil {

@@ -37,7 +37,7 @@ func (a *indexApi) Test(r *ghttp.Request) {
 }
 
 // @summary 基础配置
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/base-info   [GET]
 // @success 200 {object} model.BscBaseInfo "执行结果"
@@ -47,7 +47,7 @@ func (a *indexApi) BaseInfo(r *ghttp.Request) {
 }
 
 // @summary 地址信息
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/base-addr-info  [GET]
 // @success 200 {object} model.AddrInfo "执行结果"
@@ -61,7 +61,7 @@ func (a *indexApi) BaseAddrInfo(r *ghttp.Request) {
 }
 
 // @summary 场次信息
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/game-info   [GET]
 // @success 200 {object} model.GameIndexInfo "执行结果"
@@ -74,7 +74,7 @@ func (a *indexApi) GameInfo(r *ghttp.Request) {
 }
 
 // @summary 收益排行
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @param   page formData int false "页码"
 // @param   size formData int false "每页数量"
@@ -95,7 +95,7 @@ func (a *indexApi) GetRewardTop(r *ghttp.Request) {
 }
 
 // @summary 登录
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @param   address formData string true "钱包地址"
 // @router  /api/index/login  [POST]
@@ -106,18 +106,20 @@ func (a *indexApi) Login(r *ghttp.Request) {
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
 }
 
-// @summary 公告
-// @tags    系统信息
+// @summary 读取配置
+// @tags    系统
 // @produce json
-// @router  /api/index/notice  [GET]
+// @param   key formData string true "配置 notice_title:公告标题，notice:公告内容"
+// @router  /api/index/notice  [POST]
 // @success 200 {object} service.JsonResponse "执行结果"
 func (a *indexApi) Notice(r *ghttp.Request) {
-	res := service.GetConfig("notice")
+	key := r.GetString("key")
+	res := service.GetConfig(key)
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
 }
 
 // @summary 扇型图比例
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/token-allocation  [GET]
 // @success 200 {object} service.JsonResponse "执行结果"
@@ -128,7 +130,7 @@ func (a *indexApi) TokenAllocation(r *ghttp.Request) {
 }
 
 // @summary 市场规则
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/market-rule  [GET]
 // @success 200 {object} service.JsonResponse "执行结果"
@@ -138,7 +140,7 @@ func (a *indexApi) MarketRule(r *ghttp.Request) {
 }
 
 // @summary 修改粮草消耗
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @param   spend formData float64 true "数量"
 // @router  /api/index/set-spend  [POST]
@@ -158,7 +160,7 @@ func (a *indexApi) SetSpend(r *ghttp.Request) {
 }
 
 // @summary 马匹信息
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/get-horse  [GET]
 // @success 200 {object} model.HorseInfo "执行结果"
@@ -168,7 +170,7 @@ func (a *indexApi) GetHorse(r *ghttp.Request) {
 }
 
 // @summary 滚动消息
-// @tags    系统信息
+// @tags    系统
 // @produce json
 // @router  /api/index/scroll-msg  [GET]
 // @success 200 {object} service.JsonResponse "执行结果"
@@ -191,6 +193,25 @@ func (a *indexApi) ScrollMsg(r *ghttp.Request) {
 	}
 	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
 
+}
+
+// @summary 会员注册
+// @tags    系统
+// @produce json
+// @param   userAddr formData string true "会员钱包地址"
+// @param   refAddr formData string false "推荐人钱包地址"
+// @router  /api/index/register  [POST]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) Register(r *ghttp.Request) {
+	var req *model.UserRegisterReq
+	if err := r.Parse(&req); err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	err := service.User.Register(r.Context(), req)
+	if err != nil {
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+	}
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
 }
 
 //初始化合约数据表

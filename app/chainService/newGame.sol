@@ -81,9 +81,9 @@ contract NewGame {
         idToAddr[playerId] =0x125a0daEE26BD73B37A3c2a86c84426c68743750;
     }
 
-    function register(address ref_addr) external {
-        require(ref_addr!=msg.sender,"ref_addr can not be self!");
-        require(addrToId[msg.sender]==0,"user is exist!");
+    function register(address user_addr,address ref_addr) external {
+        require(ref_addr!=user_addr,"ref_addr can not be self!");
+        require(addrToId[user_addr]==0,"user is exist!");
         uint64 refId;
 
         if (addrToId[ref_addr]!=0){
@@ -91,7 +91,6 @@ contract NewGame {
         }else{
             refId=1;
         }
-
         Player memory _player = Player({
             getTickets:0,
             useTickets:0,
@@ -101,9 +100,9 @@ contract NewGame {
         });
         players.push(_player);
         uint64 playerId = uint64(players.length - 1);
-        addrToId[msg.sender] = playerId;
-        idToAddr[playerId] =msg.sender;
-        emit registerLog(1,playerId,msg.sender,refId);
+        addrToId[user_addr] = playerId;
+        idToAddr[playerId] =user_addr;
+        emit registerLog(1,playerId,user_addr,refId);
     }
 
     function payForTickets(uint128 _value) external {
