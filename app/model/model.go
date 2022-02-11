@@ -17,7 +17,7 @@ type PageReq struct {
 
 var (
 	//合约地址
-	ContractAddr = common.HexToAddress("0x59F569dBB52c014a388Ef9E262E3BC97fb533acD")
+	ContractAddr = common.HexToAddress("0xba81B60A1cA93d8763a24F55fECF3d6FF0DA1307")
 	//操作员地址
 	FromAddr = common.HexToAddress("0x125a0daEE26BD73B37A3c2a86c84426c68743750")
 )

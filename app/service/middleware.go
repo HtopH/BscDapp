@@ -1,6 +1,7 @@
 package service
 
 import (
+	"BscDapp/app/common"
 	"BscDapp/app/dao"
 	"github.com/gogf/gf/frame/g"
 	"github.com/gogf/gf/net/ghttp"
@@ -31,6 +32,9 @@ func (s *middleware) Auth(r *ghttp.Request) {
 
 //设置跨域信任域名
 func (s *middleware) SetCORS(r *ghttp.Request) {
+	//设置语言类型
+	r.SetCtxVar(common.LanguageKey, r.Cookie.Get("language", common.LangZH))
+
 	corsOptions := r.Response.DefaultCORSOptions()
 	corsOptions.AllowDomain = []string{"localhost:8080", "localhost:8081", "183.3.158.22:8597"}
 	r.Response.CORS(corsOptions)

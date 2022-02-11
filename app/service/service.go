@@ -1,6 +1,7 @@
 package service
 
 import (
+	"BscDapp/app/common"
 	"BscDapp/app/dao"
 	"BscDapp/app/model"
 	"github.com/gogf/gf/frame/g"
@@ -107,4 +108,16 @@ func GetNo() (int, float64) {
 		n = 1
 	}
 	return n, spendTickets.Float64()
+}
+
+//多语言
+func Multilingual(langType string, msg string) string {
+	lang := gconv.Int(langType) - 1
+	if lang >= len(common.MultiMsg) {
+		return msg
+	}
+	if res, ok := common.MultiMsg[lang][msg]; ok {
+		return res
+	}
+	return msg
 }

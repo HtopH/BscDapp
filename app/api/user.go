@@ -23,7 +23,7 @@ func (a *user) GetUserInfo(r *ghttp.Request) {
 	userInfo := service.User.GetUser(r)
 	data.FaBscUser = userInfo
 	data.ReferReward, _ = dao.FaBscCredit.Where("uid=? and type=?", userInfo.Id, model.CreditRefReward).Sum(dao.FaBscCredit.Columns.Num)
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 转账记录
@@ -38,15 +38,15 @@ func (a *user) GetTransferList(r *ghttp.Request) {
 		req *model.UserInfoRep
 	)
 	if err := r.Parse(&req); err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
 	userInfo := service.User.GetUser(r)
 	req.UserAddr = userInfo.Address
 	data, err := service.User.TransferList(r.Context(), req)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 兑换记录
@@ -61,15 +61,15 @@ func (a *user) GetTicketList(r *ghttp.Request) {
 		req *model.UserInfoRep
 	)
 	if err := r.Parse(&req); err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
 	userInfo := service.User.GetUser(r)
 	req.UserId = userInfo.Id
 	data, err := service.User.TicketList(r.Context(), req)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 一代直推会员
@@ -84,15 +84,15 @@ func (a *user) GetFirstTeam(r *ghttp.Request) {
 		req *model.UserInfoRep
 	)
 	if err := r.Parse(&req); err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
 	userInfo := service.User.GetUser(r)
 	req.UserId = userInfo.Id
 	data, err := service.User.FirstLevelTeam(r.Context(), req)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 校验参与活动资格(调用合约Join前调用校验)
@@ -104,9 +104,9 @@ func (a *user) CheckUserJoin(r *ghttp.Request) {
 	userInfo := service.User.GetUser(r)
 	gameInfo, err := dao.FaBscUserGame.Where("uid=? and status<3", userInfo.Id).One()
 	if err != nil || gameInfo != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: common.Failure})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.Failure)})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 会员活动信息
@@ -118,9 +118,9 @@ func (a *user) UserGameInfo(r *ghttp.Request) {
 	userInfo := service.User.GetUser(r)
 	data, err := service.User.GetUserGameInfo(r.Context(), userInfo.Id)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 获得投资收益(转卖)
@@ -132,9 +132,9 @@ func (a *user) GetGameReward(r *ghttp.Request) {
 	userInfo := service.User.GetUser(r)
 	err := service.User.GameReward(r.Context(), userInfo.Id)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 获得推荐奖统计
@@ -146,7 +146,7 @@ func (a *user) GetRefRewardInfo(r *ghttp.Request) {
 	userInfo := service.User.GetUser(r)
 	data, err := service.User.UserRefReward(userInfo.Id, 5)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }

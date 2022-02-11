@@ -24,11 +24,11 @@ func (s *user) Register(c context.Context, param *model.UserRegisterReq) error {
 			g.Log().Debug("Service User Register User Count Err:", err)
 		}
 		if count != 0 {
-			return gerror.New("用户已注册")
+			return gerror.New("User registered")
 		}
 		if param.RefAddr != "" {
 			if count, _ = dao.FaBscUser.Where("address=?", param.RefAddr).Count(); count == 0 {
-				return gerror.New("推荐人不存在")
+				return gerror.New("The referee does not exist")
 			}
 		} else {
 			param.RefAddr = model.OwnAddr
@@ -335,7 +335,7 @@ func (s *user) GameReward(c context.Context, Uid int) error {
 		userGameInfo, err := dao.FaBscUserGame.Ctx(ctx).Where("uid=? and status=2", Uid).One()
 		if err != nil || userGameInfo == nil {
 			g.Log().Debug("Api User GetGameReward userGameInfo Find Err:", err)
-			return gerror.New("信息不存在")
+			return gerror.New("Information doesn't exist")
 		}
 		_, err = dao.FaBscUserGame.Ctx(ctx).Where("id=?", userGameInfo.Id).Update(g.Map{"status": 3, "updated": time.Now().Unix()})
 		if err != nil {

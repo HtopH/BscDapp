@@ -13,7 +13,7 @@ type FaBscUser internal.FaBscUser
 
 // Fill with you ideas below.
 type UserRegisterReq struct {
-	UserAddr string `v:"required#请输入用户地址"`
+	UserAddr string `v:"required#Please enter the user address"`
 	RefAddr  string
 }
 

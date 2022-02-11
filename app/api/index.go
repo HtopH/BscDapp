@@ -16,26 +16,6 @@ var Index = indexApi{}
 
 type indexApi struct{}
 
-func (a *indexApi) Test(r *ghttp.Request) {
-	//baseInfo, _ := dao.FaBscBaseInfo.Where("theKey=?", model.BaseReadKey).One()
-	//num, err := strconv.Atoi(baseInfo.TheValue)
-	//if err != nil {
-	//	num = 1
-	//	g.Log().Debug("Service ListenTask strconv Err:", err)
-	//}
-	//service.NewGame.ReadBlockLog(int64(num))
-
-	//service.ListenTask.DealGameStatus(r.Context())
-
-	//n2 := service.GetNo()
-	//n3 := service.GetBase(n2)
-	//n1 := service.GetPercent()
-	//g.Log().Debug(n2, n3, n1)
-
-	g.Redis().DoVar("PUBLISH", "bsc:task", g.Map{"doType": 1})
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
-}
-
 // @summary 基础配置
 // @tags    系统
 // @produce json
@@ -43,7 +23,10 @@ func (a *indexApi) Test(r *ghttp.Request) {
 // @success 200 {object} model.BscBaseInfo "执行结果"
 func (a *indexApi) BaseInfo(r *ghttp.Request) {
 	res := service.Index.GetBaseInfo()
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{
+		Code:    http.StatusOK,
+		Data:    res,
+		Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 地址信息
@@ -57,7 +40,7 @@ func (a *indexApi) BaseAddrInfo(r *ghttp.Request) {
 		UsdtAddr:     model.UsdtAddr,
 		ContractAddr: model.ContractAddr.String(),
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 场次信息
@@ -68,9 +51,9 @@ func (a *indexApi) BaseAddrInfo(r *ghttp.Request) {
 func (a *indexApi) GameInfo(r *ghttp.Request) {
 	data, err := service.Index.GetGameBaseInfo()
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 收益排行
@@ -85,13 +68,13 @@ func (a *indexApi) GetRewardTop(r *ghttp.Request) {
 		req *model.PageReq
 	)
 	if err := r.Parse(&req); err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
 	data, err := service.User.RewardTop(r.Context(), req)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 登录
@@ -103,7 +86,7 @@ func (a *indexApi) GetRewardTop(r *ghttp.Request) {
 func (a *indexApi) Login(r *ghttp.Request) {
 	address := r.GetString("address")
 	r.Cookie.Set("address", address)
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 读取配置
@@ -115,7 +98,7 @@ func (a *indexApi) Login(r *ghttp.Request) {
 func (a *indexApi) Notice(r *ghttp.Request) {
 	key := r.GetString("key")
 	res := service.GetConfig(key)
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 扇型图比例
@@ -125,7 +108,7 @@ func (a *indexApi) Notice(r *ghttp.Request) {
 // @success 200 {object} service.JsonResponse "执行结果"
 func (a *indexApi) TokenAllocation(r *ghttp.Request) {
 	res := gconv.Map(service.GetConfig("token_allocation"))
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 
 }
 
@@ -136,7 +119,7 @@ func (a *indexApi) TokenAllocation(r *ghttp.Request) {
 // @success 200 {object} service.JsonResponse "执行结果"
 func (a *indexApi) MarketRule(r *ghttp.Request) {
 	res := service.GetConfig("market_rule")
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 修改粮草消耗
@@ -148,15 +131,15 @@ func (a *indexApi) MarketRule(r *ghttp.Request) {
 func (a *indexApi) SetSpend(r *ghttp.Request) {
 	spend := r.GetFloat64("spend")
 	if spend <= 0 {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: common.Failure})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.Failure)})
 	}
 	res, err := service.NewGame.SetSpend(spend)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
 	dao.FaBscBaseInfo.Where("theKey=?", model.BaseSpendKey).Update(g.Map{"theValue": spend, "updated": time.Now().Unix()})
 
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: res, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 马匹信息
@@ -166,7 +149,7 @@ func (a *indexApi) SetSpend(r *ghttp.Request) {
 // @success 200 {object} model.HorseInfo "执行结果"
 func (a *indexApi) GetHorse(r *ghttp.Request) {
 	data := service.Index.GetHorseInfo()
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 // @summary 滚动消息
@@ -177,8 +160,8 @@ func (a *indexApi) GetHorse(r *ghttp.Request) {
 func (a *indexApi) ScrollMsg(r *ghttp.Request) {
 	userGames, err := dao.FaBscUserGame.Order("id desc").Limit(10).All()
 	if err != nil || userGames == nil {
-		g.Log().Debug("Api Index ScrollMsg")
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+		g.Log().Debug("Api Index ScrollMsg:", err)
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.Failure)})
 	}
 	data := make([]string, len(userGames))
 	horse := service.Index.GetHorseInfo()
@@ -191,7 +174,7 @@ func (a *indexApi) ScrollMsg(r *ghttp.Request) {
 		}
 
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Data: data, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 
 }
 
@@ -205,13 +188,24 @@ func (a *indexApi) ScrollMsg(r *ghttp.Request) {
 func (a *indexApi) Register(r *ghttp.Request) {
 	var req *model.UserRegisterReq
 	if err := r.Parse(&req); err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
 	err := service.User.Register(r.Context(), req)
 	if err != nil {
-		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: err.Error()})
+		_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusBadRequest, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), err.Error())})
 	}
-	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: common.SuccessMsg})
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
+}
+
+// @summary 设置多语言
+// @tags    系统
+// @produce json
+// @param   lang formData string true "1:中文,2:英文"
+// @router  /api/index/set-language  [POST]
+// @success 200 {object} service.JsonResponse "执行结果"
+func (a *indexApi) SetLanguage(r *ghttp.Request) {
+	r.Cookie.Set("language", r.GetString("lang"))
+	_ = r.Response.WriteJsonExit(service.JsonResponse{Code: http.StatusOK, Message: service.Multilingual(r.GetCtxVar(common.LanguageKey).String(), common.SuccessMsg)})
 }
 
 //初始化合约数据表
